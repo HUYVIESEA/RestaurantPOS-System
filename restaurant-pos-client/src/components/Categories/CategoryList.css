@@ -1,5 +1,7 @@
 .category-list-container {
   padding: 1rem;
+  background: var(--bg-secondary);  /* ✅ Add */
+  min-height: 100vh;  /* ✅ Add */
 }
 
 .header {
@@ -11,7 +13,7 @@
 
 .header h2 {
   margin: 0;
-  color: var(--bun-brown);
+  color: var(--text-primary);  /* ✅ */
 }
 
 .category-grid {
@@ -21,17 +23,17 @@
 }
 
 .category-card {
-  background: var(--bun-card);
+  background: var(--bg-primary);  /* ✅ */
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(139,94,52,0.12);
-  border: 1px solid var(--bun-border);
+  box-shadow: var(--shadow-md);  /* ✅ */
+  border: 1px solid var(--border-light);  /* ✅ */
   padding: 1.5rem;
   transition: transform 0.3s;
 }
 
 .category-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-lg);  /* ✅ */
 }
 
 .category-icon {
@@ -46,12 +48,12 @@
 
 .category-info h3 {
   margin: 0 0 0.5rem 0;
-  color: var(--bun-brown);
+  color: var(--text-primary);  /* ✅ */
   font-size: 1.3rem;
 }
 
 .category-info p {
-  color: var(--bun-muted);
+  color: var(--text-secondary);  /* ✅ */
   margin: 0;
   line-height: 1.5;
 }
@@ -73,16 +75,16 @@
 
 .btn-primary {
   background-color: var(--bun-green);
-  color: #ffffff;
+  color: var(--white);
 }
 
 .btn-primary:hover {
-  background-color: #256928;
+  background-color: var(--bun-green-dark);
 }
 
 .btn-edit {
   background-color: var(--bun-yellow);
-  color: #3e3e3e;
+  color: var(--text-inverse);  /* ✅ */
 }
 
 .btn-edit:hover {
@@ -90,23 +92,23 @@
 }
 
 .btn-delete {
-  background-color: #e74c3c;
-  color: white;
+  background-color: var(--danger);  /* ✅ */
+  color: var(--white);
 }
 
 .btn-delete:hover {
-  background-color: #c0392b;
+  background-color: var(--danger-dark);  /* ✅ */
 }
 
 .loading,
-.error,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);  /* ✅ */
+}
+
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: var(--bun-muted);
-  font-size: 1.1rem;
-}
-
-.error {
-  color: #e74c3c;
+  color: var(--text-tertiary);  /* ✅ */
 }

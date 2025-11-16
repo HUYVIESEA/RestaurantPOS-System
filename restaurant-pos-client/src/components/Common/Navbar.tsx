@@ -1,0 +1,128 @@
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
+import './Navbar.css';
+
+const Navbar: React.FC = () => {
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
+
+  const menuItems = [
+    { path: '/', label: 'Dashboard', icon: 'fa-chart-line' },
+  { path: '/tables', label: 'Bàn', icon: 'fa-utensils' },
+    { path: '/orders', label: 'Đơn hàng', icon: 'fa-receipt' },
+    { path: '/products', label: 'Sản phẩm', icon: 'fa-box' },
+  { path: '/categories', label: 'Danh mục', icon: 'fa-folder' },
+    { path: '/users', label: 'Người dùng', icon: 'fa-users' },
+  ];
+
+  return (
+<nav className="modern-navbar">
+      <div className="navbar-container">
+      {/* Logo */}
+        <div className="navbar-brand">
+  <Link to="/" className="brand-link">
+    <i className="fas fa-bowl-food brand-icon"></i>
+          <span className="brand-text">BÚN ĐẬU MẸT</span>
+          </Link>
+        </div>
+
+        {/* Mobile Menu Toggle */}
+    <button 
+          className="mobile-menu-toggle"
+onClick={() => setShowMobileMenu(!showMobileMenu)}
+>
+          <i className={`fas ${showMobileMenu ? 'fa-times' : 'fa-bars'}`}></i>
+        </button>
+
+        {/* Navigation Menu */}
+        <ul className={`navbar-menu ${showMobileMenu ? 'mobile-open' : ''}`}>
+    {menuItems.map(item => (
+            <li key={item.path} className="nav-item">
+  <Link
+             to={item.path}
+           className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
+    onClick={() => setShowMobileMenu(false)}
+           >
+     <i className={`fas ${item.icon} nav-icon`}></i>
+            <span className="nav-label">{item.label}</span>
+  </Link>
+    </li>
+          ))}
+        </ul>
+
+        {/* Right Side Actions */}
+  <div className="navbar-actions">
+   {/* Notification Bell */}
+   <NotificationBell />
+ 
+          {/* Theme Toggle */}
+          <ThemeToggle />
+          
+  {/* User Menu */}
+  <div className="navbar-user">
+       <button
+ className="user-menu-button"
+         onClick={() => setShowUserMenu(!showUserMenu)}
+       >
+     <div className="user-avatar">
+       <i className="fas fa-user-circle"></i>
+     </div>
+            <div className="user-info">
+    <span className="user-name">{user?.fullName}</span>
+       <span className="user-role">
+          <i className={`fas ${user?.role === 'Admin' ? 'fa-crown' : 'fa-user'}`}></i>
+ {user?.role}
+   </span>
+     </div>
+      <i className={`fas fa-chevron-${showUserMenu ? 'up' : 'down'} dropdown-arrow`}></i>
+        </button>
+
+       {/* Dropdown Menu */}
+  {showUserMenu && (
+        <div className="user-dropdown">
+     <Link
+      to="/profile"
+         className="dropdown-item"
+onClick={() => setShowUserMenu(false)}
+     >
+         <i className="fas fa-user dropdown-icon"></i>
+      <span>Hồ sơ cá nhân</span>
+  </Link>
+    <Link
+     to="/change-password"
+          className="dropdown-item"
+         onClick={() => setShowUserMenu(false)}
+           >
+ <i className="fas fa-key dropdown-icon"></i>
+       <span>Đổi mật khẩu</span>
+     </Link>
+              <div className="dropdown-divider"></div>
+        <button
+      className="dropdown-item logout-item"
+ onClick={() => {
+        setShowUserMenu(false);
+           logout();
+      }}
+     >
+     <i className="fas fa-right-from-bracket dropdown-icon"></i>
+           <span>Đăng xuất</span>
+  </button>
+    </div>
+    )}
+  </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

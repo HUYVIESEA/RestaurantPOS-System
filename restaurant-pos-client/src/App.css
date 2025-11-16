@@ -1,6 +1,16 @@
 .App {
   min-height: 100vh;
-  background-color: var(--bun-bg);
+  background-color: var(--bg-secondary);  /* ✅ Use theme variable */
+}
+
+/* ✅ Dark mode specific */
+[data-theme="dark"] .App {
+  background-color: var(--bg-secondary);  /* Will be #2d2d2d in dark mode */
+}
+
+main {
+  background-color: var(--bg-secondary);  /* ✅ Add */
+  min-height: calc(100vh - 70px);  /* Subtract navbar height */
 }
 
 .navbar {

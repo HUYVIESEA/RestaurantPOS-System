@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { productService } from '../../services/productService';
 import { categoryService } from '../../services/categoryService';
 import { Product, Category } from '../../types';
+import { formatPriceInput, cleanPriceInput, formatCurrency } from '../../utils/priceUtils';
+import { SkeletonForm, LoadingOverlay } from '../Common/Skeleton'; // ✅ ADD
 import './ProductForm.css';
 
 const ProductForm: React.FC = () => {
@@ -100,10 +102,9 @@ const ProductForm: React.FC = () => {
         [name]: (e.target as HTMLInputElement).checked,
       }));
     } else if (name === 'price') {
-      // ✅ Allow empty or valid numbers only
-      if (value === '' || /^\d+$/.test(value)) {
-        setFormData(prev => ({ ...prev, [name]: value }));
-      }
+      // ✅ Use price utility for clean input
+      const cleanedPrice = cleanPriceInput(value);
+      setFormData(prev => ({ ...prev, [name]: cleanedPrice }));
     } else if (name === 'categoryId') {
       setFormData(prev => ({ ...prev, [name]: Number(value) }));
     } else {
@@ -152,18 +153,18 @@ const ProductForm: React.FC = () => {
           <div className="form-group">
             <label htmlFor="price">Giá (VNĐ) *</label>
             <input
-              type="text" // ✅ Changed from "number" to "text" for better control
+              type="text"
               id="price"
               name="price"
-              value={formData.price}
+              value={formatPriceInput(formData.price)} // ✅ Format for display
               onChange={handleChange}
               required
-              placeholder="Nhập giá sản phẩm"
-              inputMode="numeric" // ✅ Show numeric keyboard on mobile
+              placeholder="0"
+              inputMode="numeric"
             />
             {formData.price && (
               <small className="price-preview">
-                {Number(formData.price).toLocaleString('vi-VN')} đ
+                💰 {formatCurrency(formData.price)} {/* ✅ Use utility */}
               </small>
             )}
           </div>
@@ -218,6 +219,10 @@ const ProductForm: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {(loading && <LoadingOverlay />) /* ✅ Show loading overlay */}
+      {/* ✅ Show skeleton form when loading categories or product */}
+      {(!categories.length && !isEditMode) && <SkeletonForm />}
     </div>
   );
 };

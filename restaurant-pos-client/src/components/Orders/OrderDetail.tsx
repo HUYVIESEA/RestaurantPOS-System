@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { Order, OrderItem } from '../../types';
+import { useToast } from '../../contexts/ToastContext'; // ✅ ADD
 import AddItemDialog from './AddItemDialog';
-import CancelItemDialog from './CancelItemDialog'; // ✅ NEW
+import CancelItemDialog from './CancelItemDialog';
 import './OrderDetail.css';
 
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { showSuccess, showError, showWarning } = useToast(); // ✅ ADD
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showCancelDialog, setShowCancelDialog] = useState(false); // ✅ NEW
-  const [cancelingItem, setCancelingItem] = useState<OrderItem | null>(null); // ✅ NEW
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelingItem, setCancelingItem] = useState<OrderItem | null>(null);
+
+  const fromTables = location.state?.from === 'tables';
 
   useEffect(() => {
     if (id) {
@@ -32,31 +37,31 @@ const OrderDetail: React.FC = () => {
     } catch (err) {
       setError('Không thể tải chi tiết đơn hàng.');
       console.error('Error fetching order:', err);
-  } finally {
-setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   // ✅ NEW: Handle add item
   const handleAddItem = async (productId: number, quantity: number, notes: string) => {
     try {
-    // Call API to add item to order
-   await orderService.addItem(parseInt(id!), {
+      // Call API to add item to order
+      await orderService.addItem(parseInt(id!), {
         productId,
-  quantity,
+        quantity,
         notes: notes || undefined,
       });
       
       // Close dialog
-  setShowAddDialog(false);
+      setShowAddDialog(false);
       
       // Reload order to show new item
- await fetchOrderDetail();
+      await fetchOrderDetail();
       
-      alert(`✅ Đã thêm món thành công!\nSố lượng: ${quantity}`);
+      showSuccess(`✅ Đã thêm món thành công!\nSố lượng: ${quantity}`); // ✅ MODIFY
     } catch (err) {
       console.error('Error adding item:', err);
-    alert('Không thể thêm món');
+      showError('Không thể thêm món'); // ✅ MODIFY
     }
   };
 
@@ -72,20 +77,20 @@ setLoading(false);
 
   const handleCancelSelected = async () => {
     if (selectedItems.size === 0) {
- alert('Vui lòng chọn món cần hủy');
+      showWarning('Vui lòng chọn món cần hủy'); // ✅ CHANGED
       return;
     }
 
     const itemsToCancel = order?.orderItems?.filter(item => 
       selectedItems.has(item.id)
-    ) || [];
+) || [];
 
-    const totalCancelled = itemsToCancel.reduce(
+const totalCancelled = itemsToCancel.reduce(
       (sum, item) => sum + (item.unitPrice * item.quantity), 
     0
     );
 
-    const confirmMessage = `Bạn có chắc muốn hủy ${selectedItems.size} món?\n` +
+ const confirmMessage = `Bạn có chắc muốn hủy ${selectedItems.size} món?\n` +
    `Tổng tiền: ${totalCancelled.toLocaleString('vi-VN')} đ`;
 
     if (!window.confirm(confirmMessage)) return;
@@ -98,47 +103,45 @@ setLoading(false);
       ) || [];
 
   if (remainingItems.length === 0) {
-        // If all items cancelled, cancel the order
+     // If all items cancelled, cancel the order
       await orderService.updateStatus(parseInt(id!), 'Cancelled');
-        alert('✅ Đã hủy tất cả món. Đơn hàng chuyển sang trạng thái "Đã hủy".');
+   showSuccess('Đã hủy tất cả món. Đơn hàng chuyển sang trạng thái "Đã hủy".'); // ✅ CHANGED
         navigate('/orders');
       } else {
         // Update order with remaining items
       setOrder({
-          ...order!,
+...order!,
           orderItems: remainingItems,
           totalAmount: order!.totalAmount - totalCancelled
      });
-        setSelectedItems(new Set());
-        alert(`✅ Đã hủy ${selectedItems.size} món thành công!`);
+      setSelectedItems(new Set());
+        showSuccess(`Đã hủy ${selectedItems.size} món thành công!`); // ✅ CHANGED
       }
     } catch (err) {
-      setError('Không thể hủy món.');
+    setError('Không thể hủy món.');
       console.error('Error cancelling items:', err);
     }
   };
 
   const handleCancelSingleItem = async (itemId: number) => {
-  const item = order?.orderItems?.find(i => i.id === itemId);
+    const item = order?.orderItems?.find(i => i.id === itemId);
     if (!item) return;
 
     const itemTotal = item.unitPrice * item.quantity;
-const confirmMessage = `Hủy món: ${item.product?.name}\n` +
-    `Số lượng: ${item.quantity}\n` +
+    const confirmMessage = `Hủy món: ${item.product?.name}\n` +
+      `Số lượng: ${item.quantity}\n` +
       `Tổng: ${itemTotal.toLocaleString('vi-VN')} đ`;
 
     if (!window.confirm(confirmMessage)) return;
 
     try {
-      // ✅ Use new API
       await orderService.removeItem(parseInt(id!), itemId);
-   
-   // Reload order
       await fetchOrderDetail();
-   alert('✅ Đã hủy món thành công!');
+      showSuccess('Đã hủy món thành công!'); // ✅ CHANGED
     } catch (err) {
       setError('Không thể hủy món.');
-   console.error('Error:', err);
+      console.error('Error:', err);
+      showError('Không thể hủy món.');
     }
   };
 
@@ -169,30 +172,31 @@ const confirmMessage = `Hủy món: ${item.product?.name}\n` +
   const handleCancelConfirm = async (cancelQuantity: number) => {
     if (!cancelingItem) return;
 
-try {
-  const remainingQuantity = cancelingItem.quantity - cancelQuantity;
+    try {
+      const remainingQuantity = cancelingItem.quantity - cancelQuantity;
 
       if (remainingQuantity === 0) {
-   // Remove item completely
-   await orderService.removeItem(parseInt(id!), cancelingItem.id);
-      } else {
-   // Update quantity
-     await orderService.updateItemQuantity(parseInt(id!), cancelingItem.id, remainingQuantity);
+        // Remove item completely
+        await orderService.removeItem(parseInt(id!), cancelingItem.id);
+   } else {
+        // Update quantity
+        await orderService.updateItemQuantity(parseInt(id!), cancelingItem.id, remainingQuantity);
       }
 
    // Close dialog and reload
-    setShowCancelDialog(false);
-      setCancelingItem(null);
+      setShowCancelDialog(false);
+    setCancelingItem(null);
       await fetchOrderDetail();
-      
-      const message = remainingQuantity === 0
-    ? `✅ Đã xóa món "${cancelingItem.product?.name}"`
-     : `✅ Đã hủy ${cancelQuantity} phần. Còn lại ${remainingQuantity} phần`;
-      alert(message);
+ 
+   const message = remainingQuantity === 0
+        ? `Đã xóa món "${cancelingItem.product?.name}"`
+ : `Đã hủy ${cancelQuantity} phần. Còn lại ${remainingQuantity} phần`;
+      showSuccess(message);
 
- } catch (err) {
-   setError('Không thể hủy món.');
-   console.error('Error:', err);
+    } catch (err) {
+      setError('Không thể hủy món.');
+      console.error('Error:', err);
+      showError('Không thể hủy món.');
     }
   };
 
@@ -381,17 +385,17 @@ Bàn: {order.table?.tableNumber || 'N/A'} |
     if (window.confirm('Hoàn thành đơn hàng này?')) {
        try {
            await orderService.updateStatus(order.id, 'Completed');
-       alert(`✅ Đơn hàng đã hoàn thành!\nBàn ${order.table?.tableNumber} đã được trả tự động.`);
-          navigate('/tables');
-     } catch (err) {
-    console.error('Error completing order:', err);
-       alert('Không thể hoàn thành đơn hàng');
-        }
-      }
-   }}
-       >
-      ✓ Hoàn thành đơn
-       </button>
+       showSuccess(`Đơn hàng đã hoàn thành!\nBàn ${order.table?.tableNumber} đã được trả tự động.`);
+      navigate('/tables');
+      } catch (err) {
+           console.error('Error completing order:', err);
+       showError('Không thể hoàn thành đơn hàng');
+       }
+    }
+              }}
+  >
+              ✓ Hoàn thành đơn
+      </button>
           </>
 )}
       </div>

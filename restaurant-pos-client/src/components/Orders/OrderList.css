@@ -1,5 +1,7 @@
 .order-list-container {
   padding: 1rem;
+  background: var(--bg-secondary);  /* ✅ Add */
+  min-height: 100vh;  /* ✅ Add */
 }
 
 .header {
@@ -11,15 +13,15 @@
 
 .header h2 {
   margin: 0;
-  color: var(--bun-brown);
+  color: var(--text-primary);  /* ✅ */
 }
 
 .orders-table {
-  background: var(--bun-card);
+  background: var(--bg-primary);  /* ✅ */
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(139,94,52,0.12);
+  box-shadow: var(--shadow-md);  /* ✅ */
   overflow-x: auto;
-  border: 1px solid var(--bun-border);
+  border: 1px solid var(--border-light);  /* ✅ */
 }
 
 table {
@@ -28,24 +30,25 @@ table {
 }
 
 thead {
-  background-color: #fff3c2;
+  background-color: var(--gray-100);  /* ✅ */
 }
 
 th {
   padding: 1rem;
   text-align: left;
-font-weight: 600;
-  color: var(--bun-brown);
-  border-bottom: 2px solid var(--bun-border);
+  font-weight: 600;
+  color: var(--text-primary);  /* ✅ */
+  border-bottom: 2px solid var(--border-medium);  /* ✅ */
 }
 
 td {
   padding: 1rem;
-  border-bottom: 1px solid var(--bun-border);
+  border-bottom: 1px solid var(--border-light);  /* ✅ */
+  color: var(--text-primary);  /* ✅ */
 }
 
 tbody tr:hover {
-  background-color: #fff7d6;
+  background-color: var(--table-row-hover-bg);  /* ✅ */
 }
 
 .price {
@@ -56,28 +59,30 @@ tbody tr:hover {
 .status-select {
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  border: 1px solid var(--bun-border);
+  border: 1px solid var(--border-light);  /* ✅ */
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  background: var(--bg-primary);  /* ✅ */
+  color: var(--text-primary);  /* ✅ */
 }
 
 .status-select.warning {
-  background-color: #fff3c2;
-  color: #7a5a27;
-  border-color: var(--bun-yellow);
+  background-color: var(--warning-light);  /* ✅ */
+  color: var(--warning-dark);  /* ✅ */
+  border-color: var(--warning);
 }
 
 .status-select.success {
-  background-color: #e9f7ef;
-  color: var(--bun-green);
-  border-color: var(--bun-green);
+  background-color: var(--success-light);  /* ✅ */
+  color: var(--success-dark);  /* ✅ */
+  border-color: var(--success);
 }
 
 .status-select.danger {
-  background-color: #f8d7da;
-  color: #721c24;
-  border-color: #dc3545;
+  background-color: var(--danger-light);  /* ✅ */
+  color: var(--danger-dark);  /* ✅ */
+  border-color: var(--danger);
 }
 
 .action-buttons {
@@ -96,45 +101,23 @@ tbody tr:hover {
 
 .btn-primary {
   background-color: var(--bun-green);
-  color: #ffffff;
+  color: var(--white);
 }
 
-.btn-primary:hover {
-  background-color: #256928;
-}
-
-.btn-sm {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-}
-
-.btn-info {
-  background-color: var(--bun-yellow);
-  color: #3e3e3e;
-}
-
-.btn-info:hover {
-  background-color: #eac23a;
-}
-
-.btn-delete {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #c0392b;
+.btn-danger {
+  background-color: var(--danger);
+  color: var(--white);
 }
 
 .loading,
-.error,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);  /* ✅ */
+}
+
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: var(--bun-muted);
-  font-size: 1.1rem;
-}
-
-.error {
-  color: #e74c3c;
+  color: var(--text-tertiary);  /* ✅ */
 }

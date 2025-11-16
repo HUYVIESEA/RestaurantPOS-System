@@ -96,6 +96,12 @@
   border-left: 6px solid #28a745;
 }
 
+/* ✅ Dark mode override for available tables */
+[data-theme="dark"] .table-card.available {
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.25) 0%, rgba(46, 125, 50, 0.35) 100%);
+  border-color: var(--success);
+}
+
 .table-card.available::before {
   content: '✓';
   position: absolute;
@@ -123,6 +129,12 @@
   animation: subtlePulse 3s ease-in-out infinite;
 }
 
+/* ✅ Dark mode override for occupied tables */
+[data-theme="dark"] .table-card.occupied {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.25) 0%, rgba(220, 53, 69, 0.35) 100%);
+  border-color: var(--danger);
+}
+
 .table-card.occupied::before {
   content: '🍽️';
   position: absolute;
@@ -145,7 +157,7 @@
     box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
   }
   50% {
-  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.5);
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.5);
   }
 }
 
@@ -160,10 +172,18 @@
   border-color: #1e7e34;
 }
 
+[data-theme="dark"] .table-card.available:hover {
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.35) 0%, rgba(46, 125, 50, 0.45) 100%);
+}
+
 .table-card.occupied:hover {
   background: linear-gradient(135deg, #ffc7c7 0%, #ffb3b3 50%, #ff9999 100%);
   box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
   border-color: #c82333;
+}
+
+[data-theme="dark"] .table-card.occupied:hover {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.35) 0%, rgba(220, 53, 69, 0.45) 100%);
 }
 
 .table-header {
@@ -173,6 +193,10 @@
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] .table-header {
+  border-bottom-color: rgba(255,255,255,0.1);
 }
 
 .table-number {
@@ -186,14 +210,22 @@
   color: #155724;
 }
 
+[data-theme="dark"] .table-card.available .table-number {
+  color: #7cc47f;
+}
+
 /* ✅ Số bàn đang dùng - màu đỏ */
 .table-card.occupied .table-number {
   color: #721c24;
 }
 
+[data-theme="dark"] .table-card.occupied .table-number {
+  color: #f08080;
+}
+
 .status-badge {
   padding: 0.4rem 0.8rem;
-border-radius: 20px;
+  border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -233,7 +265,7 @@ border-radius: 20px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--bun-muted);
+  color: var(--text-secondary);  /* ✅ */
   font-size: 0.85rem;
   margin-bottom: 0.25rem;
 }
@@ -246,79 +278,6 @@ border-radius: 20px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.4rem;
-}
-
-.btn {
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.3s;
-  font-weight: 500;
-  text-align: center;
-}
-
-.btn-primary {
-  background-color: var(--bun-green);
-  color: #ffffff;
-}
-
-.btn-primary:hover {
-  background-color: #256928;
-}
-
-.btn-toggle {
-  font-weight: 600;
-}
-
-.btn-occupy {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.btn-occupy:hover {
-  background-color: #c0392b;
-}
-
-.btn-free {
-  background-color: #27ae60;
-  color: white;
-}
-
-.btn-free:hover {
-  background-color: #229954;
-}
-
-.btn-edit {
-  background-color: #f39c12;
-  color: white;
-}
-
-.btn-edit:hover {
-  background-color: #e67e22;
-}
-
-.btn-delete {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #7f8c8d;
-}
-
-.loading,
-.error,
-.empty-state {
-  text-align: center;
-  padding: 3rem;
-  color: var(--bun-muted);
-  font-size: 1.1rem;
-}
-
-.error {
-  color: #e74c3c;
 }
 
 /* ✅ Responsive Design */

@@ -1,0 +1,92 @@
+/* ========================================
+   THEME TOGGLE BUTTON
+   ======================================== */
+
+.theme-toggle {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-track {
+  width: 60px;
+  height: 30px;
+  background: var(--gray-300);
+  border-radius: var(--radius-full);
+  position: relative;
+  transition: background var(--transition-base);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle:hover .toggle-track {
+  background: var(--gray-400);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--bun-yellow) 0%, var(--bun-yellow-light) 100%);
+  border-radius: 50%;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-thumb.light {
+  left: 3px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffe44d 100%);
+}
+
+.toggle-thumb.dark {
+  left: calc(100% - 27px);
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
+.toggle-thumb i {
+  font-size: 0.7rem;
+}
+
+/* Hover animation */
+.theme-toggle:hover .toggle-thumb {
+  transform: scale(1.1);
+}
+
+/* Active state */
+.theme-toggle:active .toggle-thumb {
+  transform: scale(0.95);
+}
+
+/* Focus state for accessibility */
+.theme-toggle:focus {
+  outline: 2px solid var(--bun-green);
+  outline-offset: 4px;
+  border-radius: var(--radius-full);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .toggle-track {
+    width: 50px;
+    height: 26px;
+  }
+
+  .toggle-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .toggle-thumb.dark {
+    left: calc(100% - 23px);
+  }
+}

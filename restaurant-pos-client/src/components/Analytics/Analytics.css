@@ -1,0 +1,504 @@
+/* ========================================
+   ANALYTICS PAGE - MODERN DESIGN
+   ======================================== */
+
+.analytics-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+  background: var(--bg-secondary);  /* ✅ Add */
+  min-height: 100vh;  /* ✅ Add */
+}
+
+/* ============ HEADER ============ */
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--border-light);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.header-left h2 {
+  margin: 0 0 var(--spacing-xs) 0;
+  color: var(--bun-brown);
+  font-size: var(--font-3xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-base);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.time-range-toggle {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: var(--radius-lg);
+  padding: 0.25rem;
+}
+
+.range-btn {
+  padding: 0.5rem 1.5rem;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+}
+
+.range-btn:hover {
+  color: var(--text-primary);
+}
+
+.range-btn.active {
+  background: var(--white);
+  color: var(--bun-brown);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============ METRICS GRID ============ */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.metric-card {
+  background: var(--white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  display: flex;
+  gap: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.metric-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.metric-card.revenue .metric-icon {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+}
+
+.metric-card.orders .metric-icon {
+  background: linear-gradient(135deg, var(--bun-brown) 0%, var(--bun-brown-dark) 100%);
+}
+
+.metric-card.average .metric-icon {
+  background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%);
+}
+
+.metric-card.tables .metric-icon {
+  background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  margin: 0;
+  font-size: var(--font-3xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.metric-subtitle {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+}
+
+.metric-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: var(--spacing-sm);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+}
+
+.metric-change.positive {
+  background: var(--success-light);
+  color: var(--success-dark);
+}
+
+.metric-change.negative {
+  background: var(--danger-light);
+  color: var(--danger-dark);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: var(--spacing-sm);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6f42c1 0%, #5a32a3 100%);
+  transition: width 1s ease-out;
+}
+
+/* ============ CHART SECTION ============ */
+.chart-section {
+  background: var(--white);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header h3 {
+  margin: 0;
+  color: var(--bun-brown);
+  font-size: var(--font-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Bar Chart */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: var(--spacing-md);
+  height: 300px;
+  padding: var(--spacing-lg) 0;
+}
+
+.chart-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.bar-value {
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  min-height: 20px;
+}
+
+.bar-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bar-fill {
+  width: 80%;
+  background: linear-gradient(to top, var(--bun-brown) 0%, var(--bun-brown-light) 100%);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  transition: height 1s ease-out;
+  min-height: 4px;
+  box-shadow: 0 -2px 8px rgba(139, 94, 52, 0.3);
+}
+
+.bar-label {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: var(--font-medium);
+}
+
+/* ============ ANALYTICS COLUMNS ============ */
+.analytics-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.analytics-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: var(--font-xl);
+  color: var(--bun-brown);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.card-body {
+  padding: var(--spacing-lg);
+}
+
+/* Product List */
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.product-item:hover {
+  background: var(--table-row-hover-bg);
+  transform: translateX(4px);
+}
+
+.product-rank {
+  width: 32px;
+height: 32px;
+  background: linear-gradient(135deg, var(--bun-brown) 0%, var(--bun-brown-dark) 100%);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+justify-content: center;
+  font-weight: var(--font-bold);
+  flex-shrink: 0;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: var(--font-base);
+  color: var(--text-primary);
+}
+
+.product-info p {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.product-revenue {
+  font-size: var(--font-lg);
+  font-weight: var(--font-bold);
+  color: var(--bun-green);
+}
+
+/* Hours List */
+.hours-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.hour-item {
+  display: grid;
+  grid-template-columns: 140px 1fr 60px;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.hour-time {
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.hour-bar {
+  height: 24px;
+  background: var(--gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.hour-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bun-brown) 0%, var(--bun-brown-light) 100%);
+  transition: width 1s ease-out;
+}
+
+.hour-count {
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* Empty Data */
+.empty-data {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--text-tertiary);
+}
+
+.empty-data i {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.empty-data p {
+  margin: 0;
+  font-size: var(--font-lg);
+}
+
+/* ============ ANALYTICS ACTIONS ============ */
+.analytics-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.action-card {
+  padding: var(--spacing-xl);
+  background: var(--white);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  flex-direction: column;
+align-items: center;
+  gap: var(--spacing-md);
+  font-size: var(--font-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.action-card i {
+  font-size: 2rem;
+  color: var(--bun-brown);
+}
+
+.action-card:hover {
+  border-color: var(--bun-brown);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1200px) {
+  .analytics-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-container {
+    padding: var(--spacing-md);
+  }
+
+  .analytics-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    flex-direction: column;
+  }
+
+  .time-range-toggle {
+    width: 100%;
+  }
+
+  .range-btn {
+    flex: 1;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bar-chart {
+    height: 200px;
+  }
+
+  .hour-item {
+    grid-template-columns: 100px 1fr 50px;
+  }
+
+  .metric-value {
+    font-size: var(--font-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .header-left h2 {
+    font-size: var(--font-2xl);
+  }
+
+  .metric-card {
+    flex-direction: column;
+  }
+
+  .analytics-actions {
+    grid-template-columns: 1fr;
+  }
+}

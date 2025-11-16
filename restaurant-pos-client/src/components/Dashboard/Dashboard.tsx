@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; // ✅ ADD React
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../../services/productService';
 import { orderService } from '../../services/orderService';
 import { categoryService } from '../../services/categoryService';
 import { tableService } from '../../services/tableService';
+import { formatCurrency } from '../../utils/priceUtils'; // ✅ ADD
+import { SkeletonStats } from '../Common/Skeleton'; // ✅ ADD
 import './Dashboard.css';
 
 interface DashboardStats {
@@ -71,93 +73,134 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="loading">Đang tải...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+      <div className="dashboard-header">
+          <h2><i className="fas fa-chart-line"></i> Dashboard</h2>
+        </div>
+        <SkeletonStats />
+      </div>
+    );
+  }
+  
+  if (error) return <div className="error-state">{error}</div>;
 
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h2>Dashboard</h2>
-        <p className="subtitle">Tổng quan hệ thống Restaurant POS</p>
+        <div className="header-left">
+          <h2><i className="fas fa-chart-line"></i> Dashboard</h2>
+          <p className="subtitle">Tổng quan hệ thống Restaurant POS</p>
+        </div>
+        <button className="btn btn-primary" onClick={fetchDashboardData}>
+          <i className="fas fa-sync-alt"></i> Làm mới
+        </button>
       </div>
 
       <div className="stats-grid">
-        <div className="stat-card products">
-          <div className="stat-icon">📦</div>
+      <div className="stat-card products">
+ <div className="stat-icon">
+   <i className="fas fa-box"></i>
+       </div>
           <div className="stat-content">
-            <h3>Sản phẩm</h3>
-            <p className="stat-number">{stats.totalProducts}</p>
-            <p className="stat-label">Tổng sản phẩm</p>
+       <h3>Sản phẩm</h3>
+  <p className="stat-number">{stats.totalProducts}</p>
+    <p className="stat-label">Tổng sản phẩm</p>
+    </div>
+   <div className="stat-trend positive">
+<i className="fas fa-arrow-up"></i> +5%
           </div>
-        </div>
+     </div>
 
-        <div className="stat-card orders">
-          <div className="stat-icon">🛒</div>
-          <div className="stat-content">
-            <h3>Đơn hàng</h3>
-            <p className="stat-number">{stats.totalOrders}</p>
-            <p className="stat-label">Tổng đơn hàng</p>
+  <div className="stat-card orders">
+   <div className="stat-icon">
+         <i className="fas fa-shopping-cart"></i>
           </div>
+          <div className="stat-content">
+       <h3>Đơn hàng</h3>
+       <p className="stat-number">{stats.totalOrders}</p>
+            <p className="stat-label">Tổng đơn hàng</p>
+   </div>
+  <div className="stat-trend positive">
+     <i className="fas fa-arrow-up"></i> +12%
+    </div>
         </div>
 
         <div className="stat-card categories">
-          <div className="stat-icon">📁</div>
+   <div className="stat-icon">
+   <i className="fas fa-folder"></i>
+    </div>
           <div className="stat-content">
-            <h3>Danh mục</h3>
-            <p className="stat-number">{stats.totalCategories}</p>
-            <p className="stat-label">Tổng danh mục</p>
+       <h3>Danh mục</h3>
+       <p className="stat-number">{stats.totalCategories}</p>
+      <p className="stat-label">Tổng danh mục</p>
           </div>
         </div>
 
-        <div className="stat-card tables">
-          <div className="stat-icon">🪑</div>
-          <div className="stat-content">
-            <h3>Bàn trống</h3>
-            <p className="stat-number">{stats.availableTables}</p>
-            <p className="stat-label">Sẵn sàng phục vụ</p>
-          </div>
-        </div>
+   <div className="stat-card tables">
+   <div className="stat-icon">
+         <i className="fas fa-chair"></i>
+     </div>
+    <div className="stat-content">
+          <h3>Bàn trống</h3>
+    <p className="stat-number">{stats.availableTables}</p>
+       <p className="stat-label">Sẵn sàng phục vụ</p>
+   </div>
+      </div>
 
-        <div className="stat-card revenue">
-          <div className="stat-icon">💰</div>
-          <div className="stat-content">
-            <h3>Doanh thu hôm nay</h3>
-            <p className="stat-number">{stats.todayRevenue.toLocaleString('vi-VN')} đ</p>
-            <p className="stat-label">Đơn hàng hoàn thành</p>
+  <div className="stat-card revenue">
+   <div className="stat-icon">
+   <i className="fas fa-dollar-sign"></i>
           </div>
-        </div>
+    <div className="stat-content">
+    <h3>Doanh thu hôm nay</h3>
+  <p className="stat-number">{formatCurrency(stats.todayRevenue)}</p>
+  <p className="stat-label">Đơn hàng hoàn thành</p>
+    </div>
+ <div className="stat-trend positive">
+     <i className="fas fa-arrow-up"></i> +8%
+   </div>
+    </div>
 
-        <div className="stat-card pending">
-          <div className="stat-icon">⏳</div>
-          <div className="stat-content">
-            <h3>Đơn chờ xử lý</h3>
-            <p className="stat-number">{stats.pendingOrders}</p>
-            <p className="stat-label">Cần xử lý</p>
+     <div className="stat-card pending">
+     <div className="stat-icon">
+     <i className="fas fa-clock"></i>
           </div>
+    <div className="stat-content">
+     <h3>Đơn chờ xử lý</h3>
+    <p className="stat-number">{stats.pendingOrders}</p>
+     <p className="stat-label">Cần xử lý</p>
+          </div>
+          {stats.pendingOrders > 0 && (
+            <div className="stat-alert">
+      <i className="fas fa-exclamation-circle"></i>
+    </div>
+     )}
         </div>
       </div>
 
       <div className="quick-actions">
-        <h3>Thao tác nhanh</h3>
-        <div className="action-buttons">
+   <h3><i className="fas fa-zap"></i> Thao tác nhanh</h3>
+  <div className="action-buttons">
           <button className="action-btn primary" onClick={() => navigate('/tables')}>
-            <span className="action-icon">🍽️</span>
-            <span>Đặt món (từ bàn)</span>
+     <span className="action-icon"><i className="fas fa-utensils"></i></span>
+       <span>Đặt món (từ bàn)</span>
+   </button>
+  <button className="action-btn secondary" onClick={() => navigate('/products')}>
+   <span className="action-icon"><i className="fas fa-box"></i></span>
+   <span>Quản lý sản phẩm</span>
           </button>
-          <button className="action-btn secondary" onClick={() => navigate('/products')}>
-            <span className="action-icon">📦</span>
-            <span>Quản lý sản phẩm</span>
-          </button>
-          <button className="action-btn success" onClick={() => navigate('/orders')}>
-            <span className="action-icon">📋</span>
+    <button className="action-btn success" onClick={() => navigate('/orders')}>
+     <span className="action-icon"><i className="fas fa-receipt"></i></span>
             <span>Xem đơn hàng</span>
-          </button>
-          <button className="action-btn info" onClick={() => alert('Tính năng báo cáo đang phát triển')}>
-            <span className="action-icon">📊</span>
-            <span>Xem báo cáo</span>
+     </button>
+ <button className="action-btn info" onClick={() => navigate('/analytics')}>
+            <span className="action-icon"><i className="fas fa-chart-bar"></i></span>
+        <span>Phân tích & Báo cáo</span>
           </button>
         </div>
-      </div>
+ </div>
 
       <div className="system-info">
         <div className="info-card">

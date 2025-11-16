@@ -2,7 +2,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-fullName: string;
+  fullName: string;
   phoneNumber?: string;
   role: string;
   isActive: boolean;
@@ -24,6 +24,7 @@ export interface RegisterRequest {
 }
 
 export interface LoginResponse {
+  id: number; // ✅ ADD user ID
   token: string;
   username: string;
   email: string;

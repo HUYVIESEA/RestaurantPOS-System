@@ -3,7 +3,7 @@ import './Toast.css';
 
 interface ToastProps {
   message: string;
-  type?: 'success' | 'error' | 'info';
+  type?: 'success' | 'error' | 'info' | 'warning'; // ✅ Add warning
   onClose: () => void;
   duration?: number;
 }
@@ -23,8 +23,9 @@ const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose, durat
         <span className="toast-icon">
           {type === 'success' && '✅'}
           {type === 'error' && '❌'}
-       {type === 'info' && 'ℹ️'}
-     </span>
+          {type === 'info' && 'ℹ️'}
+          {type === 'warning' && '⚠️'}
+        </span>
         <span className="toast-message">{message}</span>
       </div>
       <button className="toast-close" onClick={onClose}>×</button>

@@ -50,12 +50,13 @@ namespace RestaurantPOS.API.Services
 
       return new LoginResponse
     {
+        Id = user.Id, // ✅ ADD user ID
     Token = token,
        Username = user.Username,
          Email = user.Email,
                 FullName = user.FullName,
-       Role = user.Role,
-      ExpiresAt = DateTime.UtcNow.AddHours(_configuration.GetValue<int>("JwtSettings:ExpiryInHours"))
+    Role = user.Role,
+  ExpiresAt = DateTime.UtcNow.AddHours(_configuration.GetValue<int>("JwtSettings:ExpiryInHours"))
   };
         }
 
@@ -293,20 +294,21 @@ rng.GetBytes(randomBytes);
        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
- var claims = new[]
-      {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-  new Claim(JwtRegisteredClaimNames.Email, user.Email),
-     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-   new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-  new Claim(ClaimTypes.Name, user.FullName),
-      new Claim(ClaimTypes.Role, user.Role)
-     };
+            var claims = new[]
+            {
+     new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+     new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+       new Claim("UserId", user.Id.ToString()), // ✅ FIXED: Use custom claim name
+      new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Keep for compatibility
+       new Claim(ClaimTypes.Name, user.FullName),
+new Claim(ClaimTypes.Role, user.Role)
+ };
 
-   var token = new JwtSecurityToken(
-   issuer: issuer,
-        audience: audience,
-     claims: claims,
+            var token = new JwtSecurityToken(
+        issuer: issuer,
+                audience: audience,
+    claims: claims,
   expires: DateTime.UtcNow.AddHours(expiryInHours),
          signingCredentials: credentials
       );
