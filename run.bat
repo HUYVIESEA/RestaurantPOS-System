@@ -22,9 +22,9 @@ if not exist "restaurant-pos-client\node_modules" (
 echo Starting servers...
 echo.
 
-REM Start backend
-echo [1/2] Starting backend...
-start "Restaurant POS - Backend API" cmd /k "cd RestaurantPOS.API && echo Backend API Server && echo ==================== && dotnet run"
+REM Start backend (with Android support)
+echo [1/2] Starting backend (with Android support)...
+start "Restaurant POS - Backend API" cmd /k "cd RestaurantPOS.API && echo Backend API Server (Android Ready) && echo ================================== && dotnet run --urls http://0.0.0.0:5000"
 
 REM Wait for backend to start
 echo Waiting for backend to initialize...
@@ -39,9 +39,12 @@ echo ========================================
 echo  Servers Starting...
 echo ========================================
 echo.
-echo Backend API:  http://localhost:5000
-echo Swagger UI:   http://localhost:5000/swagger
-echo Frontend:     http://localhost:5173
+echo Backend API:        http://localhost:5000
+echo Swagger UI:         http://localhost:5000/swagger
+echo Frontend:           http://localhost:5173
+echo.
+echo Android Emulator:   http://10.0.2.2:5000
+echo Android Device:     http://[YOUR_IP]:5000
 echo.
 echo ========================================
 echo.

@@ -330,3 +330,9 @@ background: #f8d7da;
  justify-content: center;
   }
 }
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .profile-container { background: var(--bg-primary); } 
+[data-theme="dark"] .profile-card { background: var(--bg-secondary); border-color: var(--border-medium); } 
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .profile-container { background: var(--bg-primary); } 
+[data-theme="dark"] .profile-card { background: var(--bg-secondary); border-color: var(--border-medium); } 

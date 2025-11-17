@@ -163,3 +163,9 @@ display: flex;
     align-items: flex-start;
   }
 }
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .form-container { background: var(--bg-secondary); border-color: var(--border-medium); } 
+[data-theme="dark"] .form-control { background: var(--bg-tertiary); border-color: var(--border-medium); color: var(--text-primary); } 
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .form-container { background: var(--bg-secondary); border-color: var(--border-medium); } 
+[data-theme="dark"] .form-control { background: var(--bg-tertiary); border-color: var(--border-medium); color: var(--text-primary); } 

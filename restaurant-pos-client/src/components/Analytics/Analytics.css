@@ -502,3 +502,11 @@ align-items: center;
     grid-template-columns: 1fr;
   }
 }
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .analytics-container { background: var(--bg-primary); } 
+[data-theme="dark"] .chart-container { background: var(--bg-secondary); border-color: var(--border-medium); } 
+[data-theme="dark"] .stat-card { background: var(--bg-secondary); } 
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .analytics-container { background: var(--bg-primary); } 
+[data-theme="dark"] .chart-container { background: var(--bg-secondary); border-color: var(--border-medium); } 
+[data-theme="dark"] .stat-card { background: var(--bg-secondary); } 

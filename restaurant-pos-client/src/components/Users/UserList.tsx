@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { userService, User } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { SkeletonTable } from '../Common/Skeleton'; // ✅ ADD
+import { SkeletonTable } from '../Common/Skeleton';
+import ConfirmDialog from '../Common/ConfirmDialog';
 import './UserList.css';
 
 const UserList: React.FC = () => {
@@ -15,6 +16,10 @@ const UserList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'Admin' | 'Staff'>('all');
+  
+  // Confirm dialog state
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<{ id: number; name: string } | null>(null);
   
   // Get current user ID from auth context
   const currentUserId = currentUser?.id;
@@ -79,17 +84,30 @@ showSuccess('Đã reset mật khẩu thành công');
     }
   };
 
-  const handleDelete = async (id: number, username: string) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa người dùng "${username}"?`)) return;
+  const handleDeleteClick = (id: number, fullName: string) => {
+    setUserToDelete({ id, name: fullName });
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
 
     try {
-      await userService.delete(id);
+      await userService.delete(userToDelete.id);
       await fetchUsers();
       showSuccess('Đã xóa người dùng thành công');
     } catch (err: any) {
       console.error('Error deleting user:', err);
       showError(err.response?.data || 'Không thể xóa người dùng');
+    } finally {
+      setShowConfirmDialog(false);
+      setUserToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmDialog(false);
+    setUserToDelete(null);
   };
 
   const filteredUsers = users.filter(user => {
@@ -241,7 +259,10 @@ showSuccess('Đã reset mật khẩu thành công');
         </button>
               <button
           className="btn btn-sm btn-delete"
-       onClick={() => handleDelete(user.id, user.username)}
+       onClick={() => {
+         setUserToDelete({ id: user.id, name: user.username });
+         setShowConfirmDialog(true);
+       }}
            disabled={user.id === currentUserId}
    title="Xóa"
        >
@@ -274,6 +295,18 @@ onClick={() => navigate('/users/new')}
  </div>
    )}
       </div>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        title="Xác nhận xóa người dùng"
+        message={`Bạn có chắc chắn muốn xóa người dùng "${userToDelete?.name}"? Hành động này không thể hoàn tác.`}
+        confirmText="Xóa"
+        cancelText="Hủy"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "RestaurantPOS.Android"
 include(":app")
- 

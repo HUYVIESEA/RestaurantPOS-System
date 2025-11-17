@@ -174,3 +174,11 @@
     font-size: 1.5rem;
   }
 }
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .login-container { background: var(--bg-primary); } 
+[data-theme="dark"] .login-card { background: var(--bg-secondary); border-color: var(--border-medium); } 
+[data-theme="dark"] .login-title { color: var(--bun-brown-light); } 
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .login-container { background: var(--bg-primary); } 
+[data-theme="dark"] .login-card { background: var(--bg-secondary); border-color: var(--border-medium); } 
+[data-theme="dark"] .login-title { color: var(--bun-brown-light); } 

@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
     { path: '/orders', label: 'Đơn hàng', icon: 'fa-receipt' },
     { path: '/products', label: 'Sản phẩm', icon: 'fa-box' },
   { path: '/categories', label: 'Danh mục', icon: 'fa-folder' },
+    { path: '/reports', label: 'Báo cáo', icon: 'fa-chart-bar' }, // ✅ NEW
     { path: '/users', label: 'Người dùng', icon: 'fa-users' },
   ];
 

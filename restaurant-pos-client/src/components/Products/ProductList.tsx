@@ -6,6 +6,7 @@ import { Product, Category } from '../../types';
 import { formatCurrency } from '../../utils/priceUtils';
 import { SkeletonGrid, LoadingOverlay } from '../Common/Skeleton';
 import { useToast } from '../../contexts/ToastContext';
+import ConfirmDialog from '../Common/ConfirmDialog';
 import './ProductList.css';
 
 const ProductList: React.FC = () => {
@@ -19,6 +20,10 @@ const ProductList: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  // Confirm dialog state
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -57,20 +62,32 @@ showError('Không thể tải dữ liệu sản phẩm');
     }
   };
 
-  const handleDelete = async (id: number, name: string) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa sản phẩm "${name}"?`)) return;
+  const handleDeleteClick = (id: number, name: string) => {
+    setProductToDelete({ id, name });
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
 
     try {
-  setDeleting(id);
-      await productService.delete(id);
-setProducts(products.filter(p => p.id !== id));
+      setDeleting(productToDelete.id);
+      await productService.delete(productToDelete.id);
+      setProducts(products.filter(p => p.id !== productToDelete.id));
       showSuccess('Đã xóa sản phẩm thành công');
     } catch (err) {
       console.error('Error deleting product:', err);
       showError('Không thể xóa sản phẩm');
     } finally {
-    setDeleting(null);
+      setDeleting(null);
+      setShowConfirmDialog(false);
+      setProductToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmDialog(false);
+    setProductToDelete(null);
   };
 
   const filteredProducts = products.filter(product => {
@@ -229,7 +246,7 @@ onClick={() => handleCategoryFilter(category.id)}
         </button>
 <button
             className="btn btn-sm btn-delete"
-            onClick={() => handleDelete(product.id, product.name)}
+            onClick={() => handleDeleteClick(product.id, product.name)}
             disabled={deleting === product.id}
             title="Xóa"
        >
@@ -266,6 +283,18 @@ onClick={() => handleCategoryFilter(category.id)}
       )}
 
       {deleting && <LoadingOverlay message="Đang xóa sản phẩm..." transparent />}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        title="Xác nhận xóa sản phẩm"
+        message={`Bạn có chắc chắn muốn xóa sản phẩm "${productToDelete?.name}"? Hành động này không thể hoàn tác.`}
+        confirmText="Xóa"
+        cancelText="Hủy"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

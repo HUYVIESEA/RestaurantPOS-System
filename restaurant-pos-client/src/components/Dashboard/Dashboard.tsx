@@ -181,26 +181,41 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="quick-actions">
-   <h3><i className="fas fa-zap"></i> Thao tác nhanh</h3>
-  <div className="action-buttons">
+        <h3>⚡ Thao tác nhanh</h3>
+        <div className="action-buttons">
           <button className="action-btn primary" onClick={() => navigate('/tables')}>
-     <span className="action-icon"><i className="fas fa-utensils"></i></span>
-       <span>Đặt món (từ bàn)</span>
-   </button>
-  <button className="action-btn secondary" onClick={() => navigate('/products')}>
-   <span className="action-icon"><i className="fas fa-box"></i></span>
-   <span>Quản lý sản phẩm</span>
+            <div className="action-icon">🍽️</div>
+            <div className="action-content">
+              <span className="action-title">Đặt món</span>
+              <span className="action-subtitle">Từ danh sách bàn</span>
+            </div>
           </button>
-    <button className="action-btn success" onClick={() => navigate('/orders')}>
-     <span className="action-icon"><i className="fas fa-receipt"></i></span>
-            <span>Xem đơn hàng</span>
-     </button>
- <button className="action-btn info" onClick={() => navigate('/analytics')}>
-            <span className="action-icon"><i className="fas fa-chart-bar"></i></span>
-        <span>Phân tích & Báo cáo</span>
+          
+          <button className="action-btn secondary" onClick={() => navigate('/products')}>
+            <div className="action-icon">📦</div>
+            <div className="action-content">
+              <span className="action-title">Sản phẩm</span>
+              <span className="action-subtitle">Quản lý thực đơn</span>
+            </div>
+          </button>
+          
+          <button className="action-btn success" onClick={() => navigate('/orders')}>
+            <div className="action-icon">📋</div>
+            <div className="action-content">
+              <span className="action-title">Đơn hàng</span>
+              <span className="action-subtitle">Xem tất cả</span>
+            </div>
+          </button>
+          
+          <button className="action-btn info" onClick={() => navigate('/analytics')}>
+            <div className="action-icon">📊</div>
+            <div className="action-content">
+              <span className="action-title">Báo cáo</span>
+              <span className="action-subtitle">Phân tích dữ liệu</span>
+            </div>
           </button>
         </div>
- </div>
+      </div>
 
       <div className="system-info">
         <div className="info-card">

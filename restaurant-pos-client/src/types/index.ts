@@ -91,3 +91,106 @@ export interface ModifierItem {
   name: string;
   priceDelta?: number;
 }
+
+// Report Types
+export interface RevenueReport {
+  startDate: string;
+  endDate: string;
+  totalRevenue: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  dailyRevenue: DailyRevenue[];
+}
+
+export interface DailyRevenue {
+  date: string;
+  revenue: number;
+  orderCount: number;
+}
+
+export interface ProductReport {
+  productId: number;
+  productName: string;
+  categoryName: string;
+  totalQuantitySold: number;
+  totalRevenue: number;
+  averagePrice: number;
+  orderCount: number;
+}
+
+export interface OrderStatistics {
+  totalOrders: number;
+  completedOrders: number;
+  pendingOrders: number;
+  cancelledOrders: number;
+  completionRate: number;
+  cancellationRate: number;
+  averageOrderValue: number;
+  averagePreparationTime: string;
+}
+
+export interface HourlyReport {
+  hour: number;
+  orderCount: number;
+  revenue: number;
+}
+
+export interface WeeklyReport {
+  dayOfWeek: string;
+  orderCount: number;
+  revenue: number;
+}
+
+export interface MonthlyReport {
+  month: number;
+  year: number;
+  orderCount: number;
+  revenue: number;
+}
+
+export interface TablePerformance {
+  tableId: number;
+  tableNumber: string;
+  totalOrders: number;
+  totalRevenue: number;
+  averageOrderValue: number;
+  utilizationRate: number;
+}
+
+export interface CategoryReport {
+  categoryId: number;
+  categoryName: string;
+  productCount: number;
+  totalQuantitySold: number;
+  totalRevenue: number;
+  revenuePercentage: number;
+}
+
+export interface SalesSummary {
+  reportDate: string;
+  todayRevenue: number;
+  yesterdayRevenue: number;
+  weekRevenue: number;
+  monthRevenue: number;
+  yearRevenue: number;
+  todayOrders: number;
+  weekOrders: number;
+  monthOrders: number;
+  topProducts: ProductReport[];
+  categoryBreakdown: CategoryReport[];
+}
+
+export interface ReportRequest {
+  startDate: string;
+  endDate: string;
+  reportType?: string;
+  categoryId?: number;
+  productId?: number;
+}
+
+export interface ExportRequest {
+  reportType: string;
+  startDate: string;
+  endDate: string;
+  format: 'PDF' | 'Excel' | 'CSV';
+}

@@ -1,5 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+    <!-- Primary Colors -->
+    <color name="bun_yellow">#FFD54F</color>
+    <color name="bun_yellow_light">#FFE27A</color>
+    <color name="bun_green">#2E7D32</color>
+    <color name="bun_green_light">#43A047</color>
+    <color name="bun_brown">#6D4C41</color>
+    <color name="bun_brown_light">#8D6E63</color>
+
+    <!-- Background Colors -->
+    <color name="bg_primary">#FFFFFF</color>
+    <color name="bg_secondary">#F5F5F5</color>
+    <color name="bg_tertiary">#FAFAFA</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_muted">#9E9E9E</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Border Colors -->
+    <color name="border_light">#E0E0E0</color>
+    <color name="border_medium">#BDBDBD</color>
+
+    <!-- Status Colors -->
+    <color name="danger">#D32F2F</color>
+    <color name="danger_light">#FFEBEE</color>
+    <color name="danger_dark">#C62828</color>
+    <color name="success">#388E3C</color>
+    <color name="warning">#F57C00</color>
+    <color name="info">#1976D2</color>
+
+    <!-- Demo Account Colors -->
+    <color name="demo_background">#E8F4F8</color>
+    <color name="demo_border">#3498DB</color>
+    <color name="code_background">#D1ECF1</color>
+    <color name="code_text">#0C5460</color>
+
+    <!-- Material Design Colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
 </resources>

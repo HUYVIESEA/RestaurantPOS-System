@@ -21,6 +21,7 @@ import TableList from './components/Tables/TableList';
 import TableForm from './components/Tables/TableForm';
 import Dashboard from './components/Dashboard/Dashboard';
 import Analytics from './components/Analytics/Analytics'; // ✅ ADD
+import Reports from './components/Reports/Reports'; // ✅ NEW
 import UserList from './components/Users/UserList';
 import UserForm from './components/Users/UserForm';
 import UserProfile from './components/Users/UserProfile';
@@ -69,6 +70,9 @@ function AppContent() {
 
               {/* Analytics */} {/* ✅ ADD */}
               <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
+
+              {/* Reports */} {/* ✅ NEW */}
+              <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

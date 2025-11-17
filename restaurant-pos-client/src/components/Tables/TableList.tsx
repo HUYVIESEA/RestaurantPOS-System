@@ -5,6 +5,7 @@ import { orderService } from '../../services/orderService';
 import { Table } from '../../types';
 import { useElapsedTime, getElapsedTimeColor } from '../../hooks/useElapsedTime';
 import ReturnTableDialog from './ReturnTableDialog';
+import ConfirmDialog from '../Common/ConfirmDialog';
 import './TableList.css';
 
 const TableList: React.FC = () => {
@@ -15,10 +16,14 @@ const TableList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'occupied'>('all');
   const [floorFilter, setFloorFilter] = useState<string>('all');
   
-  // ✅ Dialog state
+  // Return table dialog state
   const [showReturnDialog, setShowReturnDialog] = useState(false);
   const [returningTable, setReturningTable] = useState<{ id: number; name: string } | null>(null);
   const [pendingOrdersInfo, setPendingOrdersInfo] = useState<{ count: number; total: number }>({ count: 0, total: 0 });
+  
+  // Confirm delete dialog state
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [tableToDelete, setTableToDelete] = useState<{ id: number; number: string } | null>(null);
 
   useEffect(() => {
     fetchTables();
@@ -138,16 +143,30 @@ const TableList: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Bạn có chắc muốn xóa bàn này?')) {
-      try {
-        await tableService.delete(id);
-        setTables(tables.filter(t => t.id !== id));
-      } catch (err) {
-        setError('Không thể xóa bàn.');
-   console.error('Error deleting table:', err);
-      }
+  // Confirm delete table
+  const handleDeleteClick = (id: number, tableNumber: string) => {
+    setTableToDelete({ id, number: tableNumber });
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!tableToDelete) return;
+
+    try {
+      await tableService.delete(tableToDelete.id);
+      setTables(tables.filter(t => t.id !== tableToDelete.id));
+    } catch (err) {
+      setError('Không thể xóa bàn.');
+      console.error('Error deleting table:', err);
+    } finally {
+      setShowConfirmDialog(false);
+      setTableToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmDialog(false);
+    setTableToDelete(null);
   };
 
   // ✅ Get unique floors
@@ -192,6 +211,18 @@ const tablesByFloor = filteredTables.reduce((acc, table) => {
           }}
         />
       )}
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        title="Xác nhận xóa bàn"
+        message={`Bạn có chắc chắn muốn xóa bàn ${tableToDelete?.number}? Hành động này không thể hoàn tác.`}
+        confirmText="Xóa"
+        cancelText="Hủy"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
 
       <div className="header">
  <h2>Quản lý Bàn</h2>
@@ -256,8 +287,8 @@ Tất cả ({tables.length})
           key={table.id}
  table={table}
           onReturnTable={handleReturnTable}
-     onDelete={handleDelete}
-      onEdit={() => navigate(`/tables/edit/${table.id}`)}
+          onDelete={handleDeleteClick}
+          onEdit={() => navigate(`/tables/edit/${table.id}`)}
         />
         ))}
      </div>
@@ -271,7 +302,7 @@ Tất cả ({tables.length})
               key={table.id}
      table={table}
      onReturnTable={handleReturnTable}
-  onDelete={handleDelete}
+  onDelete={handleDeleteClick}
               onEdit={() => navigate(`/tables/edit/${table.id}`)}
        />
           ))}
@@ -289,7 +320,7 @@ Tất cả ({tables.length})
 interface TableCardProps {
   table: Table;
   onReturnTable: (id: number) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: number, tableNumber: string) => void;
   onEdit: () => void;
 }
 
@@ -379,7 +410,7 @@ const TableCard: React.FC<TableCardProps> = ({
         )}
     <button 
           className="btn btn-delete"
-   onClick={() => onDelete(table.id)}
+   onClick={() => onDelete(table.id, table.tableNumber)}
         >
           Xóa
         </button>

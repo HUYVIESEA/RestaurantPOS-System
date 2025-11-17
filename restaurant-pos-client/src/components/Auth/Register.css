@@ -140,3 +140,9 @@
     font-size: 1.5rem;
   }
 }
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .register-container { background: var(--bg-primary); } 
+[data-theme="dark"] .register-card { background: var(--bg-secondary); border-color: var(--border-medium); } 
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .register-container { background: var(--bg-primary); } 
+[data-theme="dark"] .register-card { background: var(--bg-secondary); border-color: var(--border-medium); } 

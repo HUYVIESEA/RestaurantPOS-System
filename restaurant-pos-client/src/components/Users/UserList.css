@@ -466,3 +466,13 @@ min-width: 800px;
 .users-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
 .users-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
 .users-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .user-list-container { background: var(--bg-primary); } 
+[data-theme="dark"] .user-table { background: var(--bg-secondary); } 
+[data-theme="dark"] .user-table th { background: var(--bg-tertiary); color: var(--text-primary); } 
+[data-theme="dark"] .user-table tr:hover { background: var(--bg-tertiary); } 
+/* ============ DARK MODE ============ */ 
+[data-theme="dark"] .user-list-container { background: var(--bg-primary); } 
+[data-theme="dark"] .user-table { background: var(--bg-secondary); } 
+[data-theme="dark"] .user-table th { background: var(--bg-tertiary); color: var(--text-primary); } 
+[data-theme="dark"] .user-table tr:hover { background: var(--bg-tertiary); } 

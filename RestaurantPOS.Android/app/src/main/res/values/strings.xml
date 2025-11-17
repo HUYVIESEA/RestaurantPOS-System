@@ -1,3 +1,42 @@
 <resources>
-    <string name="app_name">RestaurantPOS.Android</string>
+    <string name="app_name">Restaurant POS</string>
+    
+    <!-- Login Screen -->
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_subtitle">Nhập thông tin để truy cập hệ thống</string>
+    <string name="username_hint">Tên đăng nhập</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="login_button">Đăng nhập</string>
+    <string name="logging_in">Đang đăng nhập...</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="register_now">Đăng ký ngay</string>
+    
+    <!-- Demo Account -->
+    <string name="demo_title">Tài khoản demo:</string>
+    <string name="demo_username">Username: admin</string>
+    <string name="demo_password">Password: Admin@123</string>
+    
+    <!-- Error Messages -->
+    <string name="error_empty_username">Vui lòng nhập tên đăng nhập</string>
+    <string name="error_empty_password">Vui lòng nhập mật khẩu</string>
+    <string name="error_invalid_credentials">Tên đăng nhập hoặc mật khẩu không đúng</string>
+    <string name="error_network">Đã xảy ra lỗi. Vui lòng thử lại.</string>
+    
+    <!-- Success Messages -->
+    <string name="login_success">Đăng nhập thành công!</string>
+    <string name="userName">Tên đăng nhập</string>
+    <string name="Password">Mật khẩu</string>
+    <string name="quenmatkhau">Quên mật khẩu?</string>
+    <string name="dangnhap">Đăng nhập</string>
+    <string name="Dangnhap">Đăng nhập</string>
+    <string name="truycaphethong">Nhập thông tin để truy cập hệ thống</string>
+    <string name="restaurant_pos">🍽️ Restaurant POS</string>
+    <string name="chuacotaikhoan">Chưa có tài khoản?</string>
+    <string name="dangkyngay">Đăng ký ngay</string>
+    <string name="taikhoandemo">Tài khoản demo:</string>
+    <string name="username">Username:</string>
+    <string name="admin">admin</string>
+    <string name="password">Password:</string>
+    <string name="admin_123">Admin@123</string>
 </resources>

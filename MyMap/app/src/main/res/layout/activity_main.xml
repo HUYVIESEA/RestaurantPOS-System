@@ -32,28 +32,28 @@
             android:id="@+id/btnGetLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lấy vị trí hiện tại"
+            android:text="@string/btn_get_location"
             android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnAddMarker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Thêm điểm đánh dấu"
+            android:text="@string/btn_add_marker"
             android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnDrawRoute"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vẽ đường giữa các điểm"
+            android:text="@string/btn_draw_route"
             android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btnClear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Xóa tất cả"
+            android:text="@string/btn_clear"
             android:textAllCaps="false" />
 
         <TextView
@@ -61,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Chạm vào bản đồ để thêm điểm"
+            android:text="@string/info_tap_map"
             android:textSize="14sp"
             android:gravity="center" />
 
