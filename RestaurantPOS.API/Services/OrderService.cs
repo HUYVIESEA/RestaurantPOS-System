@@ -64,6 +64,17 @@ namespace RestaurantPOS.API.Services
             }
             order.TotalAmount = total;
 
+            // ✅ Mark table as occupied when order is created
+            if (order.TableId.HasValue)
+            {
+                var table = await _context.Tables.FindAsync(order.TableId.Value);
+                if (table != null && table.IsAvailable)
+                {
+                    table.IsAvailable = false;
+                    table.OccupiedAt = DateTime.UtcNow;
+                }
+            }
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
             return order;
@@ -80,28 +91,27 @@ namespace RestaurantPOS.API.Services
 
         order.Status = status;
 
-   // ✅ NEW: Auto-free table when order is Completed or Cancelled
+        // ✅ NEW: Auto-free table when order is Completed or Cancelled
         if ((status == "Completed" || status == "Cancelled") && order.TableId.HasValue)
         {
- // Check if there are any other pending orders for this table
-  var otherPendingOrders = await _context.Orders
-   .Where(o => o.TableId == order.TableId && 
-        o.Id != id && 
-             o.Status == "Pending")
-     .AnyAsync();
+            // Check if there are any other pending orders for this table
+            var otherPendingOrders = await _context.Orders
+                .Where(o => o.TableId == order.TableId && 
+                            o.Id != id && 
+                            o.Status == "Pending")
+                .AnyAsync();
 
-       // Only free table if no other pending orders exist
-     if (!otherPendingOrders)
-   {
-      var table = await _context.Tables.FindAsync(order.TableId.Value);
-         if (table != null)
-      {
-   table.IsAvailable = true;
+            // Only free table if no other pending orders exist
+            if (!otherPendingOrders)
+            {
+                var table = await _context.Tables.FindAsync(order.TableId.Value);
+                if (table != null)
+                {
+                    table.IsAvailable = true;
+                    table.OccupiedAt = null;
                 }
-    }
-        }
-
-        await _context.SaveChangesAsync();
+            }
+        }        await _context.SaveChangesAsync();
       return order;
         }
 

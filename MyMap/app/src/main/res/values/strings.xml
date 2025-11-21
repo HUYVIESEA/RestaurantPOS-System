@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">My Map</string>
-    <string name="btn_get_location">Lấy vị trí hiện tại</string>
-    <string name="btn_add_marker">Thêm điểm đánh dấu</string>
-    <string name="btn_draw_route">Vẽ đường giữa các điểm</string>
-    <string name="btn_clear">Xóa tất cả</string>
-    <string name="info_tap_map">Chạm vào bản đồ để thêm điểm</string>
-</resources>

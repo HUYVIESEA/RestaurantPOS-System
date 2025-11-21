@@ -1,0 +1,181 @@
+/* ========================================
+   AUTHORIZATION BANNERS & INFO BOXES
+   ======================================== */
+
+/* Warning Banner */
+.warning-banner {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  border-left: 4px solid #ffc107;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
+.warning-banner i {
+  font-size: 1.5rem;
+  color: #856404;
+}
+
+.warning-banner span {
+  color: #856404;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Info Banner */
+.info-banner {
+  background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+  border-left: 4px solid #17a2b8;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.2);
+}
+
+.info-banner i {
+  font-size: 1.5rem;
+  color: #0c5460;
+}
+
+.info-banner span {
+  color: #0c5460;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Info Box (for password change note) */
+.info-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--bun-brown);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.info-box i {
+  font-size: 2rem;
+  color: var(--bun-brown);
+  flex-shrink: 0;
+}
+
+.info-box div {
+  flex: 1;
+}
+
+.info-box strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.info-box p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Role Lock Icon */
+.role-lock {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-left: var(--spacing-xs);
+}
+
+/* Disabled Select (for role) */
+select:disabled {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Help Text Enhancement */
+.help-text {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.help-text i {
+  margin-right: var(--spacing-xs);
+}
+
+/* ========================================
+   DARK MODE
+   ======================================== */
+
+[data-theme="dark"] .warning-banner {
+  background: rgba(255, 193, 7, 0.15);
+  border-left-color: #ffd54f;
+}
+
+[data-theme="dark"] .warning-banner i,
+[data-theme="dark"] .warning-banner span {
+  color: #ffd54f;
+}
+
+[data-theme="dark"] .info-banner {
+  background: rgba(23, 162, 184, 0.15);
+  border-left-color: #5dade2;
+}
+
+[data-theme="dark"] .info-banner i,
+[data-theme="dark"] .info-banner span {
+  color: #5dade2;
+}
+
+[data-theme="dark"] .info-box {
+  background: var(--bg-tertiary);
+  border-color: var(--border-medium);
+  border-left-color: var(--bun-brown-light);
+}
+
+[data-theme="dark"] .info-box i {
+  color: var(--bun-brown-light);
+}
+
+[data-theme="dark"] select:disabled {
+  background: var(--bg-primary);
+  border-color: var(--border-medium);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .warning-banner,
+  .info-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .warning-banner i,
+  .info-banner i {
+    font-size: 1.25rem;
+  }
+
+  .info-box {
+    flex-direction: column;
+  }
+
+  .info-box i {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,486 @@
+/* ========================================
+   EMPLOYEE MANAGEMENT DIALOGS
+   ======================================== */
+
+/* Dialog Overlay */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Dialog Content */
+.dialog-content {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Dialog Header */
+.dialog-header {
+  padding: var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.dialog-header.warning {
+  background: linear-gradient(135deg, #ffd93d 0%, #f39c12 100%);
+  color: #333;
+}
+
+.dialog-header.info {
+  background: linear-gradient(135deg, #6ec1e4 0%, #3498db 100%);
+  color: white;
+}
+
+.dialog-header.success {
+  background: linear-gradient(135deg, #51cf66 0%, #27ae60 100%);
+  color: white;
+}
+
+.dialog-header.danger {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+}
+
+.dialog-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+/* Dialog Body */
+.dialog-body {
+  padding: var(--spacing-xl);
+}
+
+.dialog-message {
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.dialog-message strong {
+  color: var(--bun-brown);
+  font-weight: 600;
+}
+
+/* Warning Note */
+.warning-note {
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--warning);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.warning-note.important {
+  border-left-color: var(--danger);
+  background: rgba(239, 83, 80, 0.1);
+}
+
+.warning-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warning-note p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.warning-note strong {
+  color: var(--danger);
+}
+
+/* Success Message */
+.success-message {
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--success);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.success-message strong {
+  color: var(--success-dark);
+}
+
+/* Dialog Footer */
+.dialog-footer {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+.dialog-footer .btn {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.btn-cancel {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+}
+
+.btn-cancel:hover {
+  background: var(--border-light);
+  transform: translateY(-1px);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #ffd93d 0%, #f39c12 100%);
+  color: #333;
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.btn-info {
+  background: linear-gradient(135deg, #6ec1e4 0%, #3498db 100%);
+  color: white;
+}
+
+.btn-info:hover {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #51cf66 0%, #27ae60 100%);
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #ee5a6f 0%, #dc3545 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* ========================================
+   ROLE CHANGE DIALOG
+   ======================================== */
+
+.role-change-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-lg);
+}
+
+.role-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.role-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.role-badge {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 1rem;
+}
+
+.role-badge.admin {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.role-badge.staff {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.role-arrow {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+/* ========================================
+   PASSWORD DIALOG
+   ======================================== */
+
+.password-display {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--border-medium);
+}
+
+.password-display label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.password-box {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.password-code {
+  flex: 1;
+  padding: var(--spacing-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--success);
+  letter-spacing: 2px;
+  user-select: all;
+}
+
+.btn-copy {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-copy:hover {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   STATUS DIALOG
+   ======================================== */
+
+.status-change-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-lg);
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.status-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 1rem;
+}
+
+.status-badge.active {
+  background: linear-gradient(135deg, #51cf66 0%, #27ae60 100%);
+  color: white;
+}
+
+.status-badge.inactive {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+}
+
+.status-arrow {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 480px) {
+  .dialog-content {
+    margin: var(--spacing-md);
+    width: calc(100% - var(--spacing-xl));
+  }
+
+  .dialog-header {
+    padding: var(--spacing-lg);
+  }
+
+  .dialog-icon {
+    font-size: 2rem;
+  }
+
+  .dialog-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .dialog-body {
+    padding: var(--spacing-lg);
+  }
+
+  .dialog-footer {
+    flex-direction: column-reverse;
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+
+  .dialog-footer .btn {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .role-change-info,
+  .status-change-info {
+    flex-direction: column;
+  }
+
+  .role-arrow,
+  .status-arrow {
+    transform: rotate(90deg);
+  }
+
+  .password-box {
+    flex-direction: column;
+  }
+
+  .btn-copy {
+    width: 100%;
+  }
+}
+
+/* ========================================
+   DARK MODE
+   ======================================== */
+
+[data-theme="dark"] .dialog-content {
+  background: var(--bg-secondary);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .dialog-footer {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .btn-cancel {
+  background: var(--bg-primary);
+  border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .warning-note {
+  background: rgba(255, 193, 7, 0.1);
+}
+
+[data-theme="dark"] .warning-note.important {
+  background: rgba(239, 83, 80, 0.15);
+}
+
+[data-theme="dark"] .password-code {
+  background: var(--bg-primary);
+  color: var(--success-light);
+}

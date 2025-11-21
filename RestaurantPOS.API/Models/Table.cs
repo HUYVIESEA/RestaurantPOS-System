@@ -16,7 +16,9 @@ namespace RestaurantPOS.API.Models
 
     public bool IsAvailable { get; set; } = true;
 
-   [StringLength(50)]
+        public DateTime? OccupiedAt { get; set; } // Thời điểm bàn bắt đầu được sử dụng
+
+        [StringLength(50)]
         public string Floor { get; set; } = "Tầng 1"; // ✅ NEW: Floor/Area
 
         // ✅ NEW: Table merging/splitting support

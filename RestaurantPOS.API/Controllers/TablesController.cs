@@ -46,6 +46,13 @@ namespace RestaurantPOS.API.Controllers
             return await _context.Tables.Where(t => t.IsAvailable).ToListAsync();
         }
 
+        // GET: api/Tables/Floor/Tầng 1
+        [HttpGet("Floor/{floor}")]
+        public async Task<ActionResult<IEnumerable<Table>>> GetTablesByFloor(string floor)
+        {
+            return await _context.Tables.Where(t => t.Floor == floor).ToListAsync();
+        }
+
         // POST: api/Tables
         [HttpPost]
         public async Task<ActionResult<Table>> CreateTable(Table table)
@@ -97,6 +104,32 @@ namespace RestaurantPOS.API.Controllers
             }
 
             table.IsAvailable = isAvailable;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // POST: api/Tables/5/Return - Return a table (make it available)
+        [HttpPost("{id}/Return")]
+        public async Task<IActionResult> ReturnTable(int id)
+        {
+            var table = await _context.Tables.FindAsync(id);
+            if (table == null)
+            {
+                return NotFound();
+            }
+
+            // Check if table has pending orders
+            var hasPendingOrders = await _context.Orders
+                .AnyAsync(o => o.TableId == id && (o.Status == "Pending" || o.Status == "Processing"));
+
+            if (hasPendingOrders)
+            {
+                return BadRequest("Không thể trả bàn khi còn đơn hàng chưa hoàn thành. Vui lòng hoàn thành hoặc hủy đơn trước.");
+            }
+
+            table.IsAvailable = true;
+            table.OccupiedAt = null;
             await _context.SaveChangesAsync();
 
             return NoContent();
