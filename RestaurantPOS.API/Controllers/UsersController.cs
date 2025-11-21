@@ -237,9 +237,9 @@ user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
         return NotFound();
   }
 
-            if (role != "Admin" && role != "Staff")
+            if (role != "Admin" && role != "Manager" && role != "Staff")
     {
-      return BadRequest("Role không hợp lệ. Chỉ chấp nhận 'Admin' hoặc 'Staff'");
+      return BadRequest("Role không hợp lệ. Chỉ chấp nhận 'Admin', 'Manager' hoặc 'Staff'");
             }
 
             user.Role = role;

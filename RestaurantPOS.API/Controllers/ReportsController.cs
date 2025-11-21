@@ -5,7 +5,7 @@ using RestaurantPOS.API.Services;
 
 namespace RestaurantPOS.API.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can access reports
     [Route("api/[controller]")]
     [ApiController]
     public class ReportsController : ControllerBase

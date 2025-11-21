@@ -55,6 +55,7 @@ namespace RestaurantPOS.API.Controllers
 
         // POST: api/Tables
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can create tables
         public async Task<ActionResult<Table>> CreateTable(Table table)
         {
             _context.Tables.Add(table);
@@ -65,6 +66,7 @@ namespace RestaurantPOS.API.Controllers
 
         // PUT: api/Tables/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can update tables
         public async Task<IActionResult> UpdateTable(int id, Table table)
         {
             if (id != table.Id)
@@ -137,6 +139,7 @@ namespace RestaurantPOS.API.Controllers
 
         // DELETE: api/Tables/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can delete tables
         public async Task<IActionResult> DeleteTable(int id)
         {
             var table = await _context.Tables.FindAsync(id);

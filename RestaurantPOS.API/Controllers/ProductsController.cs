@@ -49,6 +49,7 @@ namespace RestaurantPOS.API.Controllers
 
         // POST: api/Products
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can create products
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
             var createdProduct = await _productService.CreateProductAsync(product);
@@ -57,6 +58,7 @@ namespace RestaurantPOS.API.Controllers
 
         // PUT: api/Products/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can update products
         public async Task<IActionResult> UpdateProduct(int id, Product product)
         {
             var updatedProduct = await _productService.UpdateProductAsync(id, product);
@@ -71,6 +73,7 @@ namespace RestaurantPOS.API.Controllers
 
         // DELETE: api/Products/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can delete products
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var result = await _productService.DeleteProductAsync(id);

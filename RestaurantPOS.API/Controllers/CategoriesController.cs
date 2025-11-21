@@ -41,6 +41,7 @@ namespace RestaurantPOS.API.Controllers
 
         // POST: api/Categories
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can create categories
         public async Task<ActionResult<Category>> CreateCategory(Category category)
         {
             _context.Categories.Add(category);
@@ -51,6 +52,7 @@ namespace RestaurantPOS.API.Controllers
 
         // PUT: api/Categories/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can update categories
         public async Task<IActionResult> UpdateCategory(int id, Category category)
         {
       if (id != category.Id)
@@ -81,6 +83,7 @@ namespace RestaurantPOS.API.Controllers
 
         // DELETE: api/Categories/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can delete categories
         public async Task<IActionResult> DeleteCategory(int id)
         {
       var category = await _context.Categories.FindAsync(id);

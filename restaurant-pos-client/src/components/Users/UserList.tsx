@@ -4,6 +4,7 @@ import { userService, User } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { SkeletonTable } from '../Common/Skeleton';
+import { AdminOnly } from '../Common/Protected';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import {
   ChangeRoleDialog,
@@ -202,242 +203,261 @@ const UserList: React.FC = () => {
   }
 
   return (
-    <div className="user-list-container">
-      {/* Header */}
-      <div className="header">
-        <h2>👥 Quản lý Nhân viên</h2>
-        <button 
-          className="btn btn-primary" 
-          onClick={() => navigate('/users/new')}
-        >
-          <i className="fas fa-plus"></i> Thêm nhân viên
-        </button>
-      </div>
-
-      {/* Statistics Cards */}
-      <div className="employee-stats">
-        <div className="stat-card total">
-          <div className="stat-icon">👥</div>
-          <div className="stat-content">
-            <h4>Tổng nhân viên</h4>
-            <p className="stat-number">{stats.total}</p>
+    <AdminOnly
+      fallback={
+        <div className="user-list-container">
+          <div className="no-permission">
+            <div className="no-permission-icon">🔒</div>
+            <h2>Không có quyền truy cập</h2>
+            <p>Bạn không có quyền truy cập trang quản lý người dùng.</p>
+            <p>Chỉ có <strong>Admin</strong> mới có thể quản lý người dùng.</p>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => navigate('/')}
+            >
+              ← Quay về trang chủ
+            </button>
           </div>
         </div>
-
-        <div className="stat-card active">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h4>Đang hoạt động</h4>
-            <p className="stat-number">{stats.active}</p>
-          </div>
-        </div>
-
-        <div className="stat-card inactive">
-          <div className="stat-icon">⛔</div>
-          <div className="stat-content">
-            <h4>Đã khóa</h4>
-            <p className="stat-number">{stats.inactive}</p>
-          </div>
-        </div>
-
-        <div className="stat-card admins">
-          <div className="stat-icon">👑</div>
-          <div className="stat-content">
-            <h4>Admin</h4>
-            <p className="stat-number">{stats.admins}</p>
-          </div>
-        </div>
-
-        <div className="stat-card staff">
-          <div className="stat-icon">👤</div>
-          <div className="stat-content">
-            <h4>Staff</h4>
-            <p className="stat-number">{stats.staff}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="filters">
-        <div className="search-box">
-          <i className="fas fa-search"></i>
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên, email, username..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="filter-buttons">
+      }
+    >
+      <div className="user-list-container">
+        {/* Header */}
+        <div className="header">
+          <h2>👥 Quản lý Nhân viên</h2>
           <button 
-            className={`filter-btn ${roleFilter === 'all' ? 'active' : ''}`}
-            onClick={() => setRoleFilter('all')}
+            className="btn btn-primary" 
+            onClick={() => navigate('/users/new')}
           >
-            Tất cả ({users.length})
-          </button>
-          <button 
-            className={`filter-btn ${roleFilter === 'Admin' ? 'active' : ''}`}
-            onClick={() => setRoleFilter('Admin')}
-          >
-            👑 Admin ({stats.admins})
-          </button>
-          <button 
-            className={`filter-btn ${roleFilter === 'Staff' ? 'active' : ''}`}
-            onClick={() => setRoleFilter('Staff')}
-          >
-            👤 Staff ({stats.staff})
+            <i className="fas fa-plus"></i> Thêm nhân viên
           </button>
         </div>
-      </div>
 
-      {/* User Table */}
-      <div className="table-container">
-        <table className="user-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Họ và tên</th>
-              <th>Email</th>
-              <th>Vai trò</th>
-              <th>Trạng thái</th>
-              <th>Ngày tạo</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map(user => (
-              <tr key={user.id} className={!user.isActive ? 'inactive' : ''}>
-                <td>
-                  <strong>{user.username}</strong>
-                  {user.id === currentUserId && (
-                    <span className="badge badge-info">You</span>
-                  )}
-                </td>
-                <td>{user.fullName}</td>
-                <td>{user.email}</td>
-                <td>
-                  <span className={`badge badge-${user.role.toLowerCase()}`}>
-                    {user.role === 'Admin' ? '👑 Admin' : '👤 Staff'}
-                  </span>
-                </td>
-                <td>
-                  <span className={`badge badge-${user.isActive ? 'active' : 'inactive'}`}>
-                    {user.isActive ? '✅ Hoạt động' : '⛔ Khóa'}
-                  </span>
-                </td>
-                <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      className="btn btn-sm btn-edit"
-                      onClick={() => navigate(`/users/edit/${user.id}`)}
-                      title="Sửa"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="btn btn-sm btn-warning"
-                      onClick={() => handleChangeRoleClick(user.id, user.fullName, user.role)}
-                      disabled={user.id === currentUserId}
-                      title="Đổi vai trò"
-                    >
-                      🔄
-                    </button>
-                    <button
-                      className="btn btn-sm btn-info"
-                      onClick={() => handleResetPasswordClick(user.id, user.fullName)}
-                      title="Reset mật khẩu"
-                    >
-                      🔑
-                    </button>
-                    <button
-                      className={`btn btn-sm ${user.isActive ? 'btn-danger' : 'btn-success'}`}
-                      onClick={() => handleToggleStatusClick(user.id, user.fullName, user.isActive)}
-                      disabled={user.id === currentUserId}
-                      title={user.isActive ? 'Khóa' : 'Kích hoạt'}
-                    >
-                      {user.isActive ? '🔒' : '🔓'}
-                    </button>
-                    <button
-                      className="btn btn-sm btn-delete"
-                      onClick={() => handleDeleteClick(user.id, user.fullName)}
-                      disabled={user.id === currentUserId}
-                      title="Xóa"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </td>
+        {/* Statistics Cards */}
+        <div className="employee-stats">
+          <div className="stat-card total">
+            <div className="stat-icon">👥</div>
+            <div className="stat-content">
+              <h4>Tổng nhân viên</h4>
+              <p className="stat-number">{stats.total}</p>
+            </div>
+          </div>
+
+          <div className="stat-card active">
+            <div className="stat-icon">✅</div>
+            <div className="stat-content">
+              <h4>Đang hoạt động</h4>
+              <p className="stat-number">{stats.active}</p>
+            </div>
+          </div>
+
+          <div className="stat-card inactive">
+            <div className="stat-icon">⛔</div>
+            <div className="stat-content">
+              <h4>Đã khóa</h4>
+              <p className="stat-number">{stats.inactive}</p>
+            </div>
+          </div>
+
+          <div className="stat-card admins">
+            <div className="stat-icon">👑</div>
+            <div className="stat-content">
+              <h4>Admin</h4>
+              <p className="stat-number">{stats.admins}</p>
+            </div>
+          </div>
+
+          <div className="stat-card staff">
+            <div className="stat-icon">👤</div>
+            <div className="stat-content">
+              <h4>Staff</h4>
+              <p className="stat-number">{stats.staff}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="filters">
+          <div className="search-box">
+            <i className="fas fa-search"></i>
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên, email, username..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="filter-buttons">
+            <button 
+              className={`filter-btn ${roleFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setRoleFilter('all')}
+            >
+              Tất cả ({users.length})
+            </button>
+            <button 
+              className={`filter-btn ${roleFilter === 'Admin' ? 'active' : ''}`}
+              onClick={() => setRoleFilter('Admin')}
+            >
+              👑 Admin ({stats.admins})
+            </button>
+            <button 
+              className={`filter-btn ${roleFilter === 'Staff' ? 'active' : ''}`}
+              onClick={() => setRoleFilter('Staff')}
+            >
+              👤 Staff ({stats.staff})
+            </button>
+          </div>
+        </div>
+
+        {/* User Table */}
+        <div className="table-container">
+          <table className="user-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Họ và tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th>Thao tác</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredUsers.map(user => (
+                <tr key={user.id} className={!user.isActive ? 'inactive' : ''}>
+                  <td>
+                    <strong>{user.username}</strong>
+                    {user.id === currentUserId && (
+                      <span className="badge badge-info">You</span>
+                    )}
+                  </td>
+                  <td>{user.fullName}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    <span className={`badge badge-${user.role.toLowerCase()}`}>
+                      {user.role === 'Admin' ? '👑 Admin' : user.role === 'Manager' ? '👔 Manager' : '👤 Staff'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`badge badge-${user.isActive ? 'active' : 'inactive'}`}>
+                      {user.isActive ? '✅ Hoạt động' : '⛔ Khóa'}
+                    </span>
+                  </td>
+                  <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        className="btn btn-sm btn-edit"
+                        onClick={() => navigate(`/users/edit/${user.id}`)}
+                        title="Sửa"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="btn btn-sm btn-warning"
+                        onClick={() => handleChangeRoleClick(user.id, user.fullName, user.role)}
+                        disabled={user.id === currentUserId}
+                        title="Đổi vai trò"
+                      >
+                        🔄
+                      </button>
+                      <button
+                        className="btn btn-sm btn-info"
+                        onClick={() => handleResetPasswordClick(user.id, user.fullName)}
+                        title="Reset mật khẩu"
+                      >
+                        🔑
+                      </button>
+                      <button
+                        className={`btn btn-sm ${user.isActive ? 'btn-danger' : 'btn-success'}`}
+                        onClick={() => handleToggleStatusClick(user.id, user.fullName, user.isActive)}
+                        disabled={user.id === currentUserId}
+                        title={user.isActive ? 'Khóa' : 'Kích hoạt'}
+                      >
+                        {user.isActive ? '🔒' : '🔓'}
+                      </button>
+                      <button
+                        className="btn btn-sm btn-delete"
+                        onClick={() => handleDeleteClick(user.id, user.fullName)}
+                        disabled={user.id === currentUserId}
+                        title="Xóa"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-        {filteredUsers.length === 0 && (
-          <div className="empty-state">
-            <i className="fas fa-user-slash"></i>
-            <h3>Không tìm thấy người dùng</h3>
-            <p>
-              {searchTerm
-                ? `Không có người dùng nào khớp với "${searchTerm}"`
-                : 'Chưa có người dùng nào trong hệ thống'}
-            </p>
-            {!searchTerm && (
-              <button
-                className="btn btn-primary"
-                onClick={() => navigate('/users/new')}
-              >
-                <i className="fas fa-plus"></i> Thêm người dùng đầu tiên
-              </button>
-            )}
-          </div>
-        )}
+          {filteredUsers.length === 0 && (
+            <div className="empty-state">
+              <i className="fas fa-user-slash"></i>
+              <h3>Không tìm thấy người dùng</h3>
+              <p>
+                {searchTerm
+                  ? `Không có người dùng nào khớp với "${searchTerm}"`
+                  : 'Chưa có người dùng nào trong hệ thống'}
+              </p>
+              {!searchTerm && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => navigate('/users/new')}
+                >
+                  <i className="fas fa-plus"></i> Thêm người dùng đầu tiên
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Dialogs */}
+        <ConfirmDialog
+          isOpen={showConfirmDialog}
+          title="Xác nhận xóa người dùng"
+          message={`Bạn có chắc chắn muốn xóa người dùng "${userToDelete?.name}"? Hành động này không thể hoàn tác.`}
+          confirmText="Xóa"
+          cancelText="Hủy"
+          type="danger"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+
+        <ChangeRoleDialog
+          isOpen={showRoleDialog}
+          userName={roleChangeUser?.name || ''}
+          currentRole={roleChangeUser?.role || ''}
+          onConfirm={handleConfirmRoleChange}
+          onCancel={() => {
+            setShowRoleDialog(false);
+            setRoleChangeUser(null);
+          }}
+        />
+
+        <ResetPasswordDialog
+          isOpen={showPasswordDialog}
+          userName={passwordResetUser?.name || ''}
+          newPassword={newPassword}
+          showPassword={showNewPassword}
+          onConfirm={handleConfirmResetPassword}
+          onCancel={handleClosePasswordDialog}
+        />
+
+        <ToggleStatusDialog
+          isOpen={showStatusDialog}
+          userName={statusChangeUser?.name || ''}
+          currentStatus={statusChangeUser?.status || false}
+          onConfirm={handleConfirmStatusChange}
+          onCancel={() => {
+            setShowStatusDialog(false);
+            setStatusChangeUser(null);
+          }}
+        />
       </div>
-
-      {/* Dialogs */}
-      <ConfirmDialog
-        isOpen={showConfirmDialog}
-        title="Xác nhận xóa người dùng"
-        message={`Bạn có chắc chắn muốn xóa người dùng "${userToDelete?.name}"? Hành động này không thể hoàn tác.`}
-        confirmText="Xóa"
-        cancelText="Hủy"
-        type="danger"
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-      />
-
-      <ChangeRoleDialog
-        isOpen={showRoleDialog}
-        userName={roleChangeUser?.name || ''}
-        currentRole={roleChangeUser?.role || ''}
-        onConfirm={handleConfirmRoleChange}
-        onCancel={() => {
-          setShowRoleDialog(false);
-          setRoleChangeUser(null);
-        }}
-      />
-
-      <ResetPasswordDialog
-        isOpen={showPasswordDialog}
-        userName={passwordResetUser?.name || ''}
-        newPassword={newPassword}
-        showPassword={showNewPassword}
-        onConfirm={handleConfirmResetPassword}
-        onCancel={handleClosePasswordDialog}
-      />
-
-      <ToggleStatusDialog
-        isOpen={showStatusDialog}
-        userName={statusChangeUser?.name || ''}
-        currentStatus={statusChangeUser?.status || false}
-        onConfirm={handleConfirmStatusChange}
-        onCancel={() => {
-          setShowStatusDialog(false);
-          setStatusChangeUser(null);
-        }}
-      />
-    </div>
+    </AdminOnly>
   );
 };
 

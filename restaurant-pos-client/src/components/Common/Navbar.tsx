@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePermissions } from '../../hooks/usePermissions';
 import ThemeToggle from './ThemeToggle';
 import NotificationBell from './NotificationBell';
 import './Navbar.css';
@@ -8,6 +9,7 @@ import './Navbar.css';
 const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const permissions = usePermissions();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -15,15 +17,20 @@ const Navbar: React.FC = () => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
-  const menuItems = [
-    { path: '/', label: 'Dashboard', icon: 'fa-chart-line' },
-  { path: '/tables', label: 'Bàn', icon: 'fa-utensils' },
-    { path: '/orders', label: 'Đơn hàng', icon: 'fa-receipt' },
-    { path: '/products', label: 'Sản phẩm', icon: 'fa-box' },
-  { path: '/categories', label: 'Danh mục', icon: 'fa-folder' },
-    { path: '/reports', label: 'Báo cáo', icon: 'fa-chart-bar' }, // ✅ NEW
-    { path: '/users', label: 'Người dùng', icon: 'fa-users' },
+  // All possible menu items
+  const allMenuItems = [
+    { path: '/', label: 'Dashboard', icon: 'fa-chart-line', permission: true }, // Always visible
+  { path: '/tables', label: 'Bàn', icon: 'fa-utensils', permission: true }, // Always visible
+    { path: '/orders', label: 'Đơn hàng', icon: 'fa-receipt', permission: true }, // Always visible
+    { path: '/products', label: 'Sản phẩm', icon: 'fa-box', permission: true }, // Always visible
+  { path: '/categories', label: 'Danh mục', icon: 'fa-folder', permission: true }, // Always visible
+    { path: '/analytics', label: 'Phân tích', icon: 'fa-chart-pie', permission: permissions.canAccessAnalytics }, // Admin, Manager
+    { path: '/reports', label: 'Báo cáo', icon: 'fa-chart-bar', permission: permissions.reports.canView }, // Admin, Manager
+    { path: '/users', label: 'Người dùng', icon: 'fa-users', permission: permissions.users.canView }, // Admin only
   ];
+
+  // Filter menu items based on permissions
+  const menuItems = allMenuItems.filter(item => item.permission);
 
   return (
 <nav className="modern-navbar">
@@ -80,7 +87,11 @@ onClick={() => setShowMobileMenu(!showMobileMenu)}
             <div className="user-info">
     <span className="user-name">{user?.fullName}</span>
        <span className="user-role">
-          <i className={`fas ${user?.role === 'Admin' ? 'fa-crown' : 'fa-user'}`}></i>
+          <i className={`fas ${
+            user?.role === 'Admin' ? 'fa-crown' : 
+            user?.role === 'Manager' ? 'fa-user-tie' : 
+            'fa-user'
+          }`}></i>
  {user?.role}
    </span>
      </div>

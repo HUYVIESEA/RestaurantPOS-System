@@ -19,6 +19,7 @@ namespace RestaurantPOS.API.Controllers
 
 // GET: api/Orders
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can view all orders
  public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
     var orders = await _orderService.GetAllOrdersAsync();
@@ -132,6 +133,7 @@ namespace RestaurantPOS.API.Controllers
 
         // DELETE: api/Orders/5
      [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can delete orders
  public async Task<IActionResult> DeleteOrder(int id)
  {
     var result = await _orderService.DeleteOrderAsync(id);

@@ -6,12 +6,14 @@ import { Product, Category } from '../../types';
 import { formatCurrency } from '../../utils/priceUtils';
 import { SkeletonGrid, LoadingOverlay } from '../Common/Skeleton';
 import { useToast } from '../../contexts/ToastContext';
+import { usePermissions } from '../../hooks/usePermissions';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import './ProductList.css';
 
 const ProductList: React.FC = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
+  const permissions = usePermissions();
   
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -115,12 +117,14 @@ showError('Không thể tải dữ liệu sản phẩm');
           <h2><i className="fas fa-box"></i> Quản lý Sản phẩm</h2>
        <span className="product-count">{filteredProducts.length} sản phẩm</span>
         </div>
-        <button 
-       className="btn btn-primary"
-    onClick={() => navigate('/products/new')}
-        >
-       <i className="fas fa-plus"></i> Thêm sản phẩm
-  </button>
+        {permissions.products.canCreate && (
+          <button 
+            className="btn btn-primary"
+            onClick={() => navigate('/products/new')}
+          >
+            <i className="fas fa-plus"></i> Thêm sản phẩm
+          </button>
+        )}
       </div>
 
       {/* Search & Filters */}
@@ -237,25 +241,29 @@ onClick={() => handleCategoryFilter(category.id)}
        </div>
 
      <div className="action-buttons">
-              <button
-        className="btn btn-sm btn-edit"
-    onClick={() => navigate(`/products/edit/${product.id}`)}
-            title="Chỉnh sửa"
-                 >
-                <i className="fas fa-edit"></i>
-        </button>
-<button
-            className="btn btn-sm btn-delete"
-            onClick={() => handleDeleteClick(product.id, product.name)}
-            disabled={deleting === product.id}
-            title="Xóa"
-       >
-      {deleting === product.id ? (
-      <i className="fas fa-spinner fa-spin"></i>
-         ) : (
-            <i className="fas fa-trash"></i>
-           )}
-              </button>
+              {permissions.products.canEdit && (
+                <button
+                  className="btn btn-sm btn-edit"
+                  onClick={() => navigate(`/products/edit/${product.id}`)}
+                  title="Chỉnh sửa"
+                >
+                  <i className="fas fa-edit"></i>
+                </button>
+              )}
+              {permissions.products.canDelete && (
+                <button
+                  className="btn btn-sm btn-delete"
+                  onClick={() => handleDeleteClick(product.id, product.name)}
+                  disabled={deleting === product.id}
+                  title="Xóa"
+                >
+                  {deleting === product.id ? (
+                    <i className="fas fa-spinner fa-spin"></i>
+                  ) : (
+                    <i className="fas fa-trash"></i>
+                  )}
+                </button>
+              )}
            </div>
         </div>
   </div>
@@ -271,13 +279,13 @@ onClick={() => handleCategoryFilter(category.id)}
               ? `Không có sản phẩm nào khớp với "${searchTerm}"`
            : 'Chưa có sản phẩm nào. Hãy thêm sản phẩm mới!'}
   </p>
-          {!searchTerm && (
+          {!searchTerm && permissions.products.canCreate && (
             <button 
               className="btn btn-primary"
-        onClick={() => navigate('/products/new')}
- >
-        <i className="fas fa-plus"></i> Thêm sản phẩm đầu tiên
-         </button>
+              onClick={() => navigate('/products/new')}
+            >
+              <i className="fas fa-plus"></i> Thêm sản phẩm đầu tiên
+            </button>
           )}
 </div>
       )}

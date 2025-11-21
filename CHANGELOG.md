@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.0] - 2025-11-21
+
+### 🔐 Security & Authorization Update
+
+### Added
+- ✨ **Role-Based Authorization System**
+  - Added "Manager" role to the system (Admin, Manager, Staff)
+  - Comprehensive role-based access control across all controllers
+  - Detailed authorization documentation (AUTHORIZATION.md)
+  - Authorization workflow guide (.agent/workflows/update-authorization.md)
+
+- 🔒 **Controller-Level Permissions**
+  - **ProductsController**: Admin & Manager can create/update/delete products
+  - **CategoriesController**: Admin & Manager can create/update/delete categories
+  - **OrdersController**: Admin & Manager can view all orders and delete orders
+  - **TablesController**: Admin & Manager can create/update/delete tables
+  - **ReportsController**: Only Admin & Manager can access all reports
+  - **UsersController**: Only Admin can manage users (already implemented)
+
+### Changed
+- 🔄 **Updated Role Validation**
+  - UpdateRole endpoint now accepts "Admin", "Manager", and "Staff"
+  - Improved error messages for invalid roles
+  - Better role validation across the system
+
+### Security
+- 🛡️ **Enhanced Access Control**
+  - Staff users can only view products, categories, and tables (read-only)
+  - Staff users can create and manage their own orders
+  - Staff users cannot access reports or analytics
+  - Staff users cannot manage other users
+  - Manager users have full access except user management
+  - Admin users have complete system access
+
+### Documentation
+- 📚 **New Documentation**
+  - AUTHORIZATION.md - Complete authorization reference
+  - Authorization matrix showing all permissions
+  - Testing guide for different roles
+  - Best practices for security
+
+### Fixed
+- 🐛 **Authorization Gaps**
+  - Fixed missing role checks in ProductsController
+  - Fixed missing role checks in CategoriesController
+  - Fixed missing role checks in OrdersController
+  - Fixed missing role checks in TablesController
+  - Fixed missing role checks in ReportsController
+
+### Technical Details
+- All changes are backward compatible
+- No database migrations required
+- JWT token already includes role claims
+- Build successful with 0 errors
+
+---
+
 ## [2.0.0] - 2024-01-15
 
 ### 🎉 Major Release - Complete UI/UX Overhaul

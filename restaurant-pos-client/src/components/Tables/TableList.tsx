@@ -4,12 +4,14 @@ import { tableService } from '../../services/tableService';
 import { orderService } from '../../services/orderService';
 import { Table } from '../../types';
 import { useElapsedTime, getElapsedTimeColor } from '../../hooks/useElapsedTime';
+import { usePermissions } from '../../hooks/usePermissions';
 import ReturnTableDialog from './ReturnTableDialog';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import './TableList.css';
 
 const TableList: React.FC = () => {
   const navigate = useNavigate();
+  const permissions = usePermissions();
   const [tables, setTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -226,9 +228,11 @@ const tablesByFloor = filteredTables.reduce((acc, table) => {
 
       <div className="header">
  <h2>Quản lý Bàn</h2>
-        <button className="btn btn-primary" onClick={() => navigate('/tables/new')}>
-          + Thêm bàn
-        </button>
+        {permissions.tables.canCreate && (
+          <button className="btn btn-primary" onClick={() => navigate('/tables/new')}>
+            + Thêm bàn
+          </button>
+        )}
       </div>
 
       {/* ✅ Status Filters */}
@@ -289,6 +293,7 @@ Tất cả ({tables.length})
           onReturnTable={handleReturnTable}
           onDelete={handleDeleteClick}
           onEdit={() => navigate(`/tables/edit/${table.id}`)}
+          permissions={permissions}
         />
         ))}
      </div>
@@ -304,6 +309,7 @@ Tất cả ({tables.length})
      onReturnTable={handleReturnTable}
   onDelete={handleDeleteClick}
               onEdit={() => navigate(`/tables/edit/${table.id}`)}
+              permissions={permissions}
        />
           ))}
         </div>
@@ -322,6 +328,7 @@ interface TableCardProps {
   onReturnTable: (id: number) => void;
   onDelete: (id: number, tableNumber: string) => void;
   onEdit: () => void;
+  permissions: ReturnType<typeof usePermissions>;
 }
 
 // ✅ Updated TableCard component with timer
@@ -329,7 +336,8 @@ const TableCard: React.FC<TableCardProps> = ({
   table, 
   onReturnTable,
   onDelete, 
-  onEdit 
+  onEdit,
+  permissions
 }) => {
   const navigate = useNavigate();
   const elapsedTime = useElapsedTime(table.occupiedAt);
@@ -396,7 +404,9 @@ const TableCard: React.FC<TableCardProps> = ({
     >
  🍽️ Đặt món
        </button>
- <button className="btn btn-edit" onClick={onEdit}>Sửa</button>
+      {permissions.tables.canEdit && (
+        <button className="btn btn-edit" onClick={onEdit}>Sửa</button>
+      )}
     </>
   ) : (
       <>
@@ -408,12 +418,14 @@ const TableCard: React.FC<TableCardProps> = ({
  </button>
           </>
         )}
-    <button 
-          className="btn btn-delete"
-   onClick={() => onDelete(table.id, table.tableNumber)}
-        >
-          Xóa
-        </button>
+        {permissions.tables.canDelete && (
+          <button 
+            className="btn btn-delete"
+            onClick={() => onDelete(table.id, table.tableNumber)}
+          >
+            Xóa
+          </button>
+        )}
       </div>
     </div>
   );

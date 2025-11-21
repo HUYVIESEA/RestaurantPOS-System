@@ -1,37 +1,3 @@
-# 🍜 Restaurant POS System - Hệ Thống Quản Lý Nhà Hàng
-
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
-![Status](https://img.shields.io/badge/status-production--ready-success.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-
-**Hệ thống POS (Point of Sale) chuyên nghiệp cho nhà hàng với giao diện hiện đại, responsive và hỗ trợ Dark Mode.**
-
----
-
-## 🎯 Tính Năng Chính
-
-### ✨ Frontend Features
-- 🌙 **Dark Mode** - Chế độ sáng/tối hoàn chỉnh
-- 📱 **Responsive Design** - Tương thích mọi thiết bị
-- 🔔 **Real-time Notifications** - Thông báo thời gian thực
-- 📊 **Analytics Dashboard** - Báo cáo & phân tích
-- 💰 **Price Formatting** - Định dạng VND chuẩn
-- ⚡ **Skeleton Loading** - Trải nghiệm loading mượt mà
-- 🎨 **Modern UI/UX** - Giao diện đẹp, chuyên nghiệp
-
-### 🔧 Backend Features
-- 🔐 **JWT Authentication** - Bảo mật cao
-- 📧 **Email Verification** - Xác thực email
-- 🔑 **Password Reset** - Đặt lại mật khẩu
-- 📦 **Product Management** - Quản lý sản phẩm
-- 🍽️ **Table Management** - Quản lý bàn
-- 📝 **Order Management** - Quản lý đơn hàng
-- 👥 **User Management** - Quản lý người dùng
-- 📂 **Category Management** - Quản lý danh mục
-
----
-
-## 📈 Project Status
 
 ```
 ┌────────────────────────────────────────────┐

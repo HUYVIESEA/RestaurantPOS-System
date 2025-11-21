@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { categoryService } from '../../services/categoryService';
 import { Category } from '../../types';
+import { usePermissions } from '../../hooks/usePermissions';
 import './CategoryList.css';
 
 const CategoryList: React.FC = () => {
   const navigate = useNavigate();
+  const permissions = usePermissions();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,9 +49,11 @@ const CategoryList: React.FC = () => {
     <div className="category-list-container">
       <div className="header">
         <h2>Quản lý Danh mục</h2>
-        <button className="btn btn-primary" onClick={() => navigate('/categories/new')}>
-          + Thêm danh mục
-        </button>
+        {permissions.categories.canCreate && (
+          <button className="btn btn-primary" onClick={() => navigate('/categories/new')}>
+            + Thêm danh mục
+          </button>
+        )}
       </div>
 
       <div className="category-grid">
@@ -61,18 +65,22 @@ const CategoryList: React.FC = () => {
               <p>{category.description || 'Chưa có mô tả'}</p>
             </div>
             <div className="category-actions">
-              <button 
-                className="btn btn-edit" 
-                onClick={() => navigate(`/categories/edit/${category.id}`)}
-              >
-                Sửa
-              </button>
-              <button 
-                className="btn btn-delete"
-                onClick={() => handleDelete(category.id)}
-              >
-                Xóa
-              </button>
+              {permissions.categories.canEdit && (
+                <button 
+                  className="btn btn-edit" 
+                  onClick={() => navigate(`/categories/edit/${category.id}`)}
+                >
+                  Sửa
+                </button>
+              )}
+              {permissions.categories.canDelete && (
+                <button 
+                  className="btn btn-delete"
+                  onClick={() => handleDelete(category.id)}
+                >
+                  Xóa
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -81,12 +89,14 @@ const CategoryList: React.FC = () => {
       {categories.length === 0 && (
         <div className="empty-state">
           <p>📁 Chưa có danh mục nào</p>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => navigate('/categories/new')}
-          >
-            + Tạo danh mục đầu tiên
-          </button>
+          {permissions.categories.canCreate && (
+            <button 
+              className="btn btn-primary" 
+              onClick={() => navigate('/categories/new')}
+            >
+              + Tạo danh mục đầu tiên
+            </button>
+          )}
         </div>
       )}
     </div>
