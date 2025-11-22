@@ -3,7 +3,8 @@ import './App.css';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { NotificationProvider } from './contexts/NotificationContext'; // ✅ ADD
+import { NotificationProvider } from './contexts/NotificationContext';
+import { SignalRProvider } from './contexts/SignalRContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Common/Navbar';
 import Login from './components/Auth/Login';
@@ -20,12 +21,13 @@ import CategoryForm from './components/Categories/CategoryForm';
 import TableList from './components/Tables/TableList';
 import TableForm from './components/Tables/TableForm';
 import Dashboard from './components/Dashboard/Dashboard';
-import Analytics from './components/Analytics/Analytics'; // ✅ ADD
-import Reports from './components/Reports/Reports'; // ✅ NEW
+import Statistics from './components/Reports/Statistics'; // ✅ ADD
 import UserList from './components/Users/UserList';
 import UserForm from './components/Users/UserForm';
 import UserProfile from './components/Users/UserProfile';
 import ChangePassword from './components/Users/ChangePassword';
+import PaymentResult from './components/Payment/PaymentResult'; // ✅ ADD
+
 
 function AppContent() {
   const { isAuthenticated } = useAuth(); // ✅ Remove unused variables
@@ -68,11 +70,16 @@ function AppContent() {
               <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
               <Route path="/change-password" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
 
-              {/* Analytics */} {/* ✅ ADD */}
-              <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
+              {/* Statistics (Merged Analytics & Reports) */} {/* ✅ NEW */}
+              <Route path="/statistics" element={<PrivateRoute><Statistics /></PrivateRoute>} />
+              
+              {/* Redirect old routes to new one */}
+              <Route path="/analytics" element={<Navigate to="/statistics" replace />} />
+              <Route path="/reports" element={<Navigate to="/statistics" replace />} />
+              
+              {/* Payment */}
+              <Route path="/payment-result" element={<PrivateRoute><PaymentResult /></PrivateRoute>} />
 
-              {/* Reports */} {/* ✅ NEW */}
-              <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
@@ -95,11 +102,13 @@ function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ThemeProvider>
- <AuthProvider>
-  <NotificationProvider> {/* ✅ ADD NotificationProvider */}
-   <ToastProvider>
-        <AppContent />
-            </ToastProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <SignalRProvider> {/* ✅ ADD SignalRProvider */}
+              <ToastProvider>
+                <AppContent />
+              </ToastProvider>
+            </SignalRProvider>
           </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>

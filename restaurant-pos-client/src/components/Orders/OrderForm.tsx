@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { productService } from '../../services/productService';
 import { tableService } from '../../services/tableService';
@@ -17,8 +17,6 @@ interface CartItem {
 const OrderForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = useParams<{ id: string }>();
-  const isEditMode = !!id;
 
   // Get preselected table from location state
   const preselectedTableId = location.state?.tableId;

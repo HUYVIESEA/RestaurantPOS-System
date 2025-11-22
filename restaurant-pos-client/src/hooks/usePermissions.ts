@@ -13,8 +13,7 @@ import {
   getUserPermissions,
   canViewAllOrders,
   canAccessAnalytics,
-  canPerformAction,
-  Permission
+  canPerformAction
 } from '../utils/authUtils';
 
 /**

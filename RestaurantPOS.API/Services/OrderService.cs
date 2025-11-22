@@ -1,16 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantPOS.API.Data;
 using RestaurantPOS.API.Models;
+using Microsoft.AspNetCore.SignalR;
+using RestaurantPOS.API.Hubs;
 
 namespace RestaurantPOS.API.Services
 {
     public class OrderService : IOrderService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<RestaurantHub> _hubContext;
 
-        public OrderService(ApplicationDbContext context)
+        public OrderService(ApplicationDbContext context, IHubContext<RestaurantHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
@@ -77,6 +81,10 @@ namespace RestaurantPOS.API.Services
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
+            
+            // Broadcast new order
+            await _hubContext.Clients.All.SendAsync("OrderCreated", order);
+            
             return order;
         }
 
@@ -112,6 +120,10 @@ namespace RestaurantPOS.API.Services
                 }
             }
         }        await _context.SaveChangesAsync();
+            
+            // Broadcast update
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", order);
+            
       return order;
         }
 

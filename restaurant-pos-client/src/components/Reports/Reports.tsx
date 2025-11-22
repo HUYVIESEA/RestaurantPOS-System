@@ -6,10 +6,7 @@ import { Skeleton, SkeletonCard } from '../Common/Skeleton';
 import {
   RevenueChart,
   ProductBarChart,
-  CategoryPieChart,
-  OrderStatusChart,
-  HourlyChart,
-  WeeklyChart
+  OrderStatusChart
 } from './Charts';
 import {
   SalesSummary,

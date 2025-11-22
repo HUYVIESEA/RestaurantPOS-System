@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { Order, OrderItem } from '../../types';
 import { useToast } from '../../contexts/ToastContext'; // ✅ ADD
@@ -10,7 +10,6 @@ import './OrderDetail.css';
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
   const { showSuccess, showError, showWarning } = useToast(); // ✅ ADD
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,8 +18,6 @@ const OrderDetail: React.FC = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelingItem, setCancelingItem] = useState<OrderItem | null>(null);
-
-  const fromTables = location.state?.from === 'tables';
 
   useEffect(() => {
     if (id) {
@@ -276,15 +273,15 @@ Bàn: {order.table?.tableNumber || 'N/A'} |
       <table className="items-table">
           <thead>
             <tr>
-     {order.status === 'Pending' && <th width="50">Chọn</th>}
-        <th>Món</th>
-      <th>Đơn giá</th>
-        <th>Số lượng</th>
-       <th>Thành tiền</th>
-    {order.status === 'Pending' && <th>Thao tác</th>}
-       </tr>
+              {order.status === 'Pending' && <th style={{ width: '50px' }}>Chọn</th>}
+              <th>Món</th>
+              <th>Đơn giá</th>
+              <th>Số lượng</th>
+              <th>Thành tiền</th>
+              {order.status === 'Pending' && <th>Thao tác</th>}
+            </tr>
           </thead>
-  <tbody>
+          <tbody>
             {order.orderItems?.map(item => (
       <tr key={item.id} className={selectedItems.has(item.id) ? 'selected' : ''}>
         {order.status === 'Pending' && (

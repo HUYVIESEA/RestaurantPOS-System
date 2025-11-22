@@ -24,7 +24,6 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<string>('');
 
   if (selectedUsers.length === 0) return null;
 
@@ -98,7 +97,6 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
           <button
             className="btn btn-bulk btn-danger"
             onClick={() => {
-              setConfirmAction('delete');
               setShowConfirm(true);
             }}
           >

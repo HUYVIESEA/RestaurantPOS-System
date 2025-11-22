@@ -38,11 +38,11 @@ export interface AnalyticsData {
 export const analyticsService = {
   async getAnalytics(): Promise<AnalyticsData> {
     try {
-      const [orders, products, tables] = await Promise.all([
-      orderService.getAll(),
+      const [orders, , tables] = await Promise.all([
+        orderService.getAll(),
         productService.getAll(),
-  tableService.getAll()
-  ]);
+        tableService.getAll()
+      ]);
 
       // Calculate revenue
       const completedOrders = orders.filter(o => o.status === 'Completed');
@@ -55,24 +55,24 @@ export const analyticsService = {
       const todayRevenue = todayOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
       const weekAgo = new Date(today);
- weekAgo.setDate(weekAgo.getDate() - 7);
+      weekAgo.setDate(weekAgo.getDate() - 7);
       const weekOrders = completedOrders.filter(o => new Date(o.orderDate) >= weekAgo);
       const weekRevenue = weekOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
-  const monthAgo = new Date(today);
+      const monthAgo = new Date(today);
       monthAgo.setMonth(monthAgo.getMonth() - 1);
       const monthOrders = completedOrders.filter(o => new Date(o.orderDate) >= monthAgo);
       const monthRevenue = monthOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
       // Calculate growth
-  const lastWeekRevenue = completedOrders
-    .filter(o => {
+      const lastWeekRevenue = completedOrders
+        .filter(o => {
           const date = new Date(o.orderDate);
-  const twoWeeksAgo = new Date(weekAgo);
-twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 7);
+          const twoWeeksAgo = new Date(weekAgo);
+          twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 7);
           return date >= twoWeeksAgo && date < weekAgo;
         })
-.reduce((sum, o) => sum + o.totalAmount, 0);
+        .reduce((sum, o) => sum + o.totalAmount, 0);
 
       const revenueGrowth = lastWeekRevenue > 0 
         ? ((weekRevenue - lastWeekRevenue) / lastWeekRevenue) * 100 
@@ -81,33 +81,33 @@ twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 7);
       // Top products
       const productSales = new Map<number, { name: string; quantity: number; revenue: number }>();
       
-completedOrders.forEach(order => {
-order.items?.forEach((item: any) => {
-          const existing = productSales.get(item.productId) || { name: item.product?.name || 'Unknown', quantity: 0, revenue: 0 };
-        existing.quantity += item.quantity;
- existing.revenue += item.price * item.quantity;
+      completedOrders.forEach(order => {
+        order.orderItems?.forEach((item: any) => {
+          const existing = productSales.get(item.productId) || { name: item.productName || 'Unknown', quantity: 0, revenue: 0 };
+          existing.quantity += item.quantity;
+          existing.revenue += item.unitPrice * item.quantity;
           productSales.set(item.productId, existing);
         });
       });
 
-   const topProducts = Array.from(productSales.values())
+      const topProducts = Array.from(productSales.values())
         .sort((a, b) => b.revenue - a.revenue)
         .slice(0, 5);
 
       // Peak hours
-  const hourlyOrders = new Map<number, number>();
-   completedOrders.forEach(order => {
-  const hour = new Date(order.orderDate).getHours();
+      const hourlyOrders = new Map<number, number>();
+      completedOrders.forEach(order => {
+        const hour = new Date(order.orderDate).getHours();
         hourlyOrders.set(hour, (hourlyOrders.get(hour) || 0) + 1);
       });
 
       const peakHours = Array.from(hourlyOrders.entries())
         .map(([hour, orders]) => ({ hour, orders }))
-  .sort((a, b) => b.orders - a.orders)
+        .sort((a, b) => b.orders - a.orders)
         .slice(0, 5);
 
       // Revenue by day (last 7 days)
-const revenueByDay = [];
+      const revenueByDay = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date(today);
         date.setDate(date.getDate() - i);
@@ -115,16 +115,16 @@ const revenueByDay = [];
         const dayEnd = new Date(date);
         dayEnd.setHours(23, 59, 59, 999);
 
-const dayRevenue = completedOrders
-      .filter(o => {
- const orderDate = new Date(o.orderDate);
-   return orderDate >= dayStart && orderDate <= dayEnd;
+        const dayRevenue = completedOrders
+          .filter(o => {
+            const orderDate = new Date(o.orderDate);
+            return orderDate >= dayStart && orderDate <= dayEnd;
           })
-   .reduce((sum, o) => sum + o.totalAmount, 0);
+          .reduce((sum, o) => sum + o.totalAmount, 0);
 
-     revenueByDay.push({
+        revenueByDay.push({
           day: date.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' }),
- revenue: dayRevenue
+          revenue: dayRevenue
         });
       }
 
@@ -136,13 +136,13 @@ const dayRevenue = completedOrders
         totalRevenue,
         todayRevenue,
         weekRevenue,
-     monthRevenue,
+        monthRevenue,
         revenueGrowth,
-      totalOrders: orders.length,
+        totalOrders: orders.length,
         pendingOrders: orders.filter(o => o.status === 'Pending').length,
-  completedOrders: completedOrders.length,
+        completedOrders: completedOrders.length,
         cancelledOrders: orders.filter(o => o.status === 'Cancelled').length,
-      averageOrderValue: completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0,
+        averageOrderValue: completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0,
         topProducts,
         lowStockProducts: [],
         tableOccupancyRate,

@@ -183,6 +183,11 @@
   --bun-brown: #a67c52;
   --bun-brown-dark: #8b5e34;
   --bun-brown-light: #c49970;
+  --bun-yellow: #ffd54f;
+  --bun-yellow-light: #5c4a1e;
+  --bun-green: #43a047;
+  --bun-green-light: #1b5e20;
+  --bun-green-dark: #81c784;
 
   /* Neutral Colors - Inverted and improved */
   --white: #181818;

@@ -112,3 +112,27 @@
   padding: 3rem;
   color: var(--text-tertiary);  /* ✅ */
 }
+
+/* ============ DARK MODE ============ */
+[data-theme="dark"] .category-list-container {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .category-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .category-card:hover {
+  background: var(--bg-tertiary);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .btn-edit {
+  background-color: var(--bun-yellow);
+  color: var(--text-inverse);
+}
+
+[data-theme="dark"] .btn-edit:hover {
+  background-color: #ffd966;
+}

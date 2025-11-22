@@ -19,8 +19,6 @@ export const ChangeRoleDialog: React.FC<ChangeRoleDialogProps> = ({
   onConfirm,
   onCancel
 }) => {
-  const [selectedRole, setSelectedRole] = useState(currentRole);
-
   if (!isOpen) return null;
 
   const newRole = currentRole === 'Admin' ? 'Staff' : 'Admin';

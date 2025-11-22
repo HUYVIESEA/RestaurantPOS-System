@@ -30,7 +30,7 @@ ChartJS.register(
 );
 
 // Common chart options
-const commonOptions = {
+const commonOptions: any = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {

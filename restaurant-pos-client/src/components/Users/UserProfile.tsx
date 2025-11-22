@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userService, UpdateProfileRequest } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { SkeletonProfile } from '../Common/Skeleton'; // ✅ ADD
 import './UserProfile.css';
 
 const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
-  const { user: currentUser } = useAuth();
   
   const [formData, setFormData] = useState({
     username: '',

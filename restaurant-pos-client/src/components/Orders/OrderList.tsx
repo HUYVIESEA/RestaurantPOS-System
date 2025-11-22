@@ -4,12 +4,16 @@ import { orderService } from '../../services/orderService';
 import { Order } from '../../types';
 import { formatPrice } from '../../utils/priceUtils';
 import { useToast } from '../../contexts/ToastContext';
+import { useSignalR } from '../../contexts/SignalRContext'; // ✅ ADD
 import ConfirmDialog from '../Common/ConfirmDialog';
+import VnPayButton from '../Payment/VnPayButton'; // ✅ ADD
 import './OrderList.css';
+
 
 const OrderList: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { connection } = useSignalR(); // ✅ ADD
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -21,6 +25,25 @@ const OrderList: React.FC = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  // ✅ Listen for SignalR events
+  useEffect(() => {
+    if (connection) {
+      connection.on('OrderCreated', (newOrder: Order) => {
+        setOrders(prev => [newOrder, ...prev]);
+        showToast(`Đơn hàng mới #${newOrder.id} vừa được tạo!`, 'info');
+      });
+
+      connection.on('OrderUpdated', (updatedOrder: Order) => {
+        setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+      });
+
+      return () => {
+        connection.off('OrderCreated');
+        connection.off('OrderUpdated');
+      };
+    }
+  }, [connection, showToast]);
 
   const fetchOrders = async () => {
     try {
@@ -240,6 +263,14 @@ const OrderList: React.FC = () => {
                     >
                       Xóa
                     </button>
+                    {order.status === 'Pending' && (
+                      <VnPayButton 
+                        amount={order.totalAmount}
+                        orderDescription={`Thanh toan don hang #${order.id}`}
+                        className="btn-payment-mini"
+                      />
+                    )}
+
                   </td>
                 </tr>
               ))

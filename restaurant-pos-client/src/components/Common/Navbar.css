@@ -406,3 +406,50 @@
     min-width: 180px;
   }
 }
+
+/* ============ ADDITIONAL DARK MODE OVERRIDES ============ */
+[data-theme="dark"] .user-dropdown {
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--bun-brown-light);
+}
+
+[data-theme="dark"] .dropdown-divider {
+  background: var(--border-medium);
+}
+
+[data-theme="dark"] .user-menu-button {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .user-menu-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--bun-brown-light);
+}
+
+[data-theme="dark"] .brand-link:hover {
+  color: var(--bun-yellow);
+}
+
+[data-theme="dark"] .brand-icon {
+  color: var(--bun-yellow);
+}
+
+[data-theme="dark"] .nav-link.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--bun-yellow);
+}
+
+[data-theme="dark"] .nav-link.active::after {
+  background: var(--bun-yellow);
+}

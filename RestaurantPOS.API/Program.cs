@@ -6,7 +6,11 @@ using RestaurantPOS.API.Services;
 using System.Text;
 using System.Text.Json.Serialization;
 
+using RestaurantPOS.API.Services.VnPay;
+using RestaurantPOS.API.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -28,6 +32,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
+
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
@@ -92,11 +98,14 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.AllowAnyOrigin()
-       .AllowAnyMethod()
-     .AllowAnyHeader();
+            policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // Add your client URLs here
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials(); // Required for SignalR
         });
 });
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -115,5 +124,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<RestaurantHub>("/restaurantHub");
 
 app.Run();
