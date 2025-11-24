@@ -42,7 +42,7 @@ const ProductList: React.FC = () => {
       setCategories(categoriesData);
     } catch (err) {
       console.error('Error fetching data:', err);
-showError('Không thể tải dữ liệu sản phẩm');
+showError('Không thể tải dữ liệu thực đơn');
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ showError('Không thể tải dữ liệu sản phẩm');
       setProducts(data);
     } catch (err) {
       console.error('Error filtering products:', err);
-      showError('Không thể lọc sản phẩm');
+      showError('Không thể lọc món ăn');
     } finally {
   setLoading(false);
     }
@@ -76,10 +76,10 @@ showError('Không thể tải dữ liệu sản phẩm');
       setDeleting(productToDelete.id);
       await productService.delete(productToDelete.id);
       setProducts(products.filter(p => p.id !== productToDelete.id));
-      showSuccess('Đã xóa sản phẩm thành công');
+      showSuccess('Đã xóa món ăn thành công');
     } catch (err) {
       console.error('Error deleting product:', err);
-      showError('Không thể xóa sản phẩm');
+      showError('Không thể xóa món ăn');
     } finally {
       setDeleting(null);
       setShowConfirmDialog(false);
@@ -102,7 +102,7 @@ showError('Không thể tải dữ liệu sản phẩm');
     return (
       <div className="product-list-container">
 <div className="header">
-          <h2><i className="fas fa-box"></i> Quản lý Sản phẩm</h2>
+          <h2><i className="fas fa-box"></i> Quản lý thực đơn</h2>
         </div>
    <SkeletonGrid items={6} columns={3} />
       </div>
@@ -114,15 +114,15 @@ showError('Không thể tải dữ liệu sản phẩm');
       {/* Header */}
    <div className="header">
         <div className="header-left">
-          <h2><i className="fas fa-box"></i> Quản lý Sản phẩm</h2>
-       <span className="product-count">{filteredProducts.length} sản phẩm</span>
+          <h2><i className="fas fa-box"></i> Quản lý thực đơn</h2>
+       <span className="product-count">{filteredProducts.length} thực đơn</span>
         </div>
         {permissions.products.canCreate && (
           <button 
             className="btn btn-primary"
             onClick={() => navigate('/products/new')}
           >
-            <i className="fas fa-plus"></i> Thêm sản phẩm
+            <i className="fas fa-plus"></i> Thêm thực đơn
           </button>
         )}
       </div>
@@ -133,7 +133,7 @@ showError('Không thể tải dữ liệu sản phẩm');
           <i className="fas fa-search"></i>
    <input
     type="text"
-            placeholder="Tìm kiếm sản phẩm..."
+            placeholder="Tìm kiếm thực đơn..."
 value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
        />
@@ -273,30 +273,30 @@ onClick={() => handleCategoryFilter(category.id)}
       ) : (
         <div className="empty-state">
      <i className="fas fa-box-open"></i>
-          <h3>Không tìm thấy sản phẩm</h3>
+          <h3>Không tìm thấy thực đơn</h3>
      <p>
             {searchTerm 
-              ? `Không có sản phẩm nào khớp với "${searchTerm}"`
-           : 'Chưa có sản phẩm nào. Hãy thêm sản phẩm mới!'}
+              ? `Không có thực đơn nào khớp với "${searchTerm}"`
+           : 'Chưa có thực đơn nào. Hãy thêm thực đơn mới!'}
   </p>
           {!searchTerm && permissions.products.canCreate && (
             <button 
               className="btn btn-primary"
               onClick={() => navigate('/products/new')}
             >
-              <i className="fas fa-plus"></i> Thêm sản phẩm đầu tiên
+              <i className="fas fa-plus"></i> Thêm thực đơn đầu tiên
             </button>
           )}
 </div>
       )}
 
-      {deleting && <LoadingOverlay message="Đang xóa sản phẩm..." transparent />}
+      {deleting && <LoadingOverlay message="Đang xóa thực đơn..." transparent />}
 
       {/* Confirm Dialog */}
       <ConfirmDialog
         isOpen={showConfirmDialog}
-        title="Xác nhận xóa sản phẩm"
-        message={`Bạn có chắc chắn muốn xóa sản phẩm "${productToDelete?.name}"? Hành động này không thể hoàn tác.`}
+        title="Xác nhận xóa thực đơn"
+        message={`Bạn có chắc chắn muốn xóa thực đơn "${productToDelete?.name}"? Hành động này không thể hoàn tác.`}
         confirmText="Xóa"
         cancelText="Hủy"
         type="danger"

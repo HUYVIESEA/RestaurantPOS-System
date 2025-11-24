@@ -55,7 +55,7 @@ const ProductForm: React.FC = () => {
         isAvailable: product.isAvailable,
       });
     } catch (err) {
-      setError('Không thể tải thông tin sản phẩm');
+      setError('Không thể tải thông tin thực đơn');
     }
   };
 
@@ -67,7 +67,7 @@ const ProductForm: React.FC = () => {
     // ✅ Validate price
     const priceValue = Number(formData.price);
     if (isNaN(priceValue) || priceValue < 0) {
-      setError('Giá sản phẩm không hợp lệ');
+      setError('Giá thực đơn không hợp lệ');
       setLoading(false);
       return;
     }
@@ -115,7 +115,7 @@ const ProductForm: React.FC = () => {
   return (
     <div className="product-form-container">
       <div className="form-header">
-        <h2>{isEditMode ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}</h2>
+        <h2>{isEditMode ? 'Cập nhật thực đơn' : 'Thêm thực đơn mới'}</h2>
         <button onClick={() => navigate('/products')} className="btn-back">
           ← Quay lại
         </button>
@@ -125,7 +125,7 @@ const ProductForm: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="product-form">
         <div className="form-group">
-          <label htmlFor="name">Tên sản phẩm *</label>
+          <label htmlFor="name">Tên thực đơn *</label>
           <input
             type="text"
             id="name"
@@ -133,7 +133,7 @@ const ProductForm: React.FC = () => {
             value={formData.name}
             onChange={handleChange}
             required
-            placeholder="Nhập tên sản phẩm"
+            placeholder="Nhập tên thực đơn"
           />
         </div>
 
@@ -145,7 +145,7 @@ const ProductForm: React.FC = () => {
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            placeholder="Nhập mô tả sản phẩm"
+            placeholder="Nhập mô tả thực đơn"
           />
         </div>
 

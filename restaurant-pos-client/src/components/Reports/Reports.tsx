@@ -92,7 +92,7 @@ const Reports: React.FC = () => {
       const data = await reportService.getTopSellingProducts(startDate, endDate, 10);
       setTopProducts(data);
     } catch (error) {
-      showToast('Lỗi khi tải báo cáo sản phẩm', 'error');
+      showToast('Lỗi khi tải báo cáo thực đơn', 'error');
       console.error('Error loading top products:', error);
     } finally {
       setLoading(false);
@@ -213,7 +213,7 @@ const Reports: React.FC = () => {
 
         {/* Top Products */}
         <div className="summary-section">
-          <h2>🏆 Top 5 Sản Phẩm Bán Chạy (Tháng Này)</h2>
+          <h2>🏆 Top 5 thực đơn Bán Chạy (Tháng Này)</h2>
           <div className="top-products-list">
             {salesSummary.topProducts.slice(0, 5).map((product, index) => (
               <div key={product.productId} className="top-product-item">
@@ -254,7 +254,7 @@ const Reports: React.FC = () => {
                   />
                 </div>
                 <div className="category-stats">
-                  <span>{category.productCount} sản phẩm</span>
+                  <span>{category.productCount} thực đơn</span>
                   <span>{formatPrice(category.totalRevenue)}</span>
                 </div>
               </div>
@@ -336,14 +336,14 @@ const Reports: React.FC = () => {
 
     return (
       <div className="products-report">
-        <h2>Top 10 Sản Phẩm Bán Chạy</h2>
+        <h2>Top 10 thực đơn Bán Chạy</h2>
         
         {/* Product Bar Chart */}
         {topProducts.length > 0 && (
           <div className="chart-card">
             <h3>
               <i className="fas fa-chart-bar"></i>
-              Biểu Đồ Sản Phẩm Bán Chạy
+              Biểu Đồ thực đơn Bán Chạy
             </h3>
             <ProductBarChart data={chartData} title="Số Lượng Đã Bán" />
           </div>
@@ -354,7 +354,7 @@ const Reports: React.FC = () => {
             <thead>
               <tr>
                 <th>Hạng</th>
-                <th>Sản Phẩm</th>
+                <th>thực đơn</th>
                 <th>Danh Mục</th>
                 <th>Đã Bán</th>
                 <th>Doanh Thu</th>
@@ -510,7 +510,7 @@ const Reports: React.FC = () => {
           className={`tab ${activeTab === 'products' ? 'active' : ''}`}
           onClick={() => setActiveTab('products')}
         >
-          <i className="fas fa-shopping-bag"></i> Sản Phẩm
+          <i className="fas fa-shopping-bag"></i> thực đơn
         </button>
         <button
           className={`tab ${activeTab === 'orders' ? 'active' : ''}`}

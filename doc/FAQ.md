@@ -209,8 +209,8 @@ Password: Admin@123
 ### How do I add products?
 
 **Steps:**
-1. Go to "Sản phẩm" (Products)
-2. Click "➕ Thêm Sản Phẩm"
+1. Go to "thực đơn" (Products)
+2. Click "➕ Thêm thực đơn"
 3. Enter:
    - Name
    - Price (in VND)

@@ -8,7 +8,7 @@ restaurant-pos-client/
 ├── src/
 │   ├── components/
 │   │   ├── Dashboard/        # Trang tổng quan
-│   │   ├── Products/         # Quản lý sản phẩm
+│   │   ├── Products/         # Quản lý thực đơn
 │   │   ├── Categories/       # Quản lý danh mục
 │   │   ├── Orders/           # Quản lý đơn hàng
 │   │   └── Tables/   # Quản lý bàn

@@ -104,9 +104,9 @@ const Dashboard: React.FC = () => {
    <i className="fas fa-box"></i>
        </div>
           <div className="stat-content">
-       <h3>Sản phẩm</h3>
+       <h3>thực đơn</h3>
   <p className="stat-number">{stats.totalProducts}</p>
-    <p className="stat-label">Tổng sản phẩm</p>
+    <p className="stat-label">Tổng thực đơn</p>
     </div>
    <div className="stat-trend positive">
 <i className="fas fa-arrow-up"></i> +5%
@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
           <button className="action-btn secondary" onClick={() => navigate('/products')}>
             <div className="action-icon">📦</div>
             <div className="action-content">
-              <span className="action-title">Sản phẩm</span>
+              <span className="action-title">thực đơn</span>
               <span className="action-subtitle">Quản lý thực đơn</span>
             </div>
           </button>

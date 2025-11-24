@@ -174,7 +174,7 @@ const Analytics: React.FC = () => {
    {/* Top Products */}
         <div className="analytics-card">
    <div className="card-header">
-          <h3><i className="fas fa-star"></i> Sản phẩm bán chạy</h3>
+          <h3><i className="fas fa-star"></i> thực đơn bán chạy</h3>
   </div>
    <div className="card-body">
             {data.topProducts.length > 0 ? (
@@ -245,7 +245,7 @@ const Analytics: React.FC = () => {
         </button>
         <button className="action-card" onClick={() => navigate('/products')}>
           <i className="fas fa-box"></i>
-        <span>Quản lý sản phẩm</span>
+        <span>Quản lý thực đơn</span>
         </button>
         <button className="action-card" onClick={() => navigate('/tables')}>
           <i className="fas fa-chair"></i>

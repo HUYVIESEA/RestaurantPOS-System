@@ -12,7 +12,7 @@ Hướng dẫn chi tiết sử dụng hệ thống quản lý nhà hàng Restaur
 1. [Bắt Đầu](#bắt-đầu)
 2. [Đăng Nhập & Đăng Ký](#đăng-nhập--đăng-ký)
 3. [Dashboard](#dashboard)
-4. [Quản Lý Sản Phẩm](#quản-lý-sản-phẩm)
+4. [Quản Lý thực đơn](#quản-lý-sản-phẩm)
 5. [Quản Lý Bàn](#quản-lý-bàn)
 6. [Quản Lý Đơn Hàng](#quản-lý-đơn-hàng)
 7. [Quản Lý Danh Mục](#quản-lý-danh-mục)
@@ -103,9 +103,9 @@ Dashboard hiển thị tổng quan về hoạt động nhà hàng.
 
 ### Các Thống Kê Chính
 
-**1. Sản Phẩm**
-- Tổng số sản phẩm
-- Sản phẩm mới trong tháng
+**1. thực đơn**
+- Tổng số thực đơn
+- thực đơn mới trong tháng
 - Tăng trưởng (%)
 
 **2. Đơn Hàng**
@@ -142,9 +142,9 @@ Dashboard hiển thị tổng quan về hoạt động nhà hàng.
 
 ---
 
-## 📦 Quản Lý Sản Phẩm
+## 📦 Quản Lý thực đơn
 
-### Xem Danh Sách Sản Phẩm
+### Xem Danh Sách thực đơn
 
 **Cách 1: Grid View (Lưới)**
 - Hiển thị dạng thẻ với hình ảnh
@@ -154,22 +154,22 @@ Dashboard hiển thị tổng quan về hoạt động nhà hàng.
 - Hiển thị dạng bảng chi tiết
 - Click icon danh sách ở góc phải
 
-### Tìm Kiếm Sản Phẩm
+### Tìm Kiếm thực đơn
 
 **Tìm theo tên:**
-1. Nhập tên sản phẩm vào ô tìm kiếm
+1. Nhập tên thực đơn vào ô tìm kiếm
 2. Kết quả hiện ra tự động
 
 **Lọc theo danh mục:**
 1. Click dropdown "Tất cả danh mục"
 2. Chọn danh mục cần lọc
 
-### Thêm Sản Phẩm Mới
+### Thêm thực đơn Mới
 
-**Bước 1:** Click nút "➕ Thêm Sản Phẩm"
+**Bước 1:** Click nút "➕ Thêm thực đơn"
 
 **Bước 2:** Điền thông tin:
-- **Tên sản phẩm** (bắt buộc)
+- **Tên thực đơn** (bắt buộc)
 - **Mô tả**
 - **Giá** (VNĐ)
 - **Danh mục**
@@ -186,21 +186,21 @@ Danh mục: Món Chính
 Trạng thái: Còn hàng
 ```
 
-### Sửa Sản Phẩm
+### Sửa thực đơn
 
-**Bước 1:** Click nút "✏️ Sửa" trên sản phẩm
+**Bước 1:** Click nút "✏️ Sửa" trên thực đơn
 
 **Bước 2:** Cập nhật thông tin
 
 **Bước 3:** Click "Cập nhật"
 
-### Xóa Sản Phẩm
+### Xóa thực đơn
 
 **Bước 1:** Click nút "🗑️ Xóa"
 
 **Bước 2:** Xác nhận xóa
 
-**⚠️ Lưu ý:** Không thể xóa sản phẩm đang có trong đơn hàng
+**⚠️ Lưu ý:** Không thể xóa thực đơn đang có trong đơn hàng
 
 ---
 
@@ -306,10 +306,10 @@ Trạng thái: Còn hàng
 
 ### Xem Danh Sách Danh Mục
 
-Hiển thị tất cả danh mục sản phẩm với:
+Hiển thị tất cả danh mục thực đơn với:
 - Tên danh mục
 - Mô tả
-- Số sản phẩm
+- Số thực đơn
 - Thao tác
 
 ### Thêm Danh Mục Mới
@@ -341,7 +341,7 @@ Thứ tự: 1
 1. Click "🗑️ Xóa"
 2. Xác nhận
 
-**⚠️ Lưu ý:** Không thể xóa danh mục có sản phẩm
+**⚠️ Lưu ý:** Không thể xóa danh mục có thực đơn
 
 ---
 
@@ -416,10 +416,10 @@ Thứ tự: 1
 - Doanh thu theo ngày (7 ngày gần nhất)
 - Xu hướng tăng/giảm
 
-### Top Sản Phẩm Bán Chạy
+### Top thực đơn Bán Chạy
 
-Xem top 5 sản phẩm:
-- Tên sản phẩm
+Xem top 5 thực đơn:
+- Tên thực đơn
 - Số lượng đã bán
 - Doanh thu
 
@@ -520,17 +520,17 @@ Xem giờ có nhiều đơn nhất:
 2. Nhập email đăng ký
 3. Kiểm tra email và làm theo hướng dẫn
 
-### 2. Làm sao để thêm sản phẩm mới?
+### 2. Làm sao để thêm thực đơn mới?
 
 **Trả lời:**
-1. Vào trang "Sản phẩm"
-2. Click "➕ Thêm Sản Phẩm"
+1. Vào trang "thực đơn"
+2. Click "➕ Thêm thực đơn"
 3. Điền thông tin
 4. Click "Lưu"
 
-### 3. Tại sao không xóa được sản phẩm?
+### 3. Tại sao không xóa được thực đơn?
 
-**Trả lời:** Sản phẩm có thể đang được sử dụng trong đơn hàng. Vui lòng kiểm tra lại.
+**Trả lời:** thực đơn có thể đang được sử dụng trong đơn hàng. Vui lòng kiểm tra lại.
 
 ### 4. Làm sao để xem báo cáo doanh thu?
 
