@@ -122,7 +122,7 @@ showError('Không thể tải dữ liệu thực đơn');
             className="btn btn-primary"
             onClick={() => navigate('/products/new')}
           >
-            <i className="fas fa-plus"></i> Thêm thực đơn
+            <i className="fas fa-plus"></i> Thêm món ăn
           </button>
         )}
       </div>
@@ -277,7 +277,7 @@ onClick={() => handleCategoryFilter(category.id)}
      <p>
             {searchTerm 
               ? `Không có thực đơn nào khớp với "${searchTerm}"`
-           : 'Chưa có thực đơn nào. Hãy thêm thực đơn mới!'}
+           : 'Chưa có thực đơn nào. Hãy thêm món ăn mới!'}
   </p>
           {!searchTerm && permissions.products.canCreate && (
             <button 

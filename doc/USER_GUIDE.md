@@ -164,12 +164,12 @@ Dashboard hiển thị tổng quan về hoạt động nhà hàng.
 1. Click dropdown "Tất cả danh mục"
 2. Chọn danh mục cần lọc
 
-### Thêm thực đơn Mới
+### Thêm Món Mới
 
-**Bước 1:** Click nút "➕ Thêm thực đơn"
+**Bước 1:** Click nút "➕ Thêm món"
 
 **Bước 2:** Điền thông tin:
-- **Tên thực đơn** (bắt buộc)
+- **Tên món** (bắt buộc)
 - **Mô tả**
 - **Giá** (VNĐ)
 - **Danh mục**
@@ -520,7 +520,7 @@ Xem giờ có nhiều đơn nhất:
 2. Nhập email đăng ký
 3. Kiểm tra email và làm theo hướng dẫn
 
-### 2. Làm sao để thêm thực đơn mới?
+### 2. Làm sao để thêm món ăn mới?
 
 **Trả lời:**
 1. Vào trang "thực đơn"

@@ -210,7 +210,7 @@ Password: Admin@123
 
 **Steps:**
 1. Go to "thực đơn" (Products)
-2. Click "➕ Thêm thực đơn"
+2. Click "➕ Thêm món ăn"
 3. Enter:
    - Name
    - Price (in VND)
