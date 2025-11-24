@@ -13,9 +13,25 @@ const SignalRContext = createContext<SignalRContextType>({
 
 export const useSignalR = () => useContext(SignalRContext);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-// Remove /api from the end to get the base URL, then add /restaurantHub
-const HUB_URL = API_URL.replace('/api', '') + '/restaurantHub';
+// Auto-detect Hub URL based on current hostname (same logic as api.ts)
+const getHubUrl = () => {
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  
+  if (isLocalhost) {
+    return 'http://localhost:5000/restaurantHub';
+  }
+  
+  // For LAN access, use current hostname
+  const protocol = window.location.protocol;
+  const apiPort = 5000;
+  const hubUrl = `${protocol}//${hostname}:${apiPort}/restaurantHub`;
+  
+  console.log('🔌 SignalR Hub URL:', hubUrl);
+  return hubUrl;
+};
+
+const HUB_URL = getHubUrl();
 
 export const SignalRProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);

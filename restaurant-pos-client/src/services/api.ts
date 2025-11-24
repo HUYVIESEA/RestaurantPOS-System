@@ -1,6 +1,26 @@
 import axios from 'axios';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '/api';
+// Auto-detect API URL based on current hostname
+// If accessing via LAN (not localhost), use the same hostname for API
+const getApiBaseUrl = () => {
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  
+  // If running on localhost, use env variable or default
+  if (isLocalhost) {
+    return (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/api';
+  }
+  
+  // If accessing via LAN, construct API URL using current hostname
+  const protocol = window.location.protocol;
+  const apiPort = 5000; // API server port
+  const apiUrl = `${protocol}//${hostname}:${apiPort}/api`;
+  
+  console.log('🌐 API Base URL:', apiUrl);
+  return apiUrl;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

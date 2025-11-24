@@ -62,7 +62,7 @@ const ChangePassword: React.FC = () => {
       setLoading(true);
     
       await userService.changePassword({
-   currentPassword: formData.oldPassword,
+   oldPassword: formData.oldPassword,
         newPassword: formData.newPassword,
       });
 

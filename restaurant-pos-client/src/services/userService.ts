@@ -30,7 +30,7 @@ export interface UpdateProfileRequest {
 }
 
 export interface ChangePasswordRequest {
-  currentPassword: string; // ✅ Match backend: OldPassword
+  oldPassword: string; // Match backend field name
   newPassword: string;
 }
 
@@ -81,12 +81,12 @@ export const userService = {
 
   // Update user role (Admin only)
   updateRole: async (id: number, role: string): Promise<void> => {
-    await apiClient.patch(`/Users/${id}/Role`, JSON.stringify(role));
+    await apiClient.patch(`/Users/${id}/Role`, { role });
   },
 
   // Update user status (Admin only)
   updateStatus: async (id: number, isActive: boolean): Promise<void> => {
-    await apiClient.patch(`/Users/${id}/Status`, isActive);
+    await apiClient.patch(`/Users/${id}/Status`, { isActive });
   },
 
   // Reset user password (Admin only)

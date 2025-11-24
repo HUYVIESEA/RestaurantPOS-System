@@ -98,10 +98,22 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // Add your client URLs here
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials(); // Required for SignalR
+            // In development, allow any origin for LAN access
+            if (builder.Environment.IsDevelopment())
+            {
+                policy.SetIsOriginAllowed(origin => true) // Allow any origin
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials(); // Required for SignalR
+            }
+            else
+            {
+                // In production, specify exact origins
+                policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials();
+            }
         });
 });
 

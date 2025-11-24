@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { Order, OrderItem } from '../../types';
-import { useToast } from '../../contexts/ToastContext'; // ✅ ADD
+import { useToast } from '../../contexts/ToastContext';
 import AddItemDialog from './AddItemDialog';
 import CancelItemDialog from './CancelItemDialog';
+import VnPayButton from '../Payment/VnPayButton';
 import './OrderDetail.css';
 
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { showSuccess, showError, showWarning } = useToast(); // ✅ ADD
+  const { showSuccess, showError, showWarning } = useToast();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,6 +19,7 @@ const OrderDetail: React.FC = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelingItem, setCancelingItem] = useState<OrderItem | null>(null);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -197,6 +199,22 @@ const totalCancelled = itemsToCancel.reduce(
     }
   };
 
+  // Handle cash payment
+  const handleCashPayment = async () => {
+    if (!window.confirm(`Xác nhận thanh toán tiền mặt?\n\nTổng tiền: ${order!.totalAmount.toLocaleString('vi-VN')} đ`)) {
+      return;
+    }
+
+    try {
+      await orderService.updateStatus(order!.id, 'Completed');
+      showSuccess(`✅ Thanh toán thành công!\nBàn ${order!.table?.tableNumber} đã được trả tự động.`);
+      navigate('/tables');
+    } catch (err) {
+      console.error('Error completing payment:', err);
+      showError('Không thể hoàn thành thanh toán');
+    }
+  };
+
   if (loading) return <div className="loading">Đang tải...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!order) return <div className="error">Không tìm thấy đơn hàng</div>;
@@ -221,6 +239,51 @@ const totalCancelled = itemsToCancel.reduce(
    setCancelingItem(null);
  }}
   />
+      )}
+
+      {/* Payment Method Dialog */}
+      {showPaymentDialog && (
+        <div className="modal-overlay" onClick={() => setShowPaymentDialog(false)}>
+          <div className="modal-content payment-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>Chọn phương thức thanh toán</h3>
+            <p className="payment-amount">Tổng tiền: <strong>{order.totalAmount.toLocaleString('vi-VN')} đ</strong></p>
+            
+            <div className="payment-methods">
+              <button 
+                className="payment-method-btn cash"
+                onClick={() => {
+                  setShowPaymentDialog(false);
+                  handleCashPayment();
+                }}
+              >
+                <i className="fas fa-money-bill-wave"></i>
+                <span>Tiền mặt</span>
+              </button>
+
+              <VnPayButton 
+                amount={order.totalAmount}
+                orderDescription={`Thanh toán đơn hàng #${order.id} - Bàn ${order.table?.tableNumber}`}
+                orderType="billpayment"
+                onSuccess={(url) => {
+                  // Redirect to VNPay payment page
+                  window.location.href = url;
+                }}
+                onError={(error) => {
+                  setShowPaymentDialog(false);
+                  showError(`Thanh toán VNPay thất bại: ${error}`);
+                }}
+              />
+            </div>
+
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setShowPaymentDialog(false)}
+              style={{ marginTop: '1rem', width: '100%' }}
+            >
+              Hủy
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="header">
@@ -377,22 +440,11 @@ Bàn: {order.table?.tableNumber || 'N/A'} |
      ➕ Thêm món
  </button>
             <button
-       className="btn btn-success"
-         onClick={async () => {
-    if (window.confirm('Hoàn thành đơn hàng này?')) {
-       try {
-           await orderService.updateStatus(order.id, 'Completed');
-       showSuccess(`Đơn hàng đã hoàn thành!\nBàn ${order.table?.tableNumber} đã được trả tự động.`);
-      navigate('/tables');
-      } catch (err) {
-           console.error('Error completing order:', err);
-       showError('Không thể hoàn thành đơn hàng');
-       }
-    }
-              }}
-  >
-              ✓ Hoàn thành đơn
-      </button>
+              className="btn btn-success"
+              onClick={() => setShowPaymentDialog(true)}
+            >
+              💳 Thanh toán
+            </button>
           </>
 )}
       </div>

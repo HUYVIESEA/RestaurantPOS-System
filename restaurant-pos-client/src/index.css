@@ -1,5 +1,6 @@
 /* Import Global Theme System */
 @import './styles/theme.css';
+@import './styles/mobile.css';
 
 /* Legacy Variables (will be migrated) */
 :root {

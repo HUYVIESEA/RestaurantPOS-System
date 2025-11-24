@@ -226,10 +226,10 @@ user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
       return Ok(new { message = "Đổi mật khẩu thành công" });
  }
 
-      // PATCH: api/Users/5/Role
+        // PATCH: api/Users/5/Role
   [HttpPatch("{id}/Role")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] string role)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleRequest request)
  {
          var user = await _context.Users.FindAsync(id);
    if (user == null)
@@ -237,21 +237,19 @@ user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
         return NotFound();
   }
 
-            if (role != "Admin" && role != "Manager" && role != "Staff")
+            if (request.Role != "Admin" && request.Role != "Manager" && request.Role != "Staff")
     {
       return BadRequest("Role không hợp lệ. Chỉ chấp nhận 'Admin', 'Manager' hoặc 'Staff'");
             }
 
-            user.Role = role;
+            user.Role = request.Role;
          await _context.SaveChangesAsync();
 
  return NoContent();
-        }
-
-        // PATCH: api/Users/5/Status
+        }        // PATCH: api/Users/5/Status
         [HttpPatch("{id}/Status")]
      [Authorize(Roles = "Admin")]
-     public async Task<IActionResult> UpdateStatus(int id, [FromBody] bool isActive)
+     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request)
         {
      var user = await _context.Users.FindAsync(id);
  if (user == null)
@@ -261,12 +259,12 @@ user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
 
 // Don't allow deactivating yourself
             var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0"); // ✅ FIXED
- if (id == currentUserId && !isActive)
+ if (id == currentUserId && !request.IsActive)
  {
              return BadRequest("Không thể vô hiệu hóa tài khoản của chính mình");
  }
 
-   user.IsActive = isActive;
+   user.IsActive = request.IsActive;
       await _context.SaveChangesAsync();
 
     return NoContent();
@@ -362,12 +360,20 @@ public class UpdateUserRequest
       public string FullName { get; set; } = string.Empty;
     }
 
-    // ✅ REMOVED duplicate DTOs (ChangePasswordRequest, ResetPasswordResponse)
-    // These already exist in AuthDTOs.cs
-    
+    // ✅ Additional DTOs specific to Users endpoints
+    public class UpdateRoleRequest
+    {
+        public string Role { get; set; } = string.Empty;
+    }
+
+    public class UpdateStatusRequest
+    {
+        public bool IsActive { get; set; }
+    }
+
     public class ResetPasswordResponse
     {
- public string NewPassword { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
     }
 }

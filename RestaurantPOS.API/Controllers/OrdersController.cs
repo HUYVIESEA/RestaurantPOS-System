@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using RestaurantPOS.API.Models;
 using RestaurantPOS.API.Services;
+using RestaurantPOS.API.Hubs;
 
 namespace RestaurantPOS.API.Controllers
 {
@@ -11,15 +13,17 @@ namespace RestaurantPOS.API.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IHubContext<RestaurantHub> _hubContext;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, IHubContext<RestaurantHub> hubContext)
         {
     _orderService = orderService;
+            _hubContext = hubContext;
      }
 
 // GET: api/Orders
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can view all orders
+        [Authorize(Roles = "Admin,Manager,Staff")] // All staff can view orders
  public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
     var orders = await _orderService.GetAllOrdersAsync();
@@ -53,6 +57,10 @@ namespace RestaurantPOS.API.Controllers
    public async Task<ActionResult<Order>> CreateOrder(Order order)
       {
      var createdOrder = await _orderService.CreateOrderAsync(order);
+            
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.SendAsync("OrderCreated", createdOrder);
+            
         return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.Id }, createdOrder);
         }
 
@@ -66,6 +74,9 @@ namespace RestaurantPOS.API.Controllers
    {
         return NotFound();
     }
+
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
 
        return NoContent();
         }
@@ -81,6 +92,9 @@ namespace RestaurantPOS.API.Controllers
   return NotFound();
     }
 
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
+
   return Ok(updatedOrder);
         }
 
@@ -95,6 +109,9 @@ namespace RestaurantPOS.API.Controllers
        return NotFound();
        }
 
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
+
    return Ok(updatedOrder);
         }
 
@@ -108,6 +125,9 @@ namespace RestaurantPOS.API.Controllers
 {
         return NotFound();
        }
+
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
 
    return Ok(updatedOrder);
         }

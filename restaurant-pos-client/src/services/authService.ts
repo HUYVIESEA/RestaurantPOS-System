@@ -3,12 +3,27 @@ import { LoginRequest, RegisterRequest, LoginResponse, User } from '../types/aut
 
 export const authService = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post<LoginResponse>('/Auth/Login', data);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data));
+    console.log('📡 Calling API:', '/Auth/Login', data);
+    try {
+      const response = await apiClient.post<LoginResponse>('/Auth/Login', data);
+      console.log('📥 API Response:', response.data);
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data));
+        console.log('💾 Token saved to localStorage');
+      }
+      return response.data;
+    } catch (error: any) {
+      console.error('🚫 API Error:', error);
+      console.error('🚫 Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        url: error.config?.url,
+        method: error.config?.method
+      });
+      throw error;
     }
-  return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<User> => {
@@ -63,5 +78,15 @@ export const authService = {
 
   validateResetToken: async (token: string): Promise<void> => {
 await apiClient.get(`/Auth/ValidateResetToken/${token}`);
+  },
+
+  // ✅ NEW: Update user by ID
+  updateUser: async (id: number, data: { fullName: string; email: string; role: string }): Promise<void> => {
+    await apiClient.put(`/Auth/Users/${id}`, data);
+  },
+
+  // ✅ NEW: Delete user by ID
+  deleteUser: async (id: number): Promise<void> => {
+    await apiClient.delete(`/Auth/Users/${id}`);
   },
 };

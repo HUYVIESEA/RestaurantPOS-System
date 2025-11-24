@@ -31,11 +31,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-    const response = await authService.login({ username, password });
+      console.log('🔐 Attempting login...', { username, passwordLength: password.length });
+      const response = await authService.login({ username, password });
+      console.log('✅ Login successful:', response);
       setUser(response);
       return true;
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error message:', error.message);
       return false;
     }
   };
