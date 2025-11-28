@@ -72,6 +72,9 @@ namespace RestaurantPOS.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CustomerName")
                         .HasColumnType("nvarchar(max)");
 
@@ -89,8 +92,19 @@ namespace RestaurantPOS.API.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<decimal?>("PaidAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("ParentOrderId")
                         .HasColumnType("int");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PaymentStatus")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -775,11 +789,11 @@ namespace RestaurantPOS.API.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 11, 17, 9, 48, 29, 378, DateTimeKind.Utc).AddTicks(2566),
+                            CreatedAt = new DateTime(2025, 11, 25, 19, 34, 55, 305, DateTimeKind.Utc).AddTicks(2794),
                             Email = "admin@restaurantpos.com",
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = "$2a$11$TC0qIEIMSvJszovBP5fUA.ZrOEg41KVTw3ZK8DY6Eky8UvWBbZxRe",
+                            PasswordHash = "$2a$11$sMpufbS6sQhjGYa0uWHtuOGf5WdP5OLFv8.A.w2W/yJpc81pm2cZa",
                             Role = "Admin",
                             Username = "admin"
                         });

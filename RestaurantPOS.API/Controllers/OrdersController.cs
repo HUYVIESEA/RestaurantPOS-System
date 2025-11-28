@@ -59,7 +59,7 @@ namespace RestaurantPOS.API.Controllers
      var createdOrder = await _orderService.CreateOrderAsync(order);
             
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderCreated", createdOrder);
+            await _hubContext.Clients.All.SendAsync("OrderCreated", createdOrder.Id);
             
         return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.Id }, createdOrder);
         }
@@ -76,7 +76,7 @@ namespace RestaurantPOS.API.Controllers
     }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
 
        return NoContent();
         }
@@ -93,7 +93,7 @@ namespace RestaurantPOS.API.Controllers
     }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
 
   return Ok(updatedOrder);
         }
@@ -110,7 +110,7 @@ namespace RestaurantPOS.API.Controllers
        }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
 
    return Ok(updatedOrder);
         }
@@ -127,15 +127,32 @@ namespace RestaurantPOS.API.Controllers
        }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder);
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
 
    return Ok(updatedOrder);
         }
 
-    // ✅ NEW: POST: api/Orders/5/Split - Split order into two orders
- [HttpPost("{id}/Split")]
- public async Task<ActionResult<SplitOrderResponse>> SplitOrder(int id, [FromBody] SplitOrderRequest request)
+    // ✅ NEW: PUT: api/Orders/5/Complete - Complete order and process payment
+    [HttpPut("{id}/Complete")]
+    public async Task<ActionResult<Order>> CompleteOrder(int id, [FromBody] CompleteOrderRequest request)
+    {
+        var completedOrder = await _orderService.CompleteOrderAsync(id, request.ReceivedAmount, request.PaymentMethod);
+
+        if (completedOrder == null)
         {
+            return NotFound("Không tìm thấy đơn hàng");
+        }
+
+        // ✅ Broadcast to all clients (send orderId for consistency)
+        await _hubContext.Clients.All.SendAsync("OrderCompleted", completedOrder.Id);
+
+        return Ok(completedOrder);
+    }
+
+    // ✅ NEW: POST: api/Orders/5/Split - Split order into two orders
+    [HttpPost("{id}/Split")]
+    public async Task<ActionResult<SplitOrderResponse>> SplitOrder(int id, [FromBody] SplitOrderRequest request)
+    {
        if (request.ItemIds == null || request.ItemIds.Count == 0)
     {
         return BadRequest("Vui lòng chọn ít nhất 1 món để tách");
@@ -167,7 +184,14 @@ return NoContent();
     }
     }
 
-// ✅ NEW: DTOs for split order
+// ✅ NEW: DTOs for complete order
+    public class CompleteOrderRequest
+    {
+        public double ReceivedAmount { get; set; }
+        public string PaymentMethod { get; set; } = "Cash";
+    }
+
+    // ✅ NEW: DTOs for split order
     public class SplitOrderRequest
     {
         public List<int> ItemIds { get; set; } = new();

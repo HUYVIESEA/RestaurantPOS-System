@@ -31,6 +31,17 @@ namespace RestaurantPOS.API.Models
         public int? ParentOrderId { get; set; } // For split orders
      public int? OrderGroupId { get; set; } // For merged table orders
 
+        // ✅ NEW: Payment information
+        [StringLength(20)]
+        public string? PaymentStatus { get; set; } // Unpaid, Paid, Refunded
+        
+        [StringLength(20)]
+        public string? PaymentMethod { get; set; } // Cash, Card, Transfer, etc.
+        
+        public decimal? PaidAmount { get; set; }
+        
+        public DateTime? CompletedAt { get; set; }
+
         public ICollection<OrderItem>? OrderItems { get; set; }
     }
 }

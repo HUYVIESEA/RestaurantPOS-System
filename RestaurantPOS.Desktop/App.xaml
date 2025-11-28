@@ -1,0 +1,79 @@
+﻿<Application x:Class="RestaurantPOS.Desktop.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:RestaurantPOS.Desktop"
+             xmlns:views="clr-namespace:RestaurantPOS.Desktop.Views"
+             xmlns:vm="clr-namespace:RestaurantPOS.Desktop.ViewModels"
+             xmlns:converters="clr-namespace:RestaurantPOS.Desktop.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Material Design removed to prevent crash -->
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converters -->
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            <converters:LoginButtonTextConverter x:Key="LoginButtonTextConverter"/>
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
+            <converters:BoolToStatusConverter x:Key="BoolToStatusConverter"/>
+            <converters:BoolToToggleTextConverter x:Key="BoolToToggleTextConverter"/>
+            <converters:BoolToToggleColorConverter x:Key="BoolToToggleColorConverter"/>
+
+            <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+                <views:LoginView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                <views:DashboardView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:TableManagementViewModel}">
+                <views:TableManagementView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:OrderListViewModel}">
+                <views:OrderListView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:CreateOrderViewModel}">
+                <views:CreateOrderView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:OrderDetailViewModel}">
+                <views:OrderDetailView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:UserManagementViewModel}">
+                <views:UserManagementView />
+            </DataTemplate>
+
+            <!-- Modern Button Style for Dialogs -->
+            <Style x:Key="ModernButtonStyle" TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    CornerRadius="4" 
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Opacity" Value="0.9"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Opacity" Value="0.7"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

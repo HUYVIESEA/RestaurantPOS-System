@@ -1,0 +1,335 @@
+﻿<Window x:Class="RestaurantPOS.Desktop.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:RestaurantPOS.Desktop.ViewModels"
+        xmlns:converters="clr-namespace:RestaurantPOS.Desktop.Converters"
+        xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
+        mc:Ignorable="d"
+        Title="Restaurant POS" 
+        Icon="pack://application:,,,/Resources/icons/restaurant.ico"
+        Height="768" 
+        Width="1366"
+        WindowState="Maximized"
+        WindowStyle="None"
+        AllowsTransparency="False"
+        Background="#F5F5F5">
+    
+    <Window.Resources>
+        <!-- Converter to check if current view is LoginViewModel -->
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+    </Window.Resources>
+    
+    <Grid>
+        <!-- Window Control Buttons (Always visible) -->
+        <StackPanel Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Top"
+                    Panel.ZIndex="999"
+                    Margin="0,0,0,0">
+            <Button Click="MinimizeWindow_Click"
+                    Width="45" 
+                    Height="30"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Foreground="#718096"
+                    Cursor="Hand"
+                    ToolTip="Thu nhỏ">
+                <fa:IconImage Icon="WindowMinimize" Width="14" Height="14" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+            </Button>
+            <Button Click="MaximizeWindow_Click"
+                    Width="45" 
+                    Height="30"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Foreground="#718096"
+                    Cursor="Hand"
+                    ToolTip="Phóng to">
+                <fa:IconImage Icon="Square" Width="14" Height="14" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+            </Button>
+            <Button Click="CloseWindow_Click"
+                    Width="45" 
+                    Height="30"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Foreground="#718096"
+                    Cursor="Hand"
+                    ToolTip="Đóng">
+                <fa:IconImage Icon="Xmark" Width="16" Height="16" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#F44336"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <!-- Full screen for Login -->
+        <ContentControl Content="{Binding CurrentViewModel}"
+                        Visibility="{Binding IsLoggedIn, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+        
+        <!-- Main Layout (with Sidebar) for other views -->
+        <Grid Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Sidebar Navigation -->
+            <Border Grid.Column="0" Background="#1E3A5F">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Logo & Brand -->
+                    <Border Grid.Row="0" Background="#152A45" Padding="20,25">
+                        <StackPanel>
+                            <fa:IconImage Icon="Utensils" Foreground="White" Width="40" Height="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            <TextBlock Text="RESTAURANT POS" 
+                                       FontSize="16" 
+                                       FontWeight="Bold" 
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       TextAlignment="Center"/>
+                            <TextBlock Text="Quản lý nhà hàng" 
+                                       FontSize="11" 
+                                       Foreground="#A0AEC0"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Navigation Menu -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,10,0,0">
+                            <Button Command="{Binding NavigateToDashboardCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="20,12"
+                                    HorizontalContentAlignment="Left"
+                                    Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="ChartPie" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Tổng quan" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#2D4A77"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <Button Command="{Binding NavigateToTablesCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="20,12"
+                                    HorizontalContentAlignment="Left"
+                                    Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Chair" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Phòng bàn" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#2D4A77"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <Button Command="{Binding NavigateToOrdersCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="20,12"
+                                    HorizontalContentAlignment="Left"
+                                    Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="FileInvoice" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Đơn hàng" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#2D4A77"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <Button Command="{Binding NavigateToUsersCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="20,12"
+                                    HorizontalContentAlignment="Left"
+                                    Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Users" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Người dùng" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#2D4A77"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- User Info & Logout -->
+                    <Border Grid.Row="2" Background="#152A45" Padding="15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="👤 Administrator" 
+                                           Foreground="White" 
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,3"/>
+                                <TextBlock Text="admin@restaurant.com" 
+                                           Foreground="#A0AEC0" 
+                                           FontSize="11"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="1"
+                                    Command="{Binding LogoutCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="5"
+                                    Cursor="Hand"
+                                    ToolTip="Đăng xuất">
+                                <fa:IconImage Icon="RightFromBracket" Foreground="#EF4444" Width="18" Height="18"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Main Content Area -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Top Bar -->
+                <Border Grid.Row="0" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                    <Grid Margin="20,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Search Bar -->
+                        <Border Grid.Column="0" 
+                                Background="#F5F5F5" 
+                                CornerRadius="6" 
+                                Padding="12,8"
+                                MaxWidth="400"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <fa:IconImage Grid.Column="0" Icon="MagnifyingGlass" Foreground="#718096" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" 
+                                         BorderThickness="0" 
+                                         Background="Transparent"
+                                         VerticalAlignment="Center"
+                                         FontSize="13"
+                                         Text="Tìm kiếm..."/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Right Actions -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Background="Transparent" 
+                                    BorderThickness="0"
+                                    Padding="10"
+                                    Cursor="Hand"
+                                    ToolTip="Thông báo">
+                                <fa:IconImage Icon="Bell" Foreground="#718096" Width="18" Height="18"/>
+                            </Button>
+                            <Button Background="Transparent" 
+                                    BorderThickness="0"
+                                    Padding="10"
+                                    Margin="5,0,0,0"
+                                    Cursor="Hand"
+                                    ToolTip="Cài đặt">
+                                <fa:IconImage Icon="Gear" Foreground="#718096" Width="18" Height="18"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Content -->
+                <ContentControl Grid.Row="1" 
+                                Content="{Binding CurrentViewModel}"
+                                Margin="0"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

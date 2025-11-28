@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 
 using RestaurantPOS.API.Services.VnPay;
 using RestaurantPOS.API.Hubs;
+using RestaurantPOS.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -137,5 +138,26 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<RestaurantHub>("/restaurantHub");
+
+// Check for seeding argument
+if (args.Contains("--seed"))
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            var seeder = new DatabaseSeeder(context);
+            await seeder.SeedAllAsync();
+            return; // Exit after seeding
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred while seeding the database: {ex.Message}");
+            return;
+        }
+    }
+}
 
 app.Run();

@@ -9,10 +9,11 @@ public interface IOrderService
         Task<IEnumerable<Order>> GetOrdersByTableAsync(int tableId);
      Task<Order> CreateOrderAsync(Order order);
         Task<Order?> UpdateOrderStatusAsync(int id, string status);
-      Task<Order?> AddItemToOrderAsync(int orderId, OrderItem item); // ✅ NEW
+       Task<Order?> AddItemToOrderAsync(int orderId, OrderItem item); // ✅ NEW
      Task<Order?> UpdateItemQuantityAsync(int orderId, int itemId, int quantity); // ✅ NEW
         Task<Order?> RemoveItemFromOrderAsync(int orderId, int itemId); // ✅ NEW
       Task<SplitOrderResponse?> SplitOrderAsync(int orderId, List<int> itemIds); // ✅ NEW
+        Task<Order?> CompleteOrderAsync(int orderId, double receivedAmount, string paymentMethod); // ✅ NEW
   Task<bool> DeleteOrderAsync(int id);
     }
 

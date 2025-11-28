@@ -83,9 +83,10 @@ namespace RestaurantPOS.API.Services
             await _context.SaveChangesAsync();
             
             // Broadcast new order
-            await _hubContext.Clients.All.SendAsync("OrderCreated", order);
+            await _hubContext.Clients.All.SendAsync("OrderCreated", order.Id);
             
-            return order;
+            // Reload order with includes to return complete data
+            return await GetOrderByIdAsync(order.Id) ?? order;
         }
 
         public async Task<Order?> UpdateOrderStatusAsync(int id, string status)
@@ -122,7 +123,7 @@ namespace RestaurantPOS.API.Services
         }        await _context.SaveChangesAsync();
             
             // Broadcast update
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", order);
+            await _hubContext.Clients.All.SendAsync("OrderUpdated", order.Id);
             
       return order;
         }
@@ -313,6 +314,56 @@ namespace RestaurantPOS.API.Services
       NewOrder = reloadedNew!
        };
       }
+
+        // ✅ NEW: Complete order and process payment
+        public async Task<Order?> CompleteOrderAsync(int orderId, double receivedAmount, string paymentMethod)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .Include(o => o.Table)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                return null;
+
+            // Validate payment amount
+            if (receivedAmount < (double)order.TotalAmount)
+                return null;
+
+            // Update order status
+            order.Status = "Completed";
+            order.PaymentStatus = "Paid";
+            order.PaymentMethod = paymentMethod;
+            order.PaidAmount = (decimal)receivedAmount;
+            order.CompletedAt = DateTime.UtcNow;
+
+            // Free table if this was the only pending order
+            if (order.TableId.HasValue)
+            {
+                var otherPendingOrders = await _context.Orders
+                    .Where(o => o.TableId == order.TableId &&
+                                o.Id != orderId &&
+                                o.Status == "Pending")
+                    .AnyAsync();
+
+                if (!otherPendingOrders)
+                {
+                    var table = await _context.Tables.FindAsync(order.TableId.Value);
+                    if (table != null)
+                    {
+                        table.IsAvailable = true;
+                        table.OccupiedAt = null;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Broadcast completion
+            await _hubContext.Clients.All.SendAsync("OrderCompleted", order.Id);
+
+            return await GetOrderByIdAsync(orderId);
+        }
 
         public async Task<bool> DeleteOrderAsync(int id)
         {

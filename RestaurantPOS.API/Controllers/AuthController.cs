@@ -122,33 +122,19 @@ var result = await _authService.ChangePasswordAsync(userId, request.OldPassword,
      return Ok(new { message = "Nếu email tồn tại trong hệ thống, bạn sẽ nhận được link đặt lại mật khẩu." });
       }
 
-   // POST: api/Auth/ResetPassword
- [HttpPost("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
- {
-    var result = await _authService.ResetPasswordAsync(request.Token, request.NewPassword);
-
-       if (!result)
-   {
-     return BadRequest(new { message = "Token không hợp lệ hoặc đã hết hạn" });
-   }
-
-    return Ok(new { message = "Đặt lại mật khẩu thành công" });
- }
-
- // GET: api/Auth/ValidateResetToken/{token}
-        [HttpGet("ValidateResetToken/{token}")]
-      public async Task<IActionResult> ValidateResetToken(string token)
-   {
-   var isValid = await _authService.ValidateResetTokenAsync(token);
+    // POST: api/Auth/ResetPassword
+    [HttpPost("ResetPassword")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var result = await _authService.ResetPasswordAsync(request.Token, request.NewPassword);
       
-    if (!isValid)
-{
-    return BadRequest(new { message = "Token không hợp lệ hoặc đã hết hạn" });
-    }
-
-  return Ok(new { message = "Token hợp lệ" });
+        if (!result)
+        {
+            return BadRequest(new { message = "Token không hợp lệ hoặc đã hết hạn" });
         }
+
+        return Ok(new { message = "Đặt lại mật khẩu thành công" });
+    }
   }
 
     public class ChangePasswordRequest
