@@ -244,7 +244,7 @@ public partial class CreateOrderViewModel : ObservableObject, INavigationAware
                 var request = new CreateOrderRequest
                 {
                     TableId = SelectedTable.Id,
-                    Items = items
+                    OrderItems = items
                 };
 
                 result = await _orderService.CreateOrderAsync(request);

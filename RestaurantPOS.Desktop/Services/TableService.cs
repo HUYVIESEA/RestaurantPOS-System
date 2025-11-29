@@ -84,4 +84,35 @@ public class TableService : ITableService
             return false;
         }
     }
+
+    public async Task<bool> MergeTablesAsync(List<int> tableIds)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var request = new MergeTablesRequest { TableIds = tableIds };
+            var response = await _httpClient.PostAsJsonAsync("api/Tables/Merge", request);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"TableService: Error merging tables - {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> SplitTablesAsync(int groupId)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.PostAsync($"api/Tables/Split/{groupId}", null);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"TableService: Error splitting tables - {ex.Message}");
+            return false;
+        }
+    }
 }

@@ -82,8 +82,10 @@ public class OrderService : IOrderService
         try
         {
             AddAuthorizationHeader();
-            var request = new UpdateOrderStatusRequest { Status = status };
-            var response = await _httpClient.PutAsJsonAsync($"api/Orders/{id}/status", request);
+            // Fix: API expects PATCH and [FromBody] string status.
+            // PatchAsJsonAsync serializes the string "status" to JSON string "status".
+            // This matches API expectation.
+            var response = await _httpClient.PatchAsJsonAsync($"api/Orders/{id}/status", status);
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)
@@ -193,6 +195,53 @@ public class OrderService : IOrderService
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"OrderService: Error completing order {orderId} - {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<OrderDto?> UpdateItemQuantityAsync(int orderId, int itemId, int quantity)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            // Using PatchAsJsonAsync extension method
+            var response = await _httpClient.PatchAsJsonAsync($"api/Orders/{orderId}/Items/{itemId}", quantity);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<OrderDto>();
+            }
+            
+            var error = await response.Content.ReadAsStringAsync();
+            System.Diagnostics.Debug.WriteLine($"OrderService: Error updating item quantity - {error}");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OrderService: Error updating item quantity - {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<OrderDto?> RemoveItemFromOrderAsync(int orderId, int itemId)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.DeleteAsync($"api/Orders/{orderId}/Items/{itemId}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<OrderDto>();
+            }
+            
+            var error = await response.Content.ReadAsStringAsync();
+            System.Diagnostics.Debug.WriteLine($"OrderService: Error removing item - {error}");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OrderService: Error removing item - {ex.Message}");
             return null;
         }
     }

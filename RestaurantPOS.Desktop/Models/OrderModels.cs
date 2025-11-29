@@ -27,6 +27,7 @@ public class OrderDto
 public class OrderItemDto
 {
     public int Id { get; set; }
+    public int OrderId { get; set; }
     public int ProductId { get; set; }
     
     // Backend returns Product object inside OrderItem, we need to handle this.
@@ -56,7 +57,9 @@ public class OrderItemDto
 public class CreateOrderRequest
 {
     public int TableId { get; set; }
-    public List<CreateOrderItemRequest> Items { get; set; } = new();
+    
+    [System.Text.Json.Serialization.JsonPropertyName("orderItems")]
+    public List<CreateOrderItemRequest> OrderItems { get; set; } = new();
 }
 
 public class CreateOrderItemRequest

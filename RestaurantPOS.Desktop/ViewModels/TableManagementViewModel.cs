@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace RestaurantPOS.Desktop.ViewModels
 {
-    public partial class TableManagementViewModel : ObservableObject, INavigationAware
+    public partial class TableManagementViewModel : ObservableObject, INavigationAware, IRecipient<TableUpdatedMessage>
     {
         private readonly ITableService _tableService;
         private readonly IToastService _toastService;
@@ -29,10 +29,49 @@ namespace RestaurantPOS.Desktop.ViewModels
         [ObservableProperty]
         private string _filterCapacity = "0";
 
+        [ObservableProperty]
+        private ObservableCollection<string> floors = new() { "Tất cả" };
+
+        [ObservableProperty]
+        private string selectedFloor = "Tất cả";
+
+        private System.Windows.Threading.DispatcherTimer _timer;
+
         public TableManagementViewModel(ITableService tableService, IToastService toastService)
         {
             _tableService = tableService;
             _toastService = toastService;
+            
+            WeakReferenceMessenger.Default.Register(this);
+            
+            _timer = new System.Windows.Threading.DispatcherTimer();
+            _timer.Interval = TimeSpan.FromMinutes(1);
+            _timer.Tick += (s, e) => UpdateDurations();
+            _timer.Start();
+
+            LoadTablesCommand.Execute(null);
+        }
+
+        private void UpdateDurations()
+        {
+             if (Tables == null) return;
+             foreach (var table in Tables)
+             {
+                 if (!table.IsAvailable && table.OccupiedAt.HasValue)
+                 {
+                     var diff = DateTime.UtcNow - table.OccupiedAt.Value;
+                     table.Duration = $"{(int)diff.TotalHours:00}:{diff.Minutes:00}";
+                 }
+                 else
+                 {
+                     table.Duration = "";
+                 }
+             }
+        }
+
+        public void Receive(TableUpdatedMessage message)
+        {
+            System.Diagnostics.Debug.WriteLine("TableManagementViewModel: Received TableUpdatedMessage");
             LoadTablesCommand.Execute(null);
         }
 
@@ -52,6 +91,13 @@ namespace RestaurantPOS.Desktop.ViewModels
             {
                 var tables = await _tableService.GetTablesAsync();
 
+                // Populate Floors
+                var distinctFloors = tables.Select(t => t.Floor).Distinct().OrderBy(f => f).ToList();
+                foreach (var f in distinctFloors)
+                {
+                    if (!Floors.Contains(f)) Floors.Add(f);
+                }
+
                 // Filter by Search Text
                 if (!string.IsNullOrWhiteSpace(SearchText))
                 {
@@ -70,7 +116,14 @@ namespace RestaurantPOS.Desktop.ViewModels
                     tables = tables.Where(t => t.Capacity >= cap).ToList();
                 }
 
+                // Filter by Floor
+                if (SelectedFloor != "Tất cả")
+                {
+                    tables = tables.Where(t => t.Floor == SelectedFloor).ToList();
+                }
+
                 Tables = new ObservableCollection<TableDto>(tables);
+                UpdateDurations();
                 System.Diagnostics.Debug.WriteLine($"TableManagementViewModel: Loaded {Tables.Count} tables");
             }
             catch (Exception ex)
@@ -89,10 +142,92 @@ namespace RestaurantPOS.Desktop.ViewModels
             await LoadTables();
         }
 
+        [ObservableProperty]
+        private bool isMergeMode;
+
+        [ObservableProperty]
+        private ObservableCollection<TableDto> selectedTablesForMerge = new();
+
+        [RelayCommand]
+        private void ToggleMergeMode()
+        {
+            IsMergeMode = !IsMergeMode;
+            SelectedTablesForMerge.Clear();
+            if (Tables != null)
+            {
+                foreach (var t in Tables) t.IsSelected = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ConfirmMerge()
+        {
+            if (SelectedTablesForMerge.Count < 2)
+            {
+                _toastService.ShowWarning("Vui lòng chọn ít nhất 2 bàn để ghép.");
+                return;
+            }
+
+            var ids = SelectedTablesForMerge.Select(t => t.Id).ToList();
+            var success = await _tableService.MergeTablesAsync(ids);
+            if (success)
+            {
+                _toastService.ShowSuccess("Ghép bàn thành công!");
+                IsMergeMode = false;
+                SelectedTablesForMerge.Clear();
+                await LoadTables();
+            }
+            else
+            {
+                _toastService.ShowError("Ghép bàn thất bại. Vui lòng kiểm tra lại.");
+            }
+        }
+
+        [RelayCommand]
+        private async Task SplitTable(TableDto table)
+        {
+            if (!table.IsMerged || !table.MergedGroupId.HasValue) return;
+
+            var result = MessageBox.Show($"Bạn có chắc muốn tách nhóm bàn {table.MergedTableNumbers}?", "Xác nhận tách bàn", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                var success = await _tableService.SplitTablesAsync(table.MergedGroupId.Value);
+                if (success)
+                {
+                    _toastService.ShowSuccess("Tách bàn thành công!");
+                    await LoadTables();
+                }
+                else
+                {
+                    _toastService.ShowError("Tách bàn thất bại.");
+                }
+            }
+        }
+
         [RelayCommand]
         private void SelectTable(TableDto table)
         {
             if (table == null) return;
+
+            if (IsMergeMode)
+            {
+                if (table.IsSelected)
+                {
+                    table.IsSelected = false;
+                    SelectedTablesForMerge.Remove(table);
+                }
+                else
+                {
+                    if (!table.IsAvailable)
+                    {
+                        _toastService.ShowWarning("Chỉ có thể ghép các bàn trống.");
+                        return;
+                    }
+                    table.IsSelected = true;
+                    SelectedTablesForMerge.Add(table);
+                }
+                return;
+            }
 
             if (table.Status == "Available")
             {
@@ -117,6 +252,11 @@ namespace RestaurantPOS.Desktop.ViewModels
         }
 
         partial void OnFilterCapacityChanged(string value)
+        {
+            _ = LoadTables();
+        }
+
+        partial void OnSelectedFloorChanged(string value)
         {
             _ = LoadTables();
         }

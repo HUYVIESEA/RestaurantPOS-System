@@ -121,6 +121,9 @@ public partial class App : Application
         // Toast Service (thông báo tự động ẩn)
         services.AddSingleton<IToastService, ToastService>();
 
+        // SignalR Service
+        services.AddSingleton<ISignalRService, SignalRService>();
+
         // ViewModels
         services.AddSingleton<MainViewModel>();
         services.AddTransient<LoginViewModel>();
@@ -144,5 +147,9 @@ public partial class App : Application
         var mainWindow = Services.GetRequiredService<MainWindow>();
         mainWindow.DataContext = Services.GetRequiredService<MainViewModel>();
         mainWindow.Show();
+
+        // Connect SignalR
+        var signalR = Services.GetRequiredService<ISignalRService>();
+        _ = signalR.ConnectAsync();
     }
 }

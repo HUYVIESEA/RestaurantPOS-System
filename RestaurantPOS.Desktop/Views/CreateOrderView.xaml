@@ -5,111 +5,115 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestaurantPOS.Desktop.Views"
              xmlns:vm="clr-namespace:RestaurantPOS.Desktop.ViewModels"
+             xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
              mc:Ignorable="d" 
              d:DesignHeight="768" d:DesignWidth="1024">
     
-    <Grid Background="#FAFAFA">
+    <Grid Background="#F1F5F9">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="400"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left Side: Menu Selection -->
-        <Grid Grid.Column="0" Margin="20">
+        <!-- LEFT SIDE: MENU -->
+        <Grid Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/> <!-- Top Bar -->
+                <RowDefinition Height="Auto"/> <!-- Categories -->
+                <RowDefinition Height="*"/>    <!-- Products -->
             </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                <StackPanel Orientation="Horizontal">
+            <!-- Top Bar -->
+            <Border Grid.Row="0" Background="White" Padding="16,12" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock FontSize="24" FontWeight="Bold" Foreground="#673AB7" VerticalAlignment="Center">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="Tạo Đơn Hàng Mới"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsAddingToExistingOrder}" Value="True">
-                                        <Setter Property="Text" Value="Thêm Món Vào Đơn Hiện Tại"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </StackPanel>
-                <TextBlock FontSize="14" Foreground="Gray" Margin="45,0,0,0">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Text" Value="Chọn bàn và món ăn"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsAddingToExistingOrder}" Value="True">
-                                    <Setter Property="Text" Value="Chọn thêm món ăn cho đơn hàng"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </StackPanel>
+                    <!-- Title -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock FontSize="20" FontWeight="Bold" Foreground="#1E293B">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Tạo Đơn Hàng"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAddingToExistingOrder}" Value="True">
+                                            <Setter Property="Text" Value="Thêm Món"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
 
-            <!-- Filters -->
-            <Grid Grid.Row="1" Margin="0,0,0,20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                    <!-- Search (Visual Only) -->
+                    <Border Grid.Column="1" Background="#F8FAFC" CornerRadius="8" Margin="24,0" Height="40" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <Grid>
+                            <fa:IconImage Icon="Search" Width="14" Height="14" Foreground="#94A3B8" HorizontalAlignment="Left" Margin="12,0"/>
+                            <TextBlock Text="Tìm kiếm món ăn..." Foreground="#94A3B8" VerticalAlignment="Center" Margin="36,0,0,0" FontStyle="Italic"/>
+                        </Grid>
+                    </Border>
 
-                <!-- Table Selection -->
-                <ComboBox Grid.Column="0" 
-                          ItemsSource="{Binding Tables}" 
-                          SelectedItem="{Binding SelectedTable}"
-                          DisplayMemberPath="Name"
-                          Margin="0,0,10,0"
-                          Padding="10"
-                          Background="White">
-                    <ComboBox.Resources>
-                        <Style TargetType="ComboBox">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ComboBox">
-                                        <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4" Padding="5">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" VerticalAlignment="Center" Margin="5,0"/>
-                                                <TextBlock Grid.Column="1" Text="▼" Foreground="Gray" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                                <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                                                    <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                                        <Border x:Name="DropDownBorder" Background="White" BorderThickness="1" BorderBrush="#E0E0E0"/>
-                                                        <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
-                                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
-                                                        </ScrollViewer>
-                                                    </Grid>
-                                                </Popup>
-                                            </Grid>
+                    <!-- Table Selector -->
+                    <ComboBox Grid.Column="2" 
+                              ItemsSource="{Binding Tables}" 
+                              SelectedItem="{Binding SelectedTable}"
+                              DisplayMemberPath="Name"
+                              Width="200" Height="40"
+                              Padding="10,0"
+                              Background="White"
+                              BorderBrush="#E2E8F0"
+                              VerticalContentAlignment="Center">
+                    </ComboBox>
+                </Grid>
+            </Border>
+
+            <!-- Categories -->
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Background="White" Padding="16,12,16,4">
+                <ItemsControl ItemsSource="{Binding Categories}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton GroupName="CategoryGroup" 
+                                         Content="{Binding Name}"
+                                         IsChecked="{Binding IsSelected}"
+                                         Command="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         CommandParameter="{Binding}"
+                                         Margin="0,0,8,8"
+                                         Height="36"
+                                         Padding="16,0"
+                                         Cursor="Hand">
+                                <RadioButton.Template>
+                                    <ControlTemplate TargetType="RadioButton">
+                                        <Border Name="Border" Background="#F1F5F9" CornerRadius="18" BorderThickness="1" BorderBrush="Transparent">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                                         </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#0091EA"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Foreground" Value="#64748B"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ComboBox.Resources>
-                </ComboBox>
+                                </RadioButton.Template>
+                            </RadioButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
 
-                <!-- Category Selection -->
-                <ComboBox Grid.Column="1" 
-                          ItemsSource="{Binding Categories}" 
-                          SelectedItem="{Binding SelectedCategory}"
-                          DisplayMemberPath="Name"
-                          Margin="10,0,0,0"
-                          Padding="10"
-                          Background="White"/>
-            </Grid>
-
-            <!-- Product Grid -->
-            <ScrollViewer Grid.Row="2">
+            <!-- Products -->
+            <ScrollViewer Grid.Row="2" Padding="16">
                 <ItemsControl ItemsSource="{Binding Products}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -120,33 +124,38 @@
                         <DataTemplate>
                             <Button Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                     CommandParameter="{Binding}"
-                                    Margin="0,0,15,15"
-                                    Background="Transparent"
-                                    BorderThickness="0">
-                                <Border Background="White" CornerRadius="8" Width="180" Height="200">
-                                    <Border.Effect>
-                                        <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="5" ShadowDepth="2"/>
-                                    </Border.Effect>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        
-                                        <!-- Image Placeholder -->
-                                        <Border Grid.Row="0" Background="#F5F5F5" CornerRadius="8,8,0,0">
-                                            <TextBlock Text="🍽️" FontSize="48" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray"/>
+                                    Margin="0,0,12,12"
+                                    Background="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="White" CornerRadius="8" Width="160" Height="200" BorderBrush="#E2E8F0" BorderThickness="1">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#64748B" Opacity="0.05" BlurRadius="8" ShadowDepth="2"/>
+                                            </Border.Effect>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="110"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <!-- Image -->
+                                                <Border Grid.Row="0" Background="#F8FAFC" CornerRadius="8,8,0,0">
+                                                    <fa:IconImage Icon="Utensils" Width="32" Height="32" Foreground="#CBD5E1"/>
+                                                </Border>
+                                                
+                                                <!-- Info -->
+                                                <Border Grid.Row="1" Padding="12">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" MaxHeight="40" TextTrimming="CharacterEllipsis" Foreground="#334155"/>
+                                                        <TextBlock Text="{Binding Price, StringFormat={}{0:N0} đ}" Foreground="#0091EA" FontWeight="Bold" FontSize="14" Margin="0,4,0,0"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
                                         </Border>
-
-                                        <!-- Info -->
-                                        <Border Grid.Row="1" Padding="10">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" TextWrapping="Wrap" Height="40"/>
-                                                <TextBlock Text="{Binding Price, StringFormat={}{0:N0} đ}" Foreground="#673AB7" FontWeight="SemiBold"/>
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
                             </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -154,9 +163,9 @@
             </ScrollViewer>
         </Grid>
 
-        <!-- Right Side: Cart -->
-        <Border Grid.Column="1" Background="White" BorderBrush="#E0E0E0" BorderThickness="1,0,0,0">
-            <Grid Margin="20">
+        <!-- RIGHT SIDE: CART -->
+        <Border Grid.Column="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1,0,0,0">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -164,46 +173,75 @@
                 </Grid.RowDefinitions>
 
                 <!-- Cart Header -->
-                <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                    <TextBlock Text="Giỏ Hàng" FontSize="20" FontWeight="Bold"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                        <TextBlock Text="Bàn: " Foreground="Gray"/>
-                        <TextBlock Text="{Binding SelectedTable.Name, TargetNullValue='Chưa chọn'}" FontWeight="SemiBold"/>
-                    </StackPanel>
-                </StackPanel>
+                <Border Grid.Row="0" Padding="20,16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Đơn Hàng" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <fa:IconImage Icon="Table" Width="12" Height="12" Foreground="#64748B" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding SelectedTable.Name, TargetNullValue='Chưa chọn bàn'}" Foreground="#64748B" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
                 <!-- Cart Items -->
-                <ScrollViewer Grid.Row="1">
+                <ScrollViewer Grid.Row="1" Padding="0">
                     <ItemsControl ItemsSource="{Binding CartItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="#F5F5F5" BorderThickness="0,0,0,1" Padding="0,10">
+                                <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="16,12" Background="White">
                                     <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Item Info -->
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="{Binding UnitPrice, StringFormat={}{0:N0} đ}" FontSize="12" Foreground="Gray"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" Foreground="#334155" FontSize="14"/>
+                                            <TextBlock Text="{Binding UnitPrice, StringFormat={}{0:N0}}" FontSize="12" Foreground="#94A3B8"/>
                                         </StackPanel>
 
-                                        <!-- Quantity Controls -->
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                                            <Button Command="{Binding DataContext.DecreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    CommandParameter="{Binding}"
-                                                    Content="-" Width="24" Height="24" Background="#EEEEEE" Foreground="Black" BorderThickness="0"/>
-                                            <TextBlock Text="{Binding Quantity}" Margin="10,0" VerticalAlignment="Center"/>
-                                            <Button Command="{Binding DataContext.IncreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    CommandParameter="{Binding}"
-                                                    Content="+" Width="24" Height="24" Background="#EEEEEE" Foreground="Black" BorderThickness="0"/>
-                                        </StackPanel>
+                                        <!-- Qty -->
+                                        <Border Grid.Row="0" Grid.Column="1" CornerRadius="4" BorderBrush="#E2E8F0" BorderThickness="1" Margin="12,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Command="{Binding DataContext.DecreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                        CommandParameter="{Binding}"
+                                                        Width="28" Height="28" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                                    <fa:IconImage Icon="Minus" Width="10" Height="10" Foreground="#64748B"/>
+                                                </Button>
+                                                <TextBlock Text="{Binding Quantity}" Width="24" TextAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                <Button Command="{Binding DataContext.IncreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                        CommandParameter="{Binding}"
+                                                        Width="28" Height="28" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                                    <fa:IconImage Icon="Plus" Width="10" Height="10" Foreground="#64748B"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
 
-                                        <!-- Subtotal -->
-                                        <TextBlock Grid.Column="2" Text="{Binding Subtotal, StringFormat={}{0:N0} đ}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Subtotal, StringFormat={}{0:N0}}" VerticalAlignment="Center" FontWeight="Bold" Foreground="#334155" MinWidth="60" TextAlignment="Right"/>
+                                        
+                                        <!-- Notes -->
+                                        <TextBox Grid.Row="1" Grid.ColumnSpan="3" 
+                                                 Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                                                 Margin="0,8,0,0"
+                                                 Padding="8,4"
+                                                 Background="#F8FAFC"
+                                                 BorderBrush="#E2E8F0"
+                                                 BorderThickness="1"
+                                                 FontSize="12"
+                                                 Foreground="#64748B">
+                                            <TextBox.Resources>
+                                                <Style TargetType="{x:Type Border}">
+                                                    <Setter Property="CornerRadius" Value="4"/>
+                                                </Style>
+                                            </TextBox.Resources>
+                                        </TextBox>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -212,46 +250,64 @@
                 </ScrollViewer>
 
                 <!-- Footer -->
-                <StackPanel Grid.Row="2" Margin="0,20,0,0">
-                    <Grid Margin="0,0,0,20">
-                        <TextBlock Text="Tổng cộng" FontSize="18" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} đ}" FontSize="18" FontWeight="Bold" Foreground="#673AB7" HorizontalAlignment="Right"/>
-                    </Grid>
+                <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="20">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,16">
+                            <TextBlock Text="Tổng tiền hàng" Foreground="#64748B"/>
+                            <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} đ}" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Grid Margin="0,0,0,24">
+                            <TextBlock Text="Khách cần trả" FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} đ}" FontSize="20" FontWeight="Bold" Foreground="#0091EA" HorizontalAlignment="Right"/>
+                        </Grid>
 
-                    <Button Command="{Binding SubmitOrderCommand}" 
-                            Background="#673AB7" 
-                            Foreground="White" 
-                            FontWeight="Bold" 
-                            BorderThickness="0"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Content" Value="TẠO ĐƠN HÀNG"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsAddingToExistingOrder}" Value="True">
-                                        <Setter Property="Content" Value="THÊM MÓN VÀO ĐƠN"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    
-                    <Button Command="{Binding CancelCommand}" 
-                            Content="Hủy bỏ" 
-                            Background="Transparent" 
-                            Foreground="Gray" 
-                            Margin="0,10,0,0"
-                            BorderThickness="0"
-                            Cursor="Hand"/>
-                </StackPanel>
+                        <Button Command="{Binding SubmitOrderCommand}" 
+                                Height="48"
+                                Background="#0091EA" 
+                                Foreground="White" 
+                                FontWeight="Bold" 
+                                FontSize="16"
+                                BorderThickness="0"
+                                Cursor="Hand">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </Button.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Check" Width="16" Height="16" Foreground="White" Margin="0,0,8,0"/>
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="TẠO ĐƠN HÀNG"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAddingToExistingOrder}" Value="True">
+                                                    <Setter Property="Text" Value="LƯU ĐƠN HÀNG"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Button>
+                        
+                        <Button Command="{Binding CancelCommand}" 
+                                Content="Hủy bỏ" 
+                                Background="Transparent" 
+                                Foreground="#64748B" 
+                                Margin="0,10,0,0"
+                                BorderThickness="0"
+                                Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
             </Grid>
         </Border>
 
         <!-- Loading Overlay -->
         <Grid Grid.ColumnSpan="2" Background="#80FFFFFF" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="⏳" FontSize="48" HorizontalAlignment="Center"/>
-                <TextBlock Text="Đang xử lý..." FontSize="16" Margin="0,10,0,0" Foreground="#673AB7"/>
+                <fa:IconImage Icon="Spinner" Width="48" Height="48" Foreground="#0091EA"/>
+                <TextBlock Text="Đang xử lý..." FontSize="16" Margin="0,10,0,0" Foreground="#0091EA"/>
             </StackPanel>
         </Grid>
     </Grid>

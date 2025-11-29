@@ -8,4 +8,6 @@ public interface ITableService
     Task<TableDto?> GetTableByIdAsync(int id);
     Task<bool> UpdateTableStatusAsync(int id, string status);
     Task<bool> AssignOrderToTableAsync(int tableId, int orderId);
+    Task<bool> MergeTablesAsync(List<int> tableIds);
+    Task<bool> SplitTablesAsync(int groupId);
 }

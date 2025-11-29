@@ -84,6 +84,7 @@ namespace RestaurantPOS.API.Services
             
             // Broadcast new order
             await _hubContext.Clients.All.SendAsync("OrderCreated", order.Id);
+            await _hubContext.Clients.All.SendAsync("TableUpdated");
             
             // Reload order with includes to return complete data
             return await GetOrderByIdAsync(order.Id) ?? order;
@@ -116,14 +117,29 @@ namespace RestaurantPOS.API.Services
                 var table = await _context.Tables.FindAsync(order.TableId.Value);
                 if (table != null)
                 {
-                    table.IsAvailable = true;
-                    table.OccupiedAt = null;
+                    if (table.IsMerged && table.MergedGroupId.HasValue)
+                    {
+                        var groupTables = await _context.Tables
+                            .Where(t => t.MergedGroupId == table.MergedGroupId)
+                            .ToListAsync();
+                        foreach (var t in groupTables)
+                        {
+                            t.IsAvailable = true;
+                            t.OccupiedAt = null;
+                        }
+                    }
+                    else
+                    {
+                        table.IsAvailable = true;
+                        table.OccupiedAt = null;
+                    }
                 }
             }
         }        await _context.SaveChangesAsync();
             
             // Broadcast update
             await _hubContext.Clients.All.SendAsync("OrderUpdated", order.Id);
+            await _hubContext.Clients.All.SendAsync("TableUpdated");
             
       return order;
         }
@@ -237,13 +253,30 @@ namespace RestaurantPOS.API.Services
        var table = await _context.Tables.FindAsync(order.TableId.Value);
       if (table != null)
    {
-  table.IsAvailable = true;
+        if (table.IsMerged && table.MergedGroupId.HasValue)
+        {
+            var groupTables = await _context.Tables
+                .Where(t => t.MergedGroupId == table.MergedGroupId)
+                .ToListAsync();
+            foreach (var t in groupTables)
+            {
+                t.IsAvailable = true;
+                t.OccupiedAt = null;
+            }
+        }
+        else
+        {
+            table.IsAvailable = true;
+            table.OccupiedAt = null; // Also reset OccupiedAt
+        }
        }
           }
       }
         }
 
         await _context.SaveChangesAsync();
+        await _hubContext.Clients.All.SendAsync("OrderUpdated", orderId);
+        await _hubContext.Clients.All.SendAsync("TableUpdated");
         return await GetOrderByIdAsync(orderId);
     }
 
@@ -351,8 +384,22 @@ namespace RestaurantPOS.API.Services
                     var table = await _context.Tables.FindAsync(order.TableId.Value);
                     if (table != null)
                     {
-                        table.IsAvailable = true;
-                        table.OccupiedAt = null;
+                        if (table.IsMerged && table.MergedGroupId.HasValue)
+                        {
+                            var groupTables = await _context.Tables
+                                .Where(t => t.MergedGroupId == table.MergedGroupId)
+                                .ToListAsync();
+                            foreach (var t in groupTables)
+                            {
+                                t.IsAvailable = true;
+                                t.OccupiedAt = null;
+                            }
+                        }
+                        else
+                        {
+                            table.IsAvailable = true;
+                            table.OccupiedAt = null;
+                        }
                     }
                 }
             }
@@ -361,6 +408,7 @@ namespace RestaurantPOS.API.Services
 
             // Broadcast completion
             await _hubContext.Clients.All.SendAsync("OrderCompleted", order.Id);
+            await _hubContext.Clients.All.SendAsync("TableUpdated");
 
             return await GetOrderByIdAsync(orderId);
         }
