@@ -69,24 +69,98 @@ namespace RestaurantPOS.Desktop.ViewModels
             await LoadUsers();
         }
 
-        [RelayCommand]
-        private async Task CreateUser()
-        {
-            var dialog = new Views.UserFormDialog();
-            var result = dialog.ShowDialog();
+        [ObservableProperty]
+        private bool _isRightPanelOpen;
 
-            if (result == true)
+        [ObservableProperty]
+        private string _rightPanelTitle = string.Empty;
+
+        [ObservableProperty]
+        private bool _isCreatingNew;
+
+        // Properties for binding to the Right Panel Form
+        [ObservableProperty]
+        private string _editUsername = string.Empty;
+        [ObservableProperty]
+        private string _editFullName = string.Empty;
+        [ObservableProperty]
+        private string _editEmail = string.Empty;
+        [ObservableProperty]
+        private string _editPassword = string.Empty;
+        [ObservableProperty]
+        private string _editRole = "Staff";
+
+        [ObservableProperty]
+        private ObservableCollection<string> _roles = new() { "Admin", "Manager", "Staff" };
+
+        [RelayCommand]
+        private void CloseRightPanel()
+        {
+            IsRightPanelOpen = false;
+        }
+
+        [RelayCommand]
+        private void CreateUser()
+        {
+            IsRightPanelOpen = true;
+            IsCreatingNew = true;
+            RightPanelTitle = "Thêm người dùng";
+            
+            // Clear fields
+            EditUsername = string.Empty;
+            EditFullName = string.Empty;
+            EditEmail = string.Empty;
+            EditPassword = string.Empty;
+            EditRole = "Staff";
+        }
+
+        [RelayCommand]
+        private void EditUser(UserDto? user)
+        {
+            if (user == null) return;
+
+            IsRightPanelOpen = true;
+            IsCreatingNew = false;
+            RightPanelTitle = "Sửa người dùng";
+
+            // Fill fields
+            EditUsername = user.Username;
+            EditFullName = user.FullName;
+            EditEmail = user.Email;
+            EditPassword = string.Empty; // Password usually not shown
+            EditRole = user.Role;
+            
+            SelectedUser = user; // Keep track of who we are editing
+        }
+
+        [RelayCommand]
+        private async Task SavePanel()
+        {
+            if (string.IsNullOrWhiteSpace(EditUsername) || string.IsNullOrWhiteSpace(EditFullName))
             {
-                IsLoading = true;
-                try
+                _toastService.ShowWarning("Vui lòng nhập đầy đủ thông tin bắt buộc");
+                return;
+            }
+
+            IsLoading = true;
+            try
+            {
+                if (IsCreatingNew)
                 {
+                    if (string.IsNullOrWhiteSpace(EditPassword))
+                    {
+                        _toastService.ShowWarning("Mật khẩu không được để trống khi tạo mới");
+                        IsLoading = false;
+                        return;
+                    }
+
                     var request = new CreateUserRequest
                     {
-                        Username = dialog.Username,
-                        FullName = dialog.FullName,
-                        Email = dialog.Email,
-                        Password = dialog.Password,
-                        Role = dialog.Role
+                        Username = EditUsername,
+                        FullName = EditFullName,
+                        Email = EditEmail,
+                        Password = EditPassword,
+                        Role = EditRole
                     };
 
                     var newUser = await _userService.CreateUserAsync(request);
@@ -94,64 +168,46 @@ namespace RestaurantPOS.Desktop.ViewModels
                     {
                         _toastService.ShowSuccess($"Đã tạo người dùng '{newUser.Username}' thành công!");
                         await LoadUsers();
+                        IsRightPanelOpen = false;
                     }
                 }
-                catch (Exception ex)
+                else // Update
                 {
-                    _toastService.ShowError($"Lỗi: {ex.Message}");
-                }
-                finally
-                {
-                    IsLoading = false;
-                }
-            }
-        }
+                    if (SelectedUser == null) return;
 
-        [RelayCommand]
-        private async Task EditUser(UserDto? user)
-        {
-            if (user == null) return;
-
-            var dialog = new Views.UserFormDialog(user);
-            var result = dialog.ShowDialog();
-
-            if (result == true)
-            {
-                IsLoading = true;
-                try
-                {
                     var request = new UpdateUserRequest
                     {
-                        Username = dialog.Username,
-                        FullName = dialog.FullName,
-                        Email = dialog.Email
+                        Username = EditUsername,
+                        FullName = EditFullName,
+                        Email = EditEmail
                     };
 
-                    var success = await _userService.UpdateUserAsync(user.Id, request);
+                    var success = await _userService.UpdateUserAsync(SelectedUser.Id, request);
                     if (success)
                     {
-                        // Also update role if changed
-                        if (dialog.Role != user.Role)
+                        // Update role if changed
+                        if (EditRole != SelectedUser.Role)
                         {
-                            await _userService.UpdateRoleAsync(user.Id, dialog.Role);
+                            await _userService.UpdateRoleAsync(SelectedUser.Id, EditRole);
                         }
 
-                        _toastService.ShowSuccess($"Đã cập nhật người dùng '{user.Username}' thành công!");
+                        _toastService.ShowSuccess($"Đã cập nhật người dùng '{SelectedUser.Username}' thành công!");
                         await LoadUsers();
+                        IsRightPanelOpen = false;
                     }
                     else
                     {
                         _toastService.ShowError("Có lỗi xảy ra khi cập nhật");
                     }
                 }
-                catch (Exception ex)
-                {
-                    _toastService.ShowError($"Lỗi: {ex.Message}");
-                }
-                finally
-                {
-                    IsLoading = false;
-                }
+            }
+            catch (Exception ex)
+            {
+                _toastService.ShowError($"Lỗi: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -251,6 +307,10 @@ namespace RestaurantPOS.Desktop.ViewModels
                     {
                         _toastService.ShowSuccess("Đã xóa tài khoản thành công");
                         await LoadUsers();
+                        if (IsRightPanelOpen && SelectedUser?.Id == user.Id)
+                        {
+                            IsRightPanelOpen = false;
+                        }
                     }
                     else
                     {

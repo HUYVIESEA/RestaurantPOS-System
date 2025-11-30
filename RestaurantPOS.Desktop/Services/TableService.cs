@@ -115,4 +115,53 @@ public class TableService : ITableService
             return false;
         }
     }
+
+    public async Task<TableDto?> CreateTableAsync(TableDto table)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.PostAsJsonAsync("api/Tables", table);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<TableDto>();
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"TableService: Error creating table - {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<bool> UpdateTableAsync(TableDto table)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.PutAsJsonAsync($"api/Tables/{table.Id}", table);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"TableService: Error updating table {table.Id} - {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteTableAsync(int id)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.DeleteAsync($"api/Tables/{id}");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"TableService: Error deleting table {id} - {ex.Message}");
+            return false;
+        }
+    }
 }

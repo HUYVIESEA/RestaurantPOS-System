@@ -133,6 +133,17 @@ public partial class App : Application
         services.AddTransient<CreateOrderViewModel>();
         services.AddTransient<OrderDetailViewModel>();
         services.AddTransient<UserManagementViewModel>();
+        services.AddTransient<MenuManagementViewModel>();
+
+        services.AddSingleton<ICategoryService>(sp =>
+        {
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri("http://localhost:5000/")
+            };
+            var authService = sp.GetRequiredService<IAuthenticationService>();
+            return new CategoryService(httpClient, authService);
+        });
 
         // Views
         services.AddTransient<MainWindow>();

@@ -69,6 +69,35 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
+            <Style TargetType="TextBox" x:Key="FormTextBox">
+                <Setter Property="Padding" Value="10,8"/>
+                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Background" Value="#F8FAFC"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border x:Name="border" 
+                                    CornerRadius="4" 
+                                    Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter TargetName="border" Property="BorderBrush" Value="#0090DA"/>
+                                    <Setter TargetName="border" Property="Background" Value="White"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="BorderBrush" Value="#CBD5E0"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </Grid.Resources>
 
         <!-- Page Header -->
@@ -101,6 +130,20 @@
                         <StackPanel Orientation="Horizontal">
                             <fa:IconImage Icon="RotateRight" Width="14" Height="14" Foreground="#4A5568" Margin="0,0,6,0"/>
                             <TextBlock Text="Làm mới" FontSize="13" Foreground="#4A5568"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Command="{Binding AddTableCommand}" 
+                            Background="#0090DA" 
+                            Foreground="White" 
+                            BorderThickness="0"
+                            Padding="12,8" 
+                            Margin="10,0,0,0"
+                            Cursor="Hand" 
+                            Style="{StaticResource ModernButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="Plus" Width="14" Height="14" Foreground="White" Margin="0,0,6,0"/>
+                            <TextBlock Text="Thêm bàn" FontSize="13" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -176,7 +219,7 @@
                 </ListBox>
 
                 <TextBlock Text="Sức chứa:" FontSize="13" Foreground="#718096" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <ComboBox SelectedValue="{Binding FilterCapacity}" SelectedValuePath="Tag" Width="120" VerticalAlignment="Center">
+                <ComboBox SelectedValue="{Binding FilterCapacity}" SelectedValuePath="Tag" Width="120" VerticalAlignment="Center" Style="{StaticResource ModernComboBoxStyle}">
                     <ComboBoxItem Content="Tất cả" Tag="0" IsSelected="True"/>
                     <ComboBoxItem Content="2+ người" Tag="2"/>
                     <ComboBoxItem Content="4+ người" Tag="4"/>
@@ -186,185 +229,302 @@
             </StackPanel>
         </Border>
 
-        <!-- Tables Grid -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Tables}" Margin="30,20">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Command="{Binding DataContext.SelectTableCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                CommandParameter="{Binding}"
-                                Width="200" Height="160" Margin="0,0,20,20" Cursor="Hand" BorderThickness="0">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border Background="White" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1"
-                                            Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
-                                        <Border.Effect>
-                                            <DropShadowEffect Color="#64748B" Opacity="0.1" BlurRadius="10" ShadowDepth="4"/>
-                                        </Border.Effect>
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
-                                                <Setter Property="BorderThickness" Value="1"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="BorderBrush" Value="#3B82F6"/>
-                                                        <Setter Property="BorderThickness" Value="3"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsMerged}" Value="True">
-                                                        <Setter Property="BorderBrush" Value="#8B5CF6"/>
-                                                        <Setter Property="BorderThickness" Value="2"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <Border.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Tách bàn" 
-                                                          Command="{Binding PlacementTarget.Tag.SplitTableCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" 
-                                                          CommandParameter="{Binding}"
-                                                          Visibility="{Binding IsMerged, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                    <MenuItem.Icon>
-                                                        <fa:IconImage Icon="Unlink" Width="16" Height="16" Foreground="#EF4444"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                            </ContextMenu>
-                                        </Border.ContextMenu>
+        <!-- Main Content Grid -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/> <!-- Right Panel Column -->
+            </Grid.ColumnDefinitions>
 
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="6"/>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            
-                                            <!-- Status Indicator -->
-                                            <Border Grid.Row="0" CornerRadius="12,12,0,0">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="#10B981"/> <!-- Default Green -->
-                                                        <Style.Triggers>
-                                                            <!-- Occupied (Not Merged) -> Amber -->
-                                                            <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                                                                <Setter Property="Background" Value="#F59E0B"/>
-                                                            </DataTrigger>
-                                                            <!-- Merged + Occupied -> Violet -->
-                                                            <MultiDataTrigger>
-                                                                <MultiDataTrigger.Conditions>
-                                                                    <Condition Binding="{Binding IsMerged}" Value="True"/>
-                                                                    <Condition Binding="{Binding IsAvailable}" Value="False"/>
-                                                                </MultiDataTrigger.Conditions>
-                                                                <Setter Property="Background" Value="#8B5CF6"/>
-                                                            </MultiDataTrigger>
-                                                            <!-- Selected -> Blue (Override all) -->
-                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                <Setter Property="Background" Value="#3B82F6"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-                                            </Border>
+            <!-- Tables Grid -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Tables}" Margin="30,20">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.SelectTableCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    Width="200" Height="160" Margin="0,0,20,20" Cursor="Hand" BorderThickness="0">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="White" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1"
+                                                Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#64748B" Opacity="0.1" BlurRadius="10" ShadowDepth="4"/>
+                                            </Border.Effect>
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                                                    <Setter Property="BorderThickness" Value="1"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
+                                                            <Setter Property="BorderThickness" Value="3"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsMerged}" Value="True">
+                                                            <Setter Property="BorderBrush" Value="#8B5CF6"/>
+                                                            <Setter Property="BorderThickness" Value="2"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Border.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Sửa bàn" 
+                                                              Command="{Binding PlacementTarget.Tag.EditTableCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" 
+                                                              CommandParameter="{Binding}">
+                                                        <MenuItem.Icon>
+                                                            <fa:IconImage Icon="PenToSquare" Width="16" Height="16" Foreground="#0090DA"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="Xóa bàn" 
+                                                              Command="{Binding PlacementTarget.Tag.DeleteTableCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" 
+                                                              CommandParameter="{Binding}">
+                                                        <MenuItem.Icon>
+                                                            <fa:IconImage Icon="TrashCan" Width="16" Height="16" Foreground="#EF4444"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <Separator/>
+                                                    <MenuItem Header="Tách bàn" 
+                                                              Command="{Binding PlacementTarget.Tag.SplitTableCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" 
+                                                              CommandParameter="{Binding}"
+                                                              Visibility="{Binding IsMerged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                        <MenuItem.Icon>
+                                                            <fa:IconImage Icon="Unlink" Width="16" Height="16" Foreground="#EF4444"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </Border.ContextMenu>
 
-                                            <!-- Table Info -->
-                                            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20,10">
-                                                <fa:IconImage Icon="Chair" Width="32" Height="32" Margin="0,0,0,10">
-                                                    <fa:IconImage.Style>
-                                                        <Style TargetType="fa:IconImage">
-                                                            <Setter Property="Foreground" Value="#10B981"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                                                                    <Setter Property="Foreground" Value="#F59E0B"/>
-                                                                </DataTrigger>
-                                                                <MultiDataTrigger>
-                                                                    <MultiDataTrigger.Conditions>
-                                                                        <Condition Binding="{Binding IsMerged}" Value="True"/>
-                                                                        <Condition Binding="{Binding IsAvailable}" Value="False"/>
-                                                                    </MultiDataTrigger.Conditions>
-                                                                    <Setter Property="Foreground" Value="#8B5CF6"/>
-                                                                </MultiDataTrigger>
-                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                    <Setter Property="Foreground" Value="#3B82F6"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </fa:IconImage.Style>
-                                                </fa:IconImage>
-
-                                                <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="Bold" Foreground="#334155" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="6"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
                                                 
-                                                <TextBlock FontSize="13" HorizontalAlignment="Center">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Setter Property="Text" Value="Trống"/>
-                                                            <Setter Property="Foreground" Value="#10B981"/>
-                                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                                <!-- Status Indicator -->
+                                                <Border Grid.Row="0" CornerRadius="12,12,0,0">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#10B981"/> <!-- Default Green -->
                                                             <Style.Triggers>
+                                                                <!-- Occupied (Not Merged) -> Amber -->
                                                                 <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                                                                    <Setter Property="Text" Value="Đang phục vụ"/>
-                                                                    <Setter Property="Foreground" Value="#F59E0B"/>
+                                                                    <Setter Property="Background" Value="#F59E0B"/>
                                                                 </DataTrigger>
+                                                                <!-- Merged + Occupied -> Violet -->
                                                                 <MultiDataTrigger>
                                                                     <MultiDataTrigger.Conditions>
                                                                         <Condition Binding="{Binding IsMerged}" Value="True"/>
                                                                         <Condition Binding="{Binding IsAvailable}" Value="False"/>
                                                                     </MultiDataTrigger.Conditions>
-                                                                    <Setter Property="Text" Value="Đã ghép"/>
-                                                                    <Setter Property="Foreground" Value="#8B5CF6"/>
+                                                                    <Setter Property="Background" Value="#8B5CF6"/>
                                                                 </MultiDataTrigger>
+                                                                <!-- Selected -> Blue (Override all) -->
                                                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                    <Setter Property="Text" Value="Đang chọn"/>
-                                                                    <Setter Property="Foreground" Value="#3B82F6"/>
+                                                                    <Setter Property="Background" Value="#3B82F6"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
+                                                    </Border.Style>
+                                                </Border>
 
-                                                <TextBlock FontSize="14" FontWeight="Bold" Foreground="#EF4444" HorizontalAlignment="Center" Margin="0,4,0,0">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                                            <Setter Property="Text" Value="{Binding Duration}"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
-                                            </StackPanel>
+                                                <!-- Table Info -->
+                                                <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20,10">
+                                                    <fa:IconImage Icon="Chair" Width="32" Height="32" Margin="0,0,0,10">
+                                                        <fa:IconImage.Style>
+                                                            <Style TargetType="fa:IconImage">
+                                                                <Setter Property="Foreground" Value="#10B981"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                                        <Setter Property="Foreground" Value="#F59E0B"/>
+                                                                    </DataTrigger>
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding IsMerged}" Value="True"/>
+                                                                            <Condition Binding="{Binding IsAvailable}" Value="False"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Foreground" Value="#8B5CF6"/>
+                                                                    </MultiDataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                        <Setter Property="Foreground" Value="#3B82F6"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </fa:IconImage.Style>
+                                                    </fa:IconImage>
 
-                                            <!-- Footer Info -->
-                                            <Border Grid.Row="2" BorderBrush="#F1F5F9" BorderThickness="0,1,0,0" Padding="15,10" Background="#FAFAFA" CornerRadius="0,0,12,12">
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <fa:IconImage Icon="UserGroup" Width="12" Height="12" Foreground="#94A3B8" Margin="0,0,6,0"/>
-                                                    <TextBlock Foreground="#64748B" FontSize="12">
-                                                        <Run Text="Sức chứa:"/>
-                                                        <Run Text="{Binding Capacity}" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="Bold" Foreground="#334155" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                                                    
+                                                    <TextBlock FontSize="13" HorizontalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="Trống"/>
+                                                                <Setter Property="Foreground" Value="#10B981"/>
+                                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                                        <Setter Property="Text" Value="Đang phục vụ"/>
+                                                                        <Setter Property="Foreground" Value="#F59E0B"/>
+                                                                    </DataTrigger>
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding IsMerged}" Value="True"/>
+                                                                            <Condition Binding="{Binding IsAvailable}" Value="False"/>
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Text" Value="Đã ghép"/>
+                                                                        <Setter Property="Foreground" Value="#8B5CF6"/>
+                                                                    </MultiDataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                        <Setter Property="Text" Value="Đang chọn"/>
+                                                                        <Setter Property="Foreground" Value="#3B82F6"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+
+                                                    <TextBlock FontSize="14" FontWeight="Bold" Foreground="#EF4444" HorizontalAlignment="Center" Margin="0,4,0,0">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                <Setter Property="Text" Value="{Binding Duration}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
                                                     </TextBlock>
                                                 </StackPanel>
-                                            </Border>
-                                        </Grid>
-                                    </Border>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
 
-        <!-- Loading Overlay -->
+                                                <!-- Footer Info -->
+                                                <Border Grid.Row="2" BorderBrush="#F1F5F9" BorderThickness="0,1,0,0" Padding="15,10" Background="#FAFAFA" CornerRadius="0,0,12,12">
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <fa:IconImage Icon="UserGroup" Width="12" Height="12" Foreground="#94A3B8" Margin="0,0,6,0"/>
+                                                        <TextBlock Foreground="#64748B" FontSize="12">
+                                                            <Run Text="Sức chứa:"/>
+                                                            <Run Text="{Binding Capacity}" FontWeight="Bold"/>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Right Properties Panel -->
+            <Border Grid.Column="1" 
+                    Width="350" 
+                    Background="White" 
+                    BorderBrush="#E2E8F0" 
+                    BorderThickness="1,0,0,0"
+                    Visibility="{Binding IsRightPanelOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Margin="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Panel Header -->
+                    <Border Grid.Row="0" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="20,15">
+                        <Grid>
+                            <TextBlock Text="{Binding RightPanelTitle}" FontSize="16" FontWeight="Bold" Foreground="#2D3748"/>
+                            <Button HorizontalAlignment="Right"
+                                    Command="{Binding CloseRightPanelCommand}"
+                                    Width="24" Height="24"
+                                    Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                <fa:IconImage Icon="Times" Width="14" Height="14" Foreground="#A0AEC0"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Panel Content -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="20">
+                            
+                            <TextBlock Text="Tên bàn" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,5"/>
+                            <TextBox Text="{Binding EditableTable.Name, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Khu vực (Tầng)" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,5"/>
+                            <TextBox Text="{Binding EditableTable.Floor, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Sức chứa (người)" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,5"/>
+                            <TextBox Text="{Binding EditableTable.Capacity, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Trạng thái" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,5"/>
+                            <ComboBox SelectedValue="{Binding EditableTable.Status}" 
+                                      SelectedValuePath="Tag"
+                                      Style="{StaticResource ModernComboBoxStyle}"
+                                      Margin="0,0,0,15">
+                                <ComboBoxItem Content="Trống" Tag="Available"/>
+                                <ComboBoxItem Content="Đang phục vụ" Tag="Occupied"/>
+                            </ComboBox>
+
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Panel Footer -->
+                    <Border Grid.Row="2" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="20" Background="#F8FAFC">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Bỏ qua" 
+                                    Command="{Binding CloseRightPanelCommand}"
+                                    Width="100" Height="36"
+                                    Background="White" Foreground="#4A5568" BorderBrush="#CBD5E0" BorderThickness="1"
+                                    Margin="0,0,10,0" Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                            <Button Content="Lưu" 
+                                    Command="{Binding SavePanelCommand}"
+                                    Width="100" Height="36"
+                                    Background="#0090DA" Foreground="White" BorderThickness="0"
+                                    Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Loading Overlay with Spinner -->
         <Grid Grid.RowSpan="3" Background="#80FFFFFF" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="⏳" FontSize="48" HorizontalAlignment="Center"/>
-                <TextBlock Text="Đang tải..." Foreground="#3B82F6" Margin="0,10,0,0" FontSize="16"/>
-            </StackPanel>
+            <fa:IconImage Icon="Spinner" Width="48" Height="48" Foreground="#0090DA">
+                <fa:IconImage.RenderTransform>
+                    <RotateTransform Angle="0" CenterX="24" CenterY="24"/>
+                </fa:IconImage.RenderTransform>
+                <fa:IconImage.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                 From="0" To="360" Duration="0:0:1" RepeatBehavior="Forever"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </fa:IconImage.Triggers>
+            </fa:IconImage>
         </Grid>
     </Grid>
 </UserControl>

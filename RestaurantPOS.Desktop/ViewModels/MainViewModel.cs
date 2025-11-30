@@ -31,6 +31,18 @@ public partial class MainViewModel : ObservableObject,
     [ObservableProperty]
     private bool isLoggedIn = false;
 
+    [ObservableProperty]
+    private string currentViewName = "Dashboard";
+
+    [ObservableProperty]
+    private Models.UserDto? currentUser;
+
+    [ObservableProperty]
+    private bool isAdmin;
+
+    [ObservableProperty]
+    private bool isManager; // Optional, if we have Manager role separate from Admin
+
     public MainViewModel(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
@@ -52,6 +64,9 @@ public partial class MainViewModel : ObservableObject,
     private void NavigateToUsers() => WeakReferenceMessenger.Default.Send(new NavigateToMessage("UserManagement"));
 
     [RelayCommand]
+    private void NavigateToMenu() => WeakReferenceMessenger.Default.Send(new NavigateToMessage("MenuManagement"));
+
+    [RelayCommand]
     private void Logout()
     {
         WeakReferenceMessenger.Default.Send(new LogoutMessage());
@@ -61,6 +76,13 @@ public partial class MainViewModel : ObservableObject,
     {
         System.Diagnostics.Debug.WriteLine("MainViewModel: Received LoginSuccessMessage");
         IsLoggedIn = true;
+        CurrentUser = message.User;
+        
+        // Set permissions
+        IsAdmin = CurrentUser?.Role == "Admin";
+        IsManager = CurrentUser?.Role == "Manager" || IsAdmin;
+
+        CurrentViewName = "Dashboard";
         CurrentViewModel = _serviceProvider.GetRequiredService<DashboardViewModel>();
     }
 
@@ -68,6 +90,7 @@ public partial class MainViewModel : ObservableObject,
     {
         System.Diagnostics.Debug.WriteLine("MainViewModel: Received LogoutMessage");
         IsLoggedIn = false;
+        CurrentViewName = "Login";
         CurrentViewModel = _serviceProvider.GetRequiredService<LoginViewModel>();
     }
 
@@ -75,6 +98,7 @@ public partial class MainViewModel : ObservableObject,
     {
         System.Diagnostics.Debug.WriteLine($"MainViewModel: Received NavigateToMessage - {message.ViewName}");
         
+        CurrentViewName = message.ViewName;
         CurrentViewModel = message.ViewName switch
         {
             "TableManagement" => _serviceProvider.GetRequiredService<TableManagementViewModel>(),
@@ -83,6 +107,7 @@ public partial class MainViewModel : ObservableObject,
             "CreateOrder" => _serviceProvider.GetRequiredService<CreateOrderViewModel>(),
             "OrderDetail" => _serviceProvider.GetRequiredService<OrderDetailViewModel>(),
             "UserManagement" => _serviceProvider.GetRequiredService<UserManagementViewModel>(),
+            "MenuManagement" => _serviceProvider.GetRequiredService<MenuManagementViewModel>(),
             _ => CurrentViewModel
         };
 

@@ -272,5 +272,141 @@ namespace RestaurantPOS.Desktop.ViewModels
         {
             WeakReferenceMessenger.Default.Send(new NavigateToMessage("Dashboard"));
         }
+
+        // --- Right Panel & CRUD Logic ---
+
+        [ObservableProperty]
+        private bool _isRightPanelOpen;
+
+        [ObservableProperty]
+        private string _rightPanelTitle = string.Empty;
+
+        [ObservableProperty]
+        private TableDto _editableTable = new();
+
+        private bool _isCreatingNew;
+
+        [RelayCommand]
+        private void CloseRightPanel()
+        {
+            IsRightPanelOpen = false;
+        }
+
+        [RelayCommand]
+        private void AddTable()
+        {
+            IsRightPanelOpen = true;
+            RightPanelTitle = "Thêm bàn mới";
+            EditableTable = new TableDto { Status = "Available", Capacity = 4 };
+            _isCreatingNew = true;
+        }
+
+        [RelayCommand]
+        private void EditTable(TableDto? table)
+        {
+            if (table == null) return;
+            IsRightPanelOpen = true;
+            RightPanelTitle = "Sửa thông tin bàn";
+            EditableTable = new TableDto 
+            { 
+                Id = table.Id, 
+                Name = table.Name, 
+                Capacity = table.Capacity, 
+                Status = table.Status,
+                Floor = table.Floor,
+                IsAvailable = table.IsAvailable
+            };
+            _isCreatingNew = false;
+        }
+
+        [RelayCommand]
+        private async Task DeleteTable(TableDto? table)
+        {
+            if (table == null) return;
+
+            var result = MessageBox.Show(
+                $"Bạn có chắc muốn xóa bàn '{table.Name}'?",
+                "Xác nhận xóa",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                IsLoading = true;
+                try
+                {
+                    var success = await _tableService.DeleteTableAsync(table.Id);
+                    if (success)
+                    {
+                        _toastService.ShowSuccess($"Đã xóa bàn '{table.Name}'");
+                        await LoadTables();
+                        if (IsRightPanelOpen && EditableTable.Id == table.Id)
+                        {
+                            IsRightPanelOpen = false;
+                        }
+                    }
+                    else
+                    {
+                        _toastService.ShowError("Không thể xóa bàn");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _toastService.ShowError($"Lỗi: {ex.Message}");
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
+            }
+        }
+
+        [RelayCommand]
+        private async Task SavePanel()
+        {
+            if (string.IsNullOrWhiteSpace(EditableTable.Name))
+            {
+                _toastService.ShowWarning("Tên bàn không được để trống");
+                return;
+            }
+            if (EditableTable.Capacity <= 0)
+            {
+                _toastService.ShowWarning("Sức chứa phải lớn hơn 0");
+                return;
+            }
+
+            IsLoading = true;
+            try
+            {
+                if (_isCreatingNew)
+                {
+                    var result = await _tableService.CreateTableAsync(EditableTable);
+                    if (result != null)
+                    {
+                        _toastService.ShowSuccess($"Đã thêm bàn '{result.Name}'");
+                        await LoadTables();
+                        IsRightPanelOpen = false;
+                    }
+                }
+                else
+                {
+                    var success = await _tableService.UpdateTableAsync(EditableTable);
+                    if (success)
+                    {
+                        _toastService.ShowSuccess($"Đã cập nhật bàn '{EditableTable.Name}'");
+                        await LoadTables();
+                        IsRightPanelOpen = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _toastService.ShowError($"Lỗi: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
     }
 }

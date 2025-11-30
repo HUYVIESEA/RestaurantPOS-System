@@ -7,7 +7,7 @@
         xmlns:converters="clr-namespace:RestaurantPOS.Desktop.Converters"
         xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
         mc:Ignorable="d"
-        Title="Restaurant POS" 
+        Title="Smart Order" 
         Icon="pack://application:,,,/Resources/icons/restaurant.ico"
         Height="768" 
         Width="1366"
@@ -19,6 +19,36 @@
     <Window.Resources>
         <!-- Converter to check if current view is LoginViewModel -->
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94A3B8"/> <!-- Slate 400 -->
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="10,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E293B"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     
     <Grid>
@@ -82,7 +112,14 @@
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar Navigation -->
-            <Border Grid.Column="0" Background="#1E3A5F">
+            <Border Grid.Column="0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0F172A" Offset="0.0"/>
+                        <GradientStop Color="#1E293B" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -91,175 +128,204 @@
                     </Grid.RowDefinitions>
 
                     <!-- Logo & Brand -->
-                    <Border Grid.Row="0" Background="#152A45" Padding="20,25">
+                    <Border Grid.Row="0" Padding="20,30,20,20">
                         <StackPanel>
-                            <fa:IconImage Icon="Utensils" Foreground="White" Width="40" Height="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                            <TextBlock Text="RESTAURANT POS" 
-                                       FontSize="16" 
+                            <Border Width="50" Height="50" CornerRadius="12" Background="#3B82F6" Margin="0,0,0,15" HorizontalAlignment="Center">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#3B82F6" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                                </Border.Effect>
+                                <fa:IconImage Icon="Utensils" Foreground="White" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="SMART ORDER" 
+                                       FontSize="18" 
                                        FontWeight="Bold" 
                                        Foreground="White"
                                        HorizontalAlignment="Center"
                                        TextAlignment="Center"/>
-                            <TextBlock Text="Quản lý nhà hàng" 
-                                       FontSize="11" 
-                                       Foreground="#A0AEC0"
-                                       HorizontalAlignment="Center"
-                                       Margin="0,3,0,0"/>
                         </StackPanel>
                     </Border>
 
                     <!-- Navigation Menu -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,10,0,0">
-                            <Button Command="{Binding NavigateToDashboardCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Padding="20,12"
-                                    HorizontalContentAlignment="Left"
-                                    Cursor="Hand">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:IconImage Icon="ChartPie" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Tổng quan" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
-                                </StackPanel>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,10">
+                        <StackPanel>
+                            <!-- Dashboard -->
+                            <Button Command="{Binding NavigateToDashboardCommand}" Tag="Dashboard">
                                 <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                                                        <ContentPresenter/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
                                         <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#2D4A77"/>
-                                            </Trigger>
+                                            <DataTrigger Binding="{Binding CurrentViewName}" Value="Dashboard">
+                                                <Setter Property="Background" Value="#3B82F6"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#3B82F6" BlurRadius="15" ShadowDepth="0" Opacity="0.4"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="ChartPie" Width="18" Height="18" Margin="0,0,12,0" 
+                                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                    <TextBlock Text="Tổng quan" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
 
-                            <Button Command="{Binding NavigateToTablesCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Padding="20,12"
-                                    HorizontalContentAlignment="Left"
-                                    Cursor="Hand">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:IconImage Icon="Chair" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Phòng bàn" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
-                                </StackPanel>
+                            <!-- Tables -->
+                            <Button Command="{Binding NavigateToTablesCommand}" Tag="TableManagement">
                                 <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                                                        <ContentPresenter/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
                                         <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#2D4A77"/>
-                                            </Trigger>
+                                            <DataTrigger Binding="{Binding CurrentViewName}" Value="TableManagement">
+                                                <Setter Property="Background" Value="#3B82F6"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#3B82F6" BlurRadius="15" ShadowDepth="0" Opacity="0.4"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Chair" Width="18" Height="18" Margin="0,0,12,0"
+                                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                    <TextBlock Text="Phòng bàn" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
 
-                            <Button Command="{Binding NavigateToOrdersCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Padding="20,12"
-                                    HorizontalContentAlignment="Left"
-                                    Cursor="Hand">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:IconImage Icon="FileInvoice" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Đơn hàng" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
-                                </StackPanel>
+                            <!-- Orders -->
+                            <Button Command="{Binding NavigateToOrdersCommand}" Tag="OrderList">
                                 <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                                                        <ContentPresenter/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
                                         <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#2D4A77"/>
-                                            </Trigger>
+                                            <DataTrigger Binding="{Binding CurrentViewName}" Value="OrderList">
+                                                <Setter Property="Background" Value="#3B82F6"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#3B82F6" BlurRadius="15" ShadowDepth="0" Opacity="0.4"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="FileInvoice" Width="18" Height="18" Margin="0,0,12,0"
+                                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                    <TextBlock Text="Đơn hàng" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
 
-                            <Button Command="{Binding NavigateToUsersCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Padding="20,12"
-                                    HorizontalContentAlignment="Left"
-                                    Cursor="Hand">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:IconImage Icon="Users" Foreground="#A0AEC0" Width="20" Height="20" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Người dùng" FontSize="14" Foreground="White" FontWeight="SemiBold"/>
-                                </StackPanel>
+                            <!-- Menu -->
+                            <Button Command="{Binding NavigateToMenuCommand}" Tag="MenuManagement"
+                                    Visibility="{Binding IsManager, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-                                                        <ContentPresenter/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
                                         <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#2D4A77"/>
-                                            </Trigger>
+                                            <DataTrigger Binding="{Binding CurrentViewName}" Value="MenuManagement">
+                                                <Setter Property="Background" Value="#3B82F6"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#3B82F6" BlurRadius="15" ShadowDepth="0" Opacity="0.4"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Utensils" Width="18" Height="18" Margin="0,0,12,0"
+                                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                    <TextBlock Text="Thực đơn" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Users -->
+                            <Button Command="{Binding NavigateToUsersCommand}" Tag="UserManagement"
+                                    Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CurrentViewName}" Value="UserManagement">
+                                                <Setter Property="Background" Value="#3B82F6"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#3B82F6" BlurRadius="15" ShadowDepth="0" Opacity="0.4"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Users" Width="18" Height="18" Margin="0,0,12,0"
+                                                  Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                    <TextBlock Text="Người dùng" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                         </StackPanel>
                     </ScrollViewer>
 
                     <!-- User Info & Logout -->
-                    <Border Grid.Row="2" Background="#152A45" Padding="15">
+                    <Border Grid.Row="2" Padding="20" Background="#0F172A" BorderBrush="#1E293B" BorderThickness="0,1,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                <TextBlock Text="👤 Administrator" 
+                            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="20" Background="#334155" Margin="0,0,12,0">
+                                <TextBlock Text="{Binding CurrentUser.Username, Converter={StaticResource FirstLetterConverter}}" Foreground="White" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentUser.FullName}" 
                                            Foreground="White" 
-                                           FontSize="13"
-                                           FontWeight="SemiBold"
-                                           Margin="0,0,0,3"/>
-                                <TextBlock Text="admin@restaurant.com" 
-                                           Foreground="#A0AEC0" 
-                                           FontSize="11"/>
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding CurrentUser.Role}" 
+                                           Foreground="#94A3B8" 
+                                           FontSize="12"/>
                             </StackPanel>
 
-                            <Button Grid.Column="1"
+                            <Button Grid.Column="2"
                                     Command="{Binding LogoutCommand}"
                                     Background="Transparent"
                                     BorderThickness="0"
-                                    Padding="5"
+                                    Padding="8"
                                     Cursor="Hand"
                                     ToolTip="Đăng xuất">
-                                <fa:IconImage Icon="RightFromBracket" Foreground="#EF4444" Width="18" Height="18"/>
+                                <fa:IconImage Icon="RightFromBracket" Foreground="#EF4444" Width="16" Height="16"/>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#334155"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                             </Button>
                         </Grid>
                     </Border>

@@ -10,4 +10,7 @@ public interface ITableService
     Task<bool> AssignOrderToTableAsync(int tableId, int orderId);
     Task<bool> MergeTablesAsync(List<int> tableIds);
     Task<bool> SplitTablesAsync(int groupId);
+    Task<TableDto?> CreateTableAsync(TableDto table);
+    Task<bool> UpdateTableAsync(TableDto table);
+    Task<bool> DeleteTableAsync(int id);
 }

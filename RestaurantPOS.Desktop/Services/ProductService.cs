@@ -68,4 +68,66 @@ public class ProductService : IProductService
             return new List<ProductDto>();
         }
     }
+    public async Task<ProductDto?> GetProductByIdAsync(int id)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            return await _httpClient.GetFromJsonAsync<ProductDto>($"api/Products/{id}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ProductService: Error getting product {id} - {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<ProductDto?> CreateProductAsync(ProductDto product)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.PostAsJsonAsync("api/Products", product);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ProductDto>();
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ProductService: Error creating product - {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<bool> UpdateProductAsync(ProductDto product)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.PutAsJsonAsync($"api/Products/{product.Id}", product);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ProductService: Error updating product {product.Id} - {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteProductAsync(int id)
+    {
+        try
+        {
+            AddAuthorizationHeader();
+            var response = await _httpClient.DeleteAsync($"api/Products/{id}");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ProductService: Error deleting product {id} - {ex.Message}");
+            return false;
+        }
+    }
 }

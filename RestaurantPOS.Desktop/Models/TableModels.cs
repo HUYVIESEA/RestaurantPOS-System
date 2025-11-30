@@ -22,7 +22,11 @@ public partial class TableDto : ObservableObject
         }
     }
 
-    public string Status => IsAvailable ? "Available" : "Occupied";
+    public string Status 
+    {
+        get => IsAvailable ? "Available" : "Occupied";
+        set => IsAvailable = (value == "Available");
+    }
 
     public int? CurrentOrderId { get; set; }
     public DateTime? OccupiedAt { get; set; }

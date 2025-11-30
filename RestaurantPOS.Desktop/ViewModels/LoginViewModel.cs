@@ -45,8 +45,19 @@ public partial class LoginViewModel : ObservableObject
             System.Diagnostics.Debug.WriteLine($"LoginViewModel: Login result - User: {user?.Username ?? "null"}");
             if (user != null)
             {
+                // Map LoginResponse to UserDto
+                var userDto = new Models.UserDto
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    Role = user.Role,
+                    IsActive = true // Assume active if logged in
+                };
+
                 System.Diagnostics.Debug.WriteLine("LoginViewModel: Sending LoginSuccessMessage");
-                WeakReferenceMessenger.Default.Send<Messages.LoginSuccessMessage>(new Messages.LoginSuccessMessage());
+                WeakReferenceMessenger.Default.Send<Messages.LoginSuccessMessage>(new Messages.LoginSuccessMessage(userDto));
                 System.Diagnostics.Debug.WriteLine("LoginViewModel: LoginSuccessMessage sent");
             }
             else
