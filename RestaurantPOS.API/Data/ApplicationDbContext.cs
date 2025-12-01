@@ -16,6 +16,7 @@ namespace RestaurantPOS.API.Data
         public DbSet<OrderItem> OrderItems { get; set; }
    public DbSet<Table> Tables { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserDevice> UserDevices { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

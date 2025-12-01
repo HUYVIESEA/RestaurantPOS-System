@@ -135,7 +135,29 @@ var result = await _authService.ChangePasswordAsync(userId, request.OldPassword,
 
         return Ok(new { message = "Đặt lại mật khẩu thành công" });
     }
+
+
+    // POST: api/Auth/UpdateFcmToken
+    [HttpPost("UpdateFcmToken")]
+    [Authorize]
+    public async Task<IActionResult> UpdateFcmToken([FromBody] UpdateFcmTokenRequest request)
+    {
+        var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+        var result = await _authService.UpdateFcmTokenAsync(userId, request.FcmToken);
+
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return Ok(new { message = "Cập nhật FCM token thành công" });
+    }
   }
+
+    public class UpdateFcmTokenRequest
+    {
+        public string FcmToken { get; set; } = string.Empty;
+    }
 
     public class ChangePasswordRequest
     {
@@ -154,3 +176,4 @@ var result = await _authService.ChangePasswordAsync(userId, request.OldPassword,
         public string NewPassword { get; set; } = string.Empty;
     }
 }
+

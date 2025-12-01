@@ -34,5 +34,8 @@ namespace RestaurantPOS.API.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? LastLoginAt { get; set; }
+
+        [StringLength(500)]
+        public string? FcmToken { get; set; }
     }
 }

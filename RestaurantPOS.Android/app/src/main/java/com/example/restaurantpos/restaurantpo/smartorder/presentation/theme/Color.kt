@@ -11,6 +11,13 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // Custom colors for POS
+// Custom colors for POS
 val Primary = Color(0xFF1976D2)
 val PrimaryVariant = Color(0xFF004BA0)
 val Secondary = Color(0xFFFF6F00)
+
+// Dark Mode Colors
+val PrimaryDark = Color(0xFF90CAF9)
+val SecondaryDark = Color(0xFFFFB74D)
+val SurfaceDark = Color(0xFF1E1E1E)
+val BackgroundDark = Color(0xFF121212)

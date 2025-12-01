@@ -18,64 +18,75 @@
   - [ ] Logout Functionality
 
 ### 2. 📱 Core Features (Week 3-4)
-- [ ] **Data Layer Implementation**
-  - [ ] Setup Room Database (Entities, DAOs)
-  - [ ] Setup API Services
-  - [ ] Implement Repositories (Offline-first logic)
 
-- [ ] **Product Catalog**
-  - [ ] Product List Screen
-  - [ ] Category Filter
-  - [ ] Product Search
-  - [ ] Product Detail Dialog
+- [x] **Data Layer Implementation**
+  - [x] Setup Room Database (Entities, DAOs)
+  - [x] Setup API Services
+  - [x] Implement Repositories (Offline-first logic for Products & Tables)
+
+- [x] **Product Catalog**
+  - [x] Product List Screen
+  - [x] Category Filter
+  - [x] Product Search
+  - [x] Product Detail Dialog
 
 - [ ] **Table Management**
-  - [ ] Table Grid/List View
-  - [ ] Table Status Logic (Empty/Occupied)
-  - [ ] Table Selection Flow
+  - [x] Table Grid/List View
+  - [x] Table Status Logic (Empty/Occupied)
+  - [x] Table Selection Flow
 
-- [ ] **Order Management**
-  - [ ] Cart/Basket Logic
-  - [ ] Add Item with Notes
-  - [ ] Create Order API
-  - [ ] Order List/History
+- [x] **Order Management**
+  - [x] Cart/Basket Logic
+  - [x] Add Item with Notes
+  - [x] Create Order API
+  - [x] Order List/History
 
-### 3. � Offline & Sync (Week 5-6)
+- [x] **Settings Screen**
+  - [x] Configure Server IP
+  - [x] Configure Printers
+
+### 3.  Offline & Sync (Week 5-6)
 - [ ] **Offline Logic**
-  - [ ] Local Order Creation
-  - [ ] Sync Status Tracking (isSynced flag)
+  - [x] Local Order Creation
+  - [x] Sync Status Tracking (isSynced flag)
   - [ ] Error Handling for Offline Actions
 
 - [ ] **Background Sync**
-  - [ ] Setup WorkManager
-  - [ ] Implement SyncWorker
-  - [ ] Auto-sync on Network Reconnect
+  - [x] Setup WorkManager
+  - [x] Implement SyncWorker
+  - [x] Auto-sync on Network Reconnect
 
 ### 4. 🚀 Advanced Features (Week 7-8)
 - [ ] **Real-time Updates**
-  - [ ] SignalR Client Integration
-  - [ ] Handle Order Updates
-  - [ ] Handle Table Status Updates
+  - [x] SignalR Client Integration
+  - [x] Handle Order Updates
+  - [x] Handle Table Status Updates
 
 - [ ] **Kitchen Display System**
-  - [ ] Kitchen Order View
-  - [ ] Order Status Management (Preparing/Ready)
-  - [ ] Kitchen Notifications
+  - [x] Kitchen Order View
+  - [x] Order Status Management (Preparing/Ready)
+  - [x] Kitchen Notifications (FCM Integration)
 
 - [ ] **Firebase Integration**
-  - [ ] Setup Firebase Project
-  - [ ] Implement FCM (Push Notifications)
-  - [ ] Setup Crashlytics
+  - [x] Setup Firebase Project (Guide Created)
+  - [x] Implement FCM (Service Created)
+  - [x] Setup Crashlytics (Dependencies Added)
 
 ### 5. ✨ Polish & Release (Week 9-10)
 - [ ] **UI/UX Refinement**
-  - [ ] Animations & Transitions
-  - [ ] Error/Loading States
-  - [ ] Dark Mode Support
+  - [x] Animations & Transitions
+  - [x] Error/Loading States
+  - [x] Dark Mode Support
+
+- [x] **Admin Features**
+  - [x] User Management (List, Add, Delete)
+  - [x] Menu Management (CRUD Products)
+  - [x] Reports Screen (Placeholder)
+  - [x] Admin Navigation in Home Screen
 
 - [ ] **Testing & Documentation**
   - [ ] Unit Tests (ViewModels, UseCases)
-  - [ ] User Guide
+  - [x] User Guide
   - [ ] Final Build (APK/AAB)
 
 ---

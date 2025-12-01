@@ -220,22 +220,8 @@ return false;
        .FirstOrDefaultAsync(rt => rt.Token == token && !rt.IsUsed);
 
        if (resetToken == null)
-     {
        return false;
-    }
-
-            // Check if token is expired
-      if (resetToken.ExpiresAt < DateTime.UtcNow)
-  {
- return false;
-      }
-
-    // Update password
             var user = resetToken.User;
-       if (user == null)
-  {
-       return false;
-       }
 
        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
@@ -256,64 +242,74 @@ return false;
         }
 
         public async Task<bool> ValidateResetTokenAsync(string token)
-      {
-  var resetToken = await _context.PasswordResetTokens
-       .FirstOrDefaultAsync(rt => rt.Token == token && !rt.IsUsed);
-
-   if (resetToken == null)
-    {
-return false;
-    }
-
-       // Check if token is expired
-       return resetToken.ExpiresAt >= DateTime.UtcNow;
-     }
-
-      private string GenerateResetToken()
         {
-   // Generate a cryptographically secure random token
-  var randomBytes = new byte[32];
-    using (var rng = RandomNumberGenerator.Create())
+            var resetToken = await _context.PasswordResetTokens
+                .FirstOrDefaultAsync(rt => rt.Token == token && !rt.IsUsed);
+
+            if (resetToken == null)
             {
-rng.GetBytes(randomBytes);
-       }
-       return Convert.ToBase64String(randomBytes)
-        .Replace("+", "-")
-  .Replace("/", "_")
-         .Replace("=", "");
+                return false;
+            }
+
+            // Check if token is expired
+            return resetToken.ExpiresAt >= DateTime.UtcNow;
         }
 
-   private string GenerateJwtToken(User user)
-  {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-    var secretKey = jwtSettings["SecretKey"];
-  var issuer = jwtSettings["Issuer"];
-         var audience = jwtSettings["Audience"];
-    var expiryInHours = jwtSettings.GetValue<int>("ExpiryInHours");
+        public async Task<bool> UpdateFcmTokenAsync(int userId, string fcmToken)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
 
-       var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
+            user.FcmToken = fcmToken;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private string GenerateResetToken()
+        {
+            // Generate a cryptographically secure random token
+            var randomBytes = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes)
+                .Replace("+", "-")
+                .Replace("/", "_")
+                .Replace("=", "");
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var secretKey = jwtSettings["SecretKey"];
+            var issuer = jwtSettings["Issuer"];
+            var audience = jwtSettings["Audience"];
+            var expiryInHours = jwtSettings.GetValue<int>("ExpiryInHours");
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-     new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-     new Claim(JwtRegisteredClaimNames.Email, user.Email),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-       new Claim("UserId", user.Id.ToString()), // ✅ FIXED: Use custom claim name
-      new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Keep for compatibility
-       new Claim(ClaimTypes.Name, user.FullName),
-new Claim(ClaimTypes.Role, user.Role)
- };
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("UserId", user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
 
             var token = new JwtSecurityToken(
-        issuer: issuer,
+                issuer: issuer,
                 audience: audience,
-    claims: claims,
-  expires: DateTime.UtcNow.AddHours(expiryInHours),
-         signingCredentials: credentials
-      );
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(expiryInHours),
+                signingCredentials: credentials
+            );
 
-    return new JwtSecurityTokenHandler().WriteToken(token);
- }
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

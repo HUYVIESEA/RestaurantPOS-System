@@ -38,6 +38,23 @@ builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
+// Register Firebase Service
+builder.Services.AddSingleton<IFirebaseService, FirebaseService>();
+
+// Initialize Firebase Admin SDK
+var firebaseConfigPath = Path.Combine(builder.Environment.ContentRootPath, "firebase-service-account.json");
+if (File.Exists(firebaseConfigPath))
+{
+    FirebaseAdmin.FirebaseApp.Create(new FirebaseAdmin.AppOptions()
+    {
+        Credential = Google.Apis.Auth.OAuth2.GoogleCredential.FromFile(firebaseConfigPath)
+    });
+}
+else
+{
+    Console.WriteLine($"Warning: Firebase service account file not found at {firebaseConfigPath}. Firebase features will not work.");
+}
+
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];

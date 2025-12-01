@@ -9,7 +9,8 @@ data class Order(
     val totalAmount: Double,
     val status: String,
     val paymentStatus: String,
-    val items: List<OrderItem>
+    val items: List<OrderItem>,
+    val isSynced: Boolean = true
 )
 
 data class OrderItem(

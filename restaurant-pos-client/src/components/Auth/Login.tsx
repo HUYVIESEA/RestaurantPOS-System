@@ -34,7 +34,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>🍽️ Restaurant POS</h1>
+          <h1>Smart Order POS</h1>
         <h2>Đăng nhập</h2>
        <p>Nhập thông tin để truy cập hệ thống</p>
         </div>

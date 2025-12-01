@@ -746,6 +746,10 @@ namespace RestaurantPOS.API.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("FcmToken")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -789,14 +793,42 @@ namespace RestaurantPOS.API.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 11, 25, 19, 34, 55, 305, DateTimeKind.Utc).AddTicks(2794),
+                            CreatedAt = new DateTime(2025, 12, 1, 5, 10, 10, 18, DateTimeKind.Utc).AddTicks(6872),
                             Email = "admin@restaurantpos.com",
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = "$2a$11$sMpufbS6sQhjGYa0uWHtuOGf5WdP5OLFv8.A.w2W/yJpc81pm2cZa",
+                            PasswordHash = "$2a$11$5xo7Lyuj7TaCoSRzAhPgne.gfBoxcKI1/NIyix5RxxzrSN2HrgPXe",
                             Role = "Admin",
                             Username = "admin"
                         });
+                });
+
+            modelBuilder.Entity("RestaurantPOS.API.Models.UserDevice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DeviceToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeviceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDevices");
                 });
 
             modelBuilder.Entity("RestaurantPOS.API.Models.Order", b =>
@@ -847,6 +879,17 @@ namespace RestaurantPOS.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("RestaurantPOS.API.Models.UserDevice", b =>
+                {
+                    b.HasOne("RestaurantPOS.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantPOS.API.Models.Category", b =>

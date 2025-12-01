@@ -67,6 +67,7 @@ fun OrderScreen(
     var showEditDialog by remember { mutableStateOf(false) }
     var editProductId by remember { mutableStateOf<Int?>(null) }
     var editInitialQuantity by remember { mutableStateOf(0) }
+    var editInitialNote by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -156,6 +157,7 @@ fun OrderScreen(
                             onQuantityClick = {
                                 editProductId = product.id
                                 editInitialQuantity = quantity
+                                editInitialNote = uiState.cartItems.find { it.product.id == product.id }?.note ?: ""
                                 showEditDialog = true
                             }
                         )
@@ -174,9 +176,10 @@ fun OrderScreen(
                 totalAmount = uiState.totalAmount,
                 currencyFormatter = currencyFormatter,
                 onUpdateQuantity = { id, delta -> viewModel.updateQuantity(id, delta) },
-                onQuantityClick = { id, qty ->
+                onEditItem = { id, qty, note ->
                     editProductId = id
                     editInitialQuantity = qty
+                    editInitialNote = note
                     showEditDialog = true
                 },
                 onClearCart = { 
@@ -192,14 +195,16 @@ fun OrderScreen(
     }
 
     if (showEditDialog && editProductId != null) {
-        EditQuantityDialog(
+        EditCartItemDialog(
             initialQuantity = editInitialQuantity,
+            initialNote = editInitialNote,
             onDismiss = { 
                 showEditDialog = false 
                 editProductId = null
             },
-            onConfirm = { newQty ->
+            onConfirm = { newQty, newNote ->
                 viewModel.setQuantity(editProductId!!, newQty)
+                viewModel.updateNote(editProductId!!, newNote)
                 showEditDialog = false
                 editProductId = null
             }
@@ -208,33 +213,46 @@ fun OrderScreen(
 }
 
 @Composable
-fun EditQuantityDialog(
+fun EditCartItemDialog(
     initialQuantity: Int,
+    initialNote: String,
     onDismiss: () -> Unit,
-    onConfirm: (Int) -> Unit
+    onConfirm: (Int, String) -> Unit
 ) {
     var quantityStr by remember { mutableStateOf(initialQuantity.toString()) }
+    var note by remember { mutableStateOf(initialNote) }
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Nhập số lượng") },
+        title = { Text("Chỉnh sửa món") },
         text = {
-            OutlinedTextField(
-                value = quantityStr,
-                onValueChange = { quantityStr = it.filter { char -> char.isDigit() } },
-                label = { Text("Số lượng") },
-                singleLine = true,
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                OutlinedTextField(
+                    value = quantityStr,
+                    onValueChange = { quantityStr = it.filter { char -> char.isDigit() } },
+                    label = { Text("Số lượng") },
+                    singleLine = true,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    label = { Text("Ghi chú") },
+                    placeholder = { Text("Ví dụ: Ít đường, không đá...") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 3
+                )
+            }
         },
         confirmButton = {
             Button(
                 onClick = { 
                     val qty = quantityStr.toIntOrNull() ?: initialQuantity
-                    onConfirm(qty)
+                    onConfirm(qty, note)
                 }
             ) {
                 Text("Lưu")
@@ -518,7 +536,7 @@ fun CartSheetContent(
     totalAmount: Double,
     currencyFormatter: NumberFormat,
     onUpdateQuantity: (Int, Int) -> Unit,
-    onQuantityClick: (Int, Int) -> Unit,
+    onEditItem: (Int, Int, String) -> Unit,
     onClearCart: () -> Unit,
     onSubmitOrder: () -> Unit
 ) {
@@ -558,7 +576,7 @@ fun CartSheetContent(
                     currencyFormatter = currencyFormatter,
                     onIncrease = { onUpdateQuantity(item.product.id, 1) },
                     onDecrease = { onUpdateQuantity(item.product.id, -1) },
-                    onQuantityClick = { onQuantityClick(item.product.id, item.quantity) }
+                    onEditClick = { onEditItem(item.product.id, item.quantity, item.note) }
                 )
             }
         }
@@ -598,10 +616,13 @@ fun CartItemRow(
     currencyFormatter: NumberFormat,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
-    onQuantityClick: () -> Unit
+    onEditClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onEditClick)
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Quantity Controls
@@ -619,14 +640,12 @@ fun CartItemRow(
             }
             
             Surface(
-                onClick = onQuantityClick,
                 color = Color.Transparent
             ) {
                 Text(
                     text = item.quantity.toString(),
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    fontWeight = FontWeight.Bold,
-                    textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                    fontWeight = FontWeight.Bold
                 )
             }
             
@@ -648,6 +667,14 @@ fun CartItemRow(
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
+            if (item.note.isNotEmpty()) {
+                Text(
+                    text = "Ghi chú: ${item.note}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                )
+            }
         }
         
         // Total Item Price

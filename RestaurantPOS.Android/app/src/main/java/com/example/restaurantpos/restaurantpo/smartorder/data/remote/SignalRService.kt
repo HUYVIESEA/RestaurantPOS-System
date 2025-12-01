@@ -57,22 +57,22 @@ class SignalRService @Inject constructor(
         hubConnection?.on("OrderCreated", { orderId: Int ->
             Log.d(TAG, "OrderCreated: $orderId")
             _events.tryEmit(SignalREvent.OrderCreated(orderId))
-        }, Int::class.java)
+        }, Int::class.javaObjectType)
 
         hubConnection?.on("OrderUpdated", { orderId: Int ->
             Log.d(TAG, "OrderUpdated: $orderId")
             _events.tryEmit(SignalREvent.OrderUpdated(orderId))
-        }, Int::class.java)
+        }, Int::class.javaObjectType)
 
         hubConnection?.on("OrderCompleted", { orderId: Int ->
             Log.d(TAG, "OrderCompleted: $orderId")
             _events.tryEmit(SignalREvent.OrderCompleted(orderId))
-        }, Int::class.java)
+        }, Int::class.javaObjectType)
 
         hubConnection?.on("TableUpdated", { tableId: Int ->
             Log.d(TAG, "TableUpdated: $tableId")
             _events.tryEmit(SignalREvent.TableUpdated(tableId))
-        }, Int::class.java)
+        }, Int::class.javaObjectType)
 
         // Start connection
         try {

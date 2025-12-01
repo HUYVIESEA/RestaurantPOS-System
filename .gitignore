@@ -183,3 +183,23 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Security / Secrets
+# Android
+local.properties
+google-services.json
+firebase-service-account.json
+key.properties
+
+# Keystores and Certificates
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.crt
+*.key
+
+# .NET Secrets
+appsettings.Development.json
+secrets.json

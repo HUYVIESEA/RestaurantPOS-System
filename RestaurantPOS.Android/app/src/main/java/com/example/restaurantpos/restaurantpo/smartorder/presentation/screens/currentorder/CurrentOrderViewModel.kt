@@ -20,11 +20,45 @@ data class CurrentOrderUiState(
 
 @HiltViewModel
 class CurrentOrderViewModel @Inject constructor(
-    private val ordersRepository: OrdersRepository
+    private val ordersRepository: OrdersRepository,
+    private val signalRService: com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalRService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CurrentOrderUiState())
     val uiState: StateFlow<CurrentOrderUiState> = _uiState.asStateFlow()
+
+    init {
+        listenToSignalREvents()
+    }
+
+    private fun listenToSignalREvents() {
+        viewModelScope.launch {
+            signalRService.events.collect { event ->
+                val currentOrder = _uiState.value.order
+                when (event) {
+                    is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.OrderUpdated -> {
+                        if (currentOrder != null && currentOrder.id == event.orderId) {
+                            loadCurrentOrder(currentOrder.tableId)
+                        }
+                    }
+                    is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.OrderCompleted -> {
+                        if (currentOrder != null && currentOrder.id == event.orderId) {
+                            loadCurrentOrder(currentOrder.tableId)
+                        }
+                    }
+                    is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.OrderCreated -> {
+                        // If we are viewing a table with no order, and a new order is created for this table
+                        // But we don't know the tableId from the event easily unless we fetch it or it's in event
+                        // Assuming we might need to reload if we are on that table.
+                        // For now, let's just reload if we have a tableId in mind? 
+                        // Actually loadCurrentOrder takes tableId. We don't store tableId in state explicitly except inside order.
+                        // If order is null, we don't know which table we are viewing unless we store it.
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
 
     fun loadCurrentOrder(tableId: Int) {
         viewModelScope.launch {

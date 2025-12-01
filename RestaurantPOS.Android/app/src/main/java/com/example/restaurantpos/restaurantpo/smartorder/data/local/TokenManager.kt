@@ -20,10 +20,15 @@ class TokenManager @Inject constructor(
         private val TOKEN_KEY = stringPreferencesKey("jwt_token")
         private val USER_ROLE_KEY = stringPreferencesKey("user_role")
         private val USER_NAME_KEY = stringPreferencesKey("user_name")
+        private val FCM_TOKEN_KEY = stringPreferencesKey("fcm_token")
     }
 
     val token: Flow<String?> = context.dataStore.data.map { prefs ->
         prefs[TOKEN_KEY]
+    }
+
+    val fcmToken: Flow<String?> = context.dataStore.data.map { prefs ->
+        prefs[FCM_TOKEN_KEY]
     }
     
     val userRole: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -44,6 +49,12 @@ class TokenManager @Inject constructor(
         context.dataStore.edit { prefs ->
             prefs[USER_ROLE_KEY] = role
             prefs[USER_NAME_KEY] = name
+        }
+    }
+
+    suspend fun saveFcmToken(token: String) {
+        context.dataStore.edit { prefs ->
+            prefs[FCM_TOKEN_KEY] = token
         }
     }
 

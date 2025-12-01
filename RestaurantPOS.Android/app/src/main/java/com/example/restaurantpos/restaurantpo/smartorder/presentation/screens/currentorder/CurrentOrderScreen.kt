@@ -312,13 +312,25 @@ fun OrderInfoCard(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "Mã đơn: #${order.id}",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        "Mã đơn: #${order.id}",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    if (!order.isSynced) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            Icons.Rounded.CloudOff,
+                            contentDescription = "Chưa đồng bộ",
+                            tint = Color(0xFFFFA000), // Amber
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
                 StatusChip(order.status)
             }
             Spacer(modifier = Modifier.height(8.dp))

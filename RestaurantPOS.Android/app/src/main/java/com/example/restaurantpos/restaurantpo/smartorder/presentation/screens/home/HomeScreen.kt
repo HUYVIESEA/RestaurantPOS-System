@@ -19,13 +19,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.auth.LoginViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToTables: () -> Unit,
+    onNavigateToOrderHistory: () -> Unit,
+    onNavigateToMenu: () -> Unit,
+    onNavigateToKitchen: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToUserManagement: () -> Unit,
+    onNavigateToReports: () -> Unit,
     onLogout: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -83,18 +88,46 @@ fun HomeScreen(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
+                NavigationDrawerItem(
+                    label = { Text("Lịch sử đơn hàng") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onNavigateToOrderHistory()
+                    },
+                    icon = { Icon(Icons.Rounded.History, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Bếp & Bar") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onNavigateToKitchen()
+                    },
+                    icon = { Icon(Icons.Rounded.SoupKitchen, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
                 if (uiState.userRole == "Admin" || uiState.userRole == "Manager") {
                     NavigationDrawerItem(
                         label = { Text("Quản lý Món") },
                         selected = false,
-                        onClick = { scope.launch { drawerState.close() } },
+                        onClick = { 
+                            scope.launch { drawerState.close() }
+                            onNavigateToMenu()
+                        },
                         icon = { Icon(Icons.Rounded.RestaurantMenu, null) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                     NavigationDrawerItem(
                         label = { Text("Báo cáo") },
                         selected = false,
-                        onClick = { scope.launch { drawerState.close() } },
+                        onClick = { 
+                            scope.launch { drawerState.close() }
+                            onNavigateToReports()
+                        },
                         icon = { Icon(Icons.Rounded.Assessment, null) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
@@ -104,14 +137,20 @@ fun HomeScreen(
                     NavigationDrawerItem(
                         label = { Text("Quản lý Nhân viên") },
                         selected = false,
-                        onClick = { scope.launch { drawerState.close() } },
+                        onClick = { 
+                            scope.launch { drawerState.close() }
+                            onNavigateToUserManagement()
+                        },
                         icon = { Icon(Icons.Rounded.People, null) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
                     NavigationDrawerItem(
                         label = { Text("Cài đặt") },
                         selected = false,
-                        onClick = { scope.launch { drawerState.close() } },
+                        onClick = { 
+                            scope.launch { drawerState.close() }
+                            onNavigateToSettings()
+                        },
                         icon = { Icon(Icons.Rounded.Settings, null) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
@@ -179,7 +218,9 @@ fun HomeScreen(
                         value = "42",
                         icon = Icons.Rounded.ReceiptLong,
                         color = Color(0xFF2196F3),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onNavigateToOrderHistory() }
                     )
                 }
                 

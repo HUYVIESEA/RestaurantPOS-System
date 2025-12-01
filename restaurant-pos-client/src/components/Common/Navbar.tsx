@@ -30,22 +30,21 @@ const Navbar: React.FC = () => {
 
   // Filter menu items based on permissions
   const menuItems = allMenuItems.filter(item => item.permission);
-
   return (
-<nav className="modern-navbar">
+    <nav className="modern-navbar">
       <div className="navbar-container">
-      {/* Logo */}
+        {/* Logo */}
         <div className="navbar-brand">
-  <Link to="/" className="brand-link">
-    <i className="fas fa-bowl-food brand-icon"></i>
-          <span className="brand-text">BÚN ĐẬU MẸT</span>
+          <Link to="/" className="brand-link">
+            <i className="fas fa-store brand-icon"></i>
+            <span className="brand-text">Smart Order</span>
           </Link>
         </div>
 
         {/* Mobile Menu Toggle */}
-    <button 
+        <button 
           className="mobile-menu-toggle"
-onClick={() => setShowMobileMenu(!showMobileMenu)}
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
 >
           <i className={`fas ${showMobileMenu ? 'fa-times' : 'fa-bars'}`}></i>
         </button>

@@ -205,6 +205,22 @@ class OrderViewModel @Inject constructor(
         }
     }
     
+    fun updateNote(productId: Int, note: String) {
+        val currentCart = _uiState.value.cartItems
+        val itemIndex = currentCart.indexOfFirst { it.product.id == productId }
+        
+        if (itemIndex != -1) {
+            val newCart = currentCart.mapIndexed { index, cartItem ->
+                if (index == itemIndex) {
+                    cartItem.copy(note = note)
+                } else {
+                    cartItem
+                }
+            }
+            _uiState.value = _uiState.value.copy(cartItems = newCart)
+        }
+    }
+
     fun clearCart() {
         _uiState.value = _uiState.value.copy(cartItems = emptyList())
     }

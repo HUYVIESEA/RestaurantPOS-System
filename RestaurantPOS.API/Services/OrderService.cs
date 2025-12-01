@@ -10,41 +10,45 @@ namespace RestaurantPOS.API.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<RestaurantHub> _hubContext;
+        private readonly IFirebaseService _firebaseService;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(ApplicationDbContext context, IHubContext<RestaurantHub> hubContext)
+        public OrderService(ApplicationDbContext context, IHubContext<RestaurantHub> hubContext, IFirebaseService firebaseService, ILogger<OrderService> logger)
         {
             _context = context;
             _hubContext = hubContext;
+            _firebaseService = firebaseService;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
             return await _context.Orders
-   .Include(o => o.Table)
-        .Include(o => o.OrderItems)
-       .ThenInclude(oi => oi.Product)
-      .OrderByDescending(o => o.OrderDate)
-   .ToListAsync();
+                .Include(o => o.Table)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
         }
 
         public async Task<Order?> GetOrderByIdAsync(int id)
         {
             return await _context.Orders
-             .Include(o => o.Table)
+                .Include(o => o.Table)
                 .Include(o => o.OrderItems)
-     .ThenInclude(oi => oi.Product)
-          .FirstOrDefaultAsync(o => o.Id == id);
+                .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<IEnumerable<Order>> GetOrdersByTableAsync(int tableId)
         {
             return await _context.Orders
-      .Include(o => o.Table)
-    .Include(o => o.OrderItems)
-      .ThenInclude(oi => oi.Product)
-       .Where(o => o.TableId == tableId)
-     .OrderByDescending(o => o.OrderDate)
-    .ToListAsync();
+                .Include(o => o.Table)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .Where(o => o.TableId == tableId)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
         }
 
         public async Task<Order> CreateOrderAsync(Order order)
@@ -82,9 +86,30 @@ namespace RestaurantPOS.API.Services
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
             
-            // Broadcast new order
+            // Broadcast new order via SignalR
             await _hubContext.Clients.All.SendAsync("OrderCreated", order.Id);
             await _hubContext.Clients.All.SendAsync("TableUpdated");
+
+            // ✅ Send Firebase Notification to Kitchen
+            try 
+            {
+                string title = $"New Order #{order.Id}";
+                string body = order.TableId.HasValue ? $"Table {order.TableId}" : "Takeaway";
+                if (order.OrderItems != null && order.OrderItems.Any())
+                {
+                    body += $" - {order.OrderItems.Count} items";
+                }
+                
+                await _firebaseService.SendTopicNotificationAsync(title, body, "Kitchen", new Dictionary<string, string>
+                {
+                    { "orderId", order.Id.ToString() },
+                    { "type", "new_order" }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send Firebase notification for new order");
+            }
             
             // Reload order with includes to return complete data
             return await GetOrderByIdAsync(order.Id) ?? order;
@@ -93,55 +118,86 @@ namespace RestaurantPOS.API.Services
         public async Task<Order?> UpdateOrderStatusAsync(int id, string status)
         {
             var order = await _context.Orders
-  .Include(o => o.Table)
-      .FirstOrDefaultAsync(o => o.Id == id);
+                .Include(o => o.Table)
+                .FirstOrDefaultAsync(o => o.Id == id);
             
-    if (order == null)
-            return null;
+            if (order == null)
+                return null;
 
-        order.Status = status;
+            string oldStatus = order.Status;
+            order.Status = status;
 
-        // ✅ NEW: Auto-free table when order is Completed or Cancelled
-        if ((status == "Completed" || status == "Cancelled") && order.TableId.HasValue)
-        {
-            // Check if there are any other pending orders for this table
-            var otherPendingOrders = await _context.Orders
-                .Where(o => o.TableId == order.TableId && 
-                            o.Id != id && 
-                            o.Status == "Pending")
-                .AnyAsync();
-
-            // Only free table if no other pending orders exist
-            if (!otherPendingOrders)
+            // ✅ NEW: Auto-free table when order is Completed or Cancelled
+            if ((status == "Completed" || status == "Cancelled") && order.TableId.HasValue)
             {
-                var table = await _context.Tables.FindAsync(order.TableId.Value);
-                if (table != null)
+                // Check if there are any other pending orders for this table
+                var otherPendingOrders = await _context.Orders
+                    .Where(o => o.TableId == order.TableId && 
+                                o.Id != id && 
+                                o.Status == "Pending")
+                    .AnyAsync();
+
+                // Only free table if no other pending orders exist
+                if (!otherPendingOrders)
                 {
-                    if (table.IsMerged && table.MergedGroupId.HasValue)
+                    var table = await _context.Tables.FindAsync(order.TableId.Value);
+                    if (table != null)
                     {
-                        var groupTables = await _context.Tables
-                            .Where(t => t.MergedGroupId == table.MergedGroupId)
-                            .ToListAsync();
-                        foreach (var t in groupTables)
+                        if (table.IsMerged && table.MergedGroupId.HasValue)
                         {
-                            t.IsAvailable = true;
-                            t.OccupiedAt = null;
+                            var groupTables = await _context.Tables
+                                .Where(t => t.MergedGroupId == table.MergedGroupId)
+                                .ToListAsync();
+                            foreach (var t in groupTables)
+                            {
+                                t.IsAvailable = true;
+                                t.OccupiedAt = null;
+                            }
+                        }
+                        else
+                        {
+                            table.IsAvailable = true;
+                            table.OccupiedAt = null;
                         }
                     }
-                    else
-                    {
-                        table.IsAvailable = true;
-                        table.OccupiedAt = null;
-                    }
                 }
-            }
-        }        await _context.SaveChangesAsync();
+            }        
             
-            // Broadcast update
+            await _context.SaveChangesAsync();
+            
+            // Broadcast update via SignalR
             await _hubContext.Clients.All.SendAsync("OrderUpdated", order.Id);
             await _hubContext.Clients.All.SendAsync("TableUpdated");
+
+            // ✅ Send Firebase Notification for Status Change
+            if (oldStatus != status)
+            {
+                try
+                {
+                    string topic = "Waiters"; // Default to waiters
+                    string title = $"Order #{order.Id} Updated";
+                    string body = $"Status changed to {status}";
+                    
+                    if (status == "Ready") // Assuming we might add this status later
+                    {
+                        title = $"Order #{order.Id} Ready";
+                        body = $"Table {order.TableId} is ready to serve";
+                    }
+
+                    await _firebaseService.SendTopicNotificationAsync(title, body, topic, new Dictionary<string, string>
+                    {
+                        { "orderId", order.Id.ToString() },
+                        { "type", "order_update" },
+                        { "status", status }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send Firebase notification for order update");
+                }
+            }
             
-      return order;
+            return order;
         }
 
         // ✅ Add item to existing order

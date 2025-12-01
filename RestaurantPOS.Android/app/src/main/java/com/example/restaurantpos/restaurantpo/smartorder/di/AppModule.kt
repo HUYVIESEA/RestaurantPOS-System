@@ -23,7 +23,7 @@ object AppModule {
 
     // Change this to your computer's IP address when testing on real device
     // For emulator: 10.0.2.2 points to localhost
-    private const val BASE_URL = "http://192.168.0.101:5000/"
+    private const val BASE_URL = "http://172.16.13.163:5000/"
     private const val CLIENT_URL = "http://172.16.13.163:5000/"
     private const val EMULATOR_CLIENT_URL = "http://10.0.2.2:5000/"
 
@@ -53,9 +53,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        settingsManager: com.example.restaurantpos.restaurantpo.smartorder.data.local.SettingsManager
+    ): Retrofit {
+        var baseUrl = settingsManager.getBaseUrl()
+        if (!baseUrl.endsWith("/")) {
+            baseUrl += "/"
+        }
+        
         return Retrofit.Builder()
-            .baseUrl(CLIENT_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -85,9 +93,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideTablesRepository(
-        api: com.example.restaurantpos.restaurantpo.smartorder.data.remote.api.TablesApi
+        api: com.example.restaurantpos.restaurantpo.smartorder.data.remote.api.TablesApi,
+        dao: com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.TableDao
     ): com.example.restaurantpos.restaurantpo.smartorder.domain.repository.TablesRepository {
-        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.TablesRepositoryImpl(api)
+        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.TablesRepositoryImpl(api, dao)
     }
     
     @Provides
@@ -99,9 +108,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideProductsRepository(
-        api: com.example.restaurantpos.restaurantpo.smartorder.data.remote.api.ProductsApi
+        api: com.example.restaurantpos.restaurantpo.smartorder.data.remote.api.ProductsApi,
+        dao: com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.ProductDao
     ): com.example.restaurantpos.restaurantpo.smartorder.domain.repository.ProductsRepository {
-        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.ProductsRepositoryImpl(api)
+        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.ProductsRepositoryImpl(api, dao)
     }
     
     @Provides
@@ -113,8 +123,15 @@ object AppModule {
     @Provides
     @Singleton
     fun provideOrdersRepository(
-        api: com.example.restaurantpos.restaurantpo.smartorder.data.remote.api.OrdersApi
+        api: com.example.restaurantpos.restaurantpo.smartorder.data.remote.api.OrdersApi,
+        dao: com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.OrderDao
     ): com.example.restaurantpos.restaurantpo.smartorder.domain.repository.OrdersRepository {
-        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.OrdersRepositoryImpl(api)
+        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.OrdersRepositoryImpl(api, dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationRepository(): com.example.restaurantpos.restaurantpo.smartorder.domain.repository.NotificationRepository {
+        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.NotificationRepositoryImpl()
     }
 }

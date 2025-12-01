@@ -1,3 +1,4 @@
+
 using RestaurantPOS.API.Models;
 using RestaurantPOS.API.Models.DTOs;
 
@@ -14,6 +15,7 @@ namespace RestaurantPOS.API.Services
      Task<bool> ChangePasswordAsync(int userId, string oldPassword, string newPassword);
      Task<bool> ForgotPasswordAsync(string email);
      Task<bool> ResetPasswordAsync(string token, string newPassword);
+        Task<bool> UpdateFcmTokenAsync(int userId, string fcmToken);
         Task<bool> ValidateResetTokenAsync(string token);
     }
 }
