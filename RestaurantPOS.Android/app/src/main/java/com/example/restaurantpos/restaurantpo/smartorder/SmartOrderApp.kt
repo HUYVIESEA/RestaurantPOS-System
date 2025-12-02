@@ -35,7 +35,7 @@ class SmartOrderApp : Application(), Configuration.Provider {
         // - Production: http://192.168.0.101:5000
         // - Client: http://172.16.13.163:5000
         // - Emulator: http://10.0.2.2:5000
-        val clientURL = "http://172.16.13.163:5000"
+        val clientURL = "http://192.168.0.101:5000"
         try {
             signalRService.connect(clientURL)
         } catch (e: Exception) {

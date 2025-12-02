@@ -1,0 +1,76 @@
+# PR Labeler Configuration
+# Automatically label PRs based on changed files
+
+# Backend changes
+backend:
+  - 'RestaurantPOS.API/**/*'
+  - 'RestaurantPOS.API.Tests/**/*'
+
+# Frontend changes
+frontend:
+  - 'restaurant-pos-client/**/*'
+
+# Android changes
+android:
+  - 'RestaurantPOS.Android/**/*'
+
+# Desktop changes (deprecated)
+desktop:
+  - 'RestaurantPOS.Desktop/**/*'
+
+# Documentation changes
+documentation:
+  - '*.md'
+  - 'doc/**/*'
+  - 'docs/**/*'
+
+# Configuration changes
+config:
+  - '*.json'
+  - '*.yml'
+  - '*.yaml'
+  - '*.config'
+  - '.env*'
+  - 'appsettings*.json'
+
+# CI/CD changes
+ci:
+  - '.github/**/*'
+
+# Database changes
+database:
+  - '**/Migrations/**/*'
+  - '**/Data/**/*'
+  - '**/*DbContext.cs'
+
+# Dependencies
+dependencies:
+  - '**/package.json'
+  - '**/package-lock.json'
+  - '**/*.csproj'
+  - '**/build.gradle*'
+
+# Security
+security:
+  - '**/*Security*'
+  - '**/*Auth*'
+  - '**/*Jwt*'
+
+# API
+api:
+  - '**/Controllers/**/*'
+  - '**/Services/**/*'
+
+# UI
+ui:
+  - '**/components/**/*'
+  - '**/screens/**/*'
+  - '**/*.css'
+  - '**/*.scss'
+
+# Tests
+tests:
+  - '**/*.test.*'
+  - '**/*.spec.*'
+  - '**/*Test.cs'
+  - '**/*Tests.cs'

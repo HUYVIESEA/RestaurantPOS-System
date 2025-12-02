@@ -14,7 +14,7 @@ class SettingsManager @Inject constructor(
 
     companion object {
         private const val KEY_BASE_URL = "base_url"
-        private const val DEFAULT_BASE_URL = "http://172.16.13.163:5000" // Default fallback
+        private const val DEFAULT_BASE_URL = "http://192.168.0.101:5000" // Default fallback
     }
 
     fun getBaseUrl(): String {

@@ -1,0 +1,91 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'RestaurantPOS.API/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'RestaurantPOS.API/**'
+
+jobs:
+  build-and-test:
+    name: Build and Test Backend
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore RestaurantPOS.API/RestaurantPOS.API.csproj
+      
+    - name: Build
+      run: dotnet build RestaurantPOS.API/RestaurantPOS.API.csproj --configuration Release --no-restore
+      
+    - name: Run tests
+      run: dotnet test RestaurantPOS.API.Tests/RestaurantPOS.API.Tests.csproj --no-build --verbosity normal --configuration Release
+      if: always()
+      
+    - name: Check format
+      run: dotnet format RestaurantPOS.API/RestaurantPOS.API.csproj --verify-no-changes --no-restore
+      continue-on-error: true
+      
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: windows-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Security scan
+      run: |
+        dotnet list RestaurantPOS.API/RestaurantPOS.API.csproj package --vulnerable --include-transitive | tee security-report.txt
+      continue-on-error: true
+      
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-report
+        path: security-report.txt
+        
+  build-publish:
+    name: Build Publish Artifacts
+    runs-on: windows-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Publish
+      run: dotnet publish RestaurantPOS.API/RestaurantPOS.API.csproj --configuration Release --output ./publish
+      
+    - name: Upload publish artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-publish
+        path: ./publish
+        retention-days: 7

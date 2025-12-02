@@ -1,0 +1,145 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'RestaurantPOS.Android/**'
+      - '.github/workflows/android-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'RestaurantPOS.Android/**'
+
+jobs:
+  build-and-test:
+    name: Build and Test Android
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      working-directory: ./RestaurantPOS.Android
+      
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Run lint
+      run: ./gradlew lint
+      working-directory: ./RestaurantPOS.Android
+      continue-on-error: true
+      
+    - name: Run unit tests
+      run: ./gradlew test
+      working-directory: ./RestaurantPOS.Android
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: android-test-results
+        path: RestaurantPOS.Android/app/build/test-results
+        
+    - name: Build debug APK
+      run: ./gradlew assembleDebug
+      working-directory: ./RestaurantPOS.Android
+      
+    - name: Upload debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-debug-apk
+        path: RestaurantPOS.Android/app/build/outputs/apk/debug/*.apk
+        retention-days: 7
+        
+  build-release:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      working-directory: ./RestaurantPOS.Android
+      
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Decode Keystore
+      env:
+        ENCODED_KEYSTORE: ${{ secrets.KEYSTORE_FILE }}
+      run: |
+        echo $ENCODED_KEYSTORE | base64 -di > RestaurantPOS.Android/restaurant-pos.keystore
+      if: env.ENCODED_KEYSTORE != ''
+      
+    - name: Create keystore.properties
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      run: |
+        echo "storePassword=$KEYSTORE_PASSWORD" > RestaurantPOS.Android/keystore.properties
+        echo "keyPassword=$KEY_PASSWORD" >> RestaurantPOS.Android/keystore.properties
+        echo "keyAlias=$KEY_ALIAS" >> RestaurantPOS.Android/keystore.properties
+        echo "storeFile=restaurant-pos.keystore" >> RestaurantPOS.Android/keystore.properties
+      if: env.KEYSTORE_PASSWORD != ''
+      
+    - name: Build release APK
+      run: ./gradlew assembleRelease
+      working-directory: ./RestaurantPOS.Android
+      
+    - name: Upload release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-release-apk
+        path: RestaurantPOS.Android/app/build/outputs/apk/release/*.apk
+        retention-days: 30
+        
+    - name: Build release AAB
+      run: ./gradlew bundleRelease
+      working-directory: ./RestaurantPOS.Android
+      
+    - name: Upload release AAB
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-release-aab
+        path: RestaurantPOS.Android/app/build/outputs/bundle/release/*.aab
+        retention-days: 30
