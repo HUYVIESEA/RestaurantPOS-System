@@ -460,6 +460,17 @@ namespace RestaurantPOS.API.Services
                 }
             }
 
+            // Create payment record
+            var payment = new Payment
+            {
+                OrderId = order.Id,
+                Amount = (decimal)receivedAmount,
+                Method = paymentMethod,
+                Status = "Success",
+                PaymentDate = DateTime.UtcNow
+            };
+            _context.Payments.Add(payment);
+
             await _context.SaveChangesAsync();
 
             // Broadcast completion

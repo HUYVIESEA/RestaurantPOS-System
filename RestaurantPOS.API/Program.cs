@@ -6,7 +6,7 @@ using RestaurantPOS.API.Services;
 using System.Text;
 using System.Text.Json.Serialization;
 
-using RestaurantPOS.API.Services.VnPay;
+// using RestaurantPOS.API.Services.VnPay; // Disabled - using VietQR instead
 using RestaurantPOS.API.Hubs;
 using RestaurantPOS.API;
 
@@ -33,7 +33,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IVnPayService, VnPayService>();
+// builder.Services.AddScoped<IVnPayService, VnPayService>();
+
+builder.Services.AddHttpClient(); // Required for VietQR
+builder.Services.AddScoped<RestaurantPOS.API.Services.VietQR.IVietQRService, RestaurantPOS.API.Services.VietQR.VietQRService>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IReportService, ReportService>();

@@ -1,0 +1,140 @@
+<Window x:Class="RestaurantPOS.Desktop.Views.CustomerDisplayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Customer Display" Height="1080" Width="1920"
+        WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual"
+        Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="*"/>    <!-- Content -->
+        </Grid.RowDefinitions>
+
+        <!-- Header / Brand -->
+        <Border Grid.Row="0" Background="{DynamicResource PrimaryHueMidBrush}" Padding="30">
+            <TextBlock Text="Chào mừng quý khách!" Foreground="White" 
+                       FontSize="48" FontWeight="Bold" HorizontalAlignment="Center"/>
+        </Border>
+
+        <!-- CONTENT SWITCHER -->
+        <Grid Grid.Row="1">
+            <!-- IDLE STATE (Ads/Welcome) -->
+            <Grid Visibility="{Binding IsIdleVisible}">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0D47A1" Offset="0.0"/>
+                        <GradientStop Color="#1976D2" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Border Background="White" CornerRadius="50" Width="120" Height="120" Padding="20"
+                            Effect="{StaticResource MaterialDesignShadowDepth2}">
+                         <Image Source="/Res/Img/restaurant.png" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Border>
+                    
+                    <TextBlock Text="Kính mời quý khách gọi món" FontSize="40" Margin="0,30,0,0" 
+                               Foreground="White" FontWeight="Bold" 
+                               Effect="{StaticResource MaterialDesignShadowDepth1}"/>
+                    <TextBlock Text="Welcome" FontSize="24" Margin="0,10,0,0" 
+                               Foreground="#E3F2FD" HorizontalAlignment="Center" FontStyle="Italic"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ORDER STATE -->
+            <Grid Visibility="{Binding IsOrderVisible}" Margin="50">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="400"/>
+                </Grid.ColumnDefinitions>
+
+                <DataGrid ItemsSource="{Binding CartItems}" AutoGenerateColumns="False" 
+                          CanUserAddRows="False" IsReadOnly="True"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                          Background="Transparent" BorderThickness="0">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
+                            <Setter Property="FontSize" Value="24"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Height" Value="60"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Tên món" Binding="{Binding Product.Name}" Width="*" ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                     <Setter Property="FontSize" Value="24"/>
+                                     <Setter Property="Padding" Value="10"/>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="SL" Binding="{Binding Quantity}" Width="100">
+                             <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                     <Setter Property="FontSize" Value="24"/>
+                                     <Setter Property="FontWeight" Value="Bold"/>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Thành tiền" Binding="{Binding TotalPrice, StringFormat=N0}" Width="200">
+                             <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                     <Setter Property="FontSize" Value="24"/>
+                                     <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                                     <Setter Property="FontWeight" Value="Bold"/>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <materialDesign:Card Grid.Column="1" UniformCornerRadius="10" Margin="30,0,0,0" Padding="30" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Text="Tổng cộng" FontSize="30" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} đ}" 
+                                   FontSize="48" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </StackPanel>
+                </materialDesign:Card>
+            </Grid>
+
+            <!-- PAYMENT STATE -->
+            <Grid Visibility="{Binding IsPaymentVisible}">
+                <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50">
+                        <!-- Amount Section -->
+                        <materialDesign:Card UniformCornerRadius="20" Padding="40" VerticalAlignment="Center" Margin="0,0,50,0">
+                            <StackPanel>
+                                <TextBlock Text="Tổng thanh toán" FontSize="32" FontWeight="SemiBold" Foreground="#666" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding PaymentAmount, StringFormat={}{0:N0} đ}" 
+                                           FontSize="60" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" 
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <!-- QR Code Section -->
+                        <materialDesign:Card UniformCornerRadius="20" Padding="20" VerticalAlignment="Center"
+                                             Effect="{StaticResource MaterialDesignShadowDepth2}">
+                            <StackPanel>
+                                <!-- Placeholder View (When IDLE/Cash) -->
+                                <StackPanel Visibility="{Binding QrCodeUrl, Converter={StaticResource StringIsEmptyToVisibilityConverter}}">
+                                     <materialDesign:PackIcon Kind="QrcodeScan" Width="550" Height="700" Foreground="#EEE"/>
+                                     <TextBlock Text="Vui lòng kiểm tra số tiền" HorizontalAlignment="Center" FontSize="24" FontWeight="Bold" Margin="0,20,0,0" Foreground="Gray"/>
+                                </StackPanel>
+
+                                <!-- Actual QR View -->
+                                <StackPanel Visibility="{Binding QrCodeUrl, Converter={StaticResource StringIsNotEmptyToVisibilityConverter}}">
+                                    <Image Source="{Binding QrCodeUrl}" Width="550" Height="700" Stretch="Uniform"/>
+                                    <TextBlock Text="Quét mã để thanh toán" HorizontalAlignment="Center" FontSize="24" FontWeight="Bold" Margin="0,20,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </StackPanel>
+                </Viewbox>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

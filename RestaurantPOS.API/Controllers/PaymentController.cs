@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RestaurantPOS.API.Services.VnPay;
+// using RestaurantPOS.API.Services.VnPay; // Disabled
 
 namespace RestaurantPOS.API.Controllers
 {
@@ -8,13 +8,14 @@ namespace RestaurantPOS.API.Controllers
     [ApiController]
     public class PaymentController : ControllerBase
     {
-        private readonly IVnPayService _vnPayService;
+        // private readonly IVnPayService _vnPayService;
 
-        public PaymentController(IVnPayService vnPayService)
+        public PaymentController(/*IVnPayService vnPayService*/)
         {
-            _vnPayService = vnPayService;
+            // _vnPayService = vnPayService;
         }
 
+        /*
         [HttpPost("create-payment-url")]
         [Authorize] // Chỉ user đã đăng nhập mới được thanh toán
         public IActionResult CreatePaymentUrl([FromBody] PaymentInformationModel model)
@@ -46,5 +47,6 @@ namespace RestaurantPOS.API.Controllers
                 Data = response
             });
         }
+        */
     }
 }

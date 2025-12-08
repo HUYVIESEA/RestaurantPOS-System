@@ -1,0 +1,153 @@
+<UserControl x:Class="RestaurantPOS.Desktop.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Cài đặt hệ thống" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+                <!-- Store Info -->
+                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                             <fa:IconImage Icon="Store" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                             <TextBlock Text="Thông tin cửa hàng" FontSize="18" FontWeight="Bold"/>
+                        </StackPanel>
+                        
+                        <TextBox Text="{Binding StoreName}" materialDesign:HintAssist.Hint="Tên cửa hàng" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                        <TextBox Text="{Binding StoreAddress}" materialDesign:HintAssist.Hint="Địa chỉ" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                        <TextBox Text="{Binding StorePhone}" materialDesign:HintAssist.Hint="Số điện thoại" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Printing -->
+                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                             <fa:IconImage Icon="Print" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                             <TextBlock Text="Cấu hình in ấn" FontSize="18" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <TextBox Text="{Binding PrinterName}" materialDesign:HintAssist.Hint="Tên máy in hóa đơn" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                        
+                        <CheckBox IsChecked="{Binding AutoPrint}" Content="Tự động in hóa đơn khi thanh toán" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </materialDesign:Card>
+                
+                <!-- Startup Options -->
+                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                             <fa:IconImage Icon="Rocket" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                             <TextBlock Text="Tùy chọn khởi động" FontSize="18" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <CheckBox IsChecked="{Binding StartWithWindows}" Content="Khởi động cùng Windows" Margin="0,0,0,10"/>
+                        <CheckBox IsChecked="{Binding StartInFullScreen}" Content="Mở toàn màn hình khi khởi động"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Utilities -->
+                 <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                             <fa:IconImage Icon="Tools" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                             <TextBlock Text="Tiện ích" FontSize="18" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left" Content="Sao lưu dữ liệu" Margin="0,0,0,10"/>
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left" 
+                                Content="Quản lý bàn" Margin="0,0,0,10"
+                                Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="TableManagement"/>
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left" Content="Đồng bộ lại danh mục"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Display Settings -->
+                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                             <fa:IconImage Icon="Desktop" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                             <TextBlock Text="Cấu hình hiển thị" FontSize="18" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Chọn màn hình phụ dành cho khách hàng:" Margin="0,0,0,5"/>
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <ComboBox ItemsSource="{Binding AvailableScreens}" 
+                                      SelectedItem="{Binding SelectedCustomerScreen}"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      Grid.Column="0" Margin="0,0,10,0"/>
+
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Grid.Column="1"
+                                    Command="{Binding RefreshScreensCommand}"
+                                    ToolTip="Làm mới danh sách">
+                                <fa:IconImage Icon="Sync" Width="16" Height="16"/>
+                            </Button>
+                        </Grid>
+                        
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left"
+                                Command="{Binding IdentifyScreensCommand}">
+                             <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Eye" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Test hiển thị màn hình"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Payment Settings (Admin Only) -->
+                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20" 
+                                     Background="#FFF3E0">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                            <fa:IconImage Icon="CreditCard" Foreground="#FF9800" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Cài đặt thanh toán VietQR" FontSize="18" FontWeight="Bold" Foreground="#E65100"/>
+                            <Border Background="#F44336" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Admin" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                            </Border>
+                        </StackPanel>
+                        
+                        <TextBlock Text="Cấu hình tài khoản ngân hàng nhận thanh toán. Yêu cầu nhập mật khẩu để thay đổi." 
+                                   TextWrapping="Wrap" Foreground="#795548" Margin="0,0,0,15" FontSize="12"/>
+
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}" 
+                                HorizontalAlignment="Left" 
+                                Background="#FF9800"
+                                Click="OpenPaymentSettings_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Lock" Foreground="White" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Cài đặt thanh toán" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <Button Style="{StaticResource MaterialDesignRaisedButton}" 
+                        Command="{Binding SaveSettingsCommand}"
+                        Width="150" Height="50" HorizontalAlignment="Left" Margin="0,20,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:IconImage Icon="Save" Foreground="White" Width="20" Height="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Lưu cài đặt"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

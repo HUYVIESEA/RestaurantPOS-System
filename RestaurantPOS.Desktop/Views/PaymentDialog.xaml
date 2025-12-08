@@ -1,0 +1,230 @@
+<UserControl x:Class="RestaurantPOS.Desktop.Views.PaymentDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             Width="1050" Height="1150">
+    <materialDesign:Card UniformCornerRadius="10" Padding="0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="{DynamicResource PrimaryHueMidBrush}" CornerRadius="10,10,0,0" Padding="20">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <fa:IconImage Icon="MoneyBillWave" Foreground="White" Height="24" Width="24" Margin="0,0,10,0"/>
+                        <TextBlock Text="Thanh toán" Foreground="White" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding TableName, StringFormat=' - {0}'}" Foreground="White" FontSize="20" FontWeight="Bold"/>
+                    </StackPanel>
+                    
+                    <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
+                            HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                            Foreground="White" Margin="-10,-10,-10,0">
+                         <materialDesign:PackIcon Kind="Close" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Method Selector -->
+                    <RowDefinition Height="*"/>    <!-- Main Body -->
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                                 Content="Tiền mặt" IsChecked="{Binding IsCashPayment}"
+                                 Margin="0,0,10,0" Width="120"/>
+                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                                 Content="Chuyển khoản / QR" IsChecked="{Binding IsTransferPayment, Mode=OneWay}"
+                                 Width="150"/>
+                </StackPanel>
+
+                <!-- CASH PAYMENT UI -->
+                <Grid Grid.Row="1" Visibility="{Binding IsCashPayment, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <!-- Bill Details -->
+                        <Grid Margin="0,0,0,5">
+                            <TextBlock Text="Tổng tiền hàng:" Foreground="Gray"/>
+                            <TextBlock Text="{Binding OriginalTotalAmount, StringFormat={}{0:N0} đ}" FontWeight="Bold" HorizontalAlignment="Right"/>
+                        </Grid>
+                        
+                        <Grid Margin="0,0,0,10">
+                           <Grid.ColumnDefinitions>
+                               <ColumnDefinition Width="Auto"/>
+                               <ColumnDefinition Width="*"/>
+                               <ColumnDefinition Width="Auto"/>
+                           </Grid.ColumnDefinitions>
+                           <TextBlock Grid.Column="0" Text="Giảm giá:" VerticalAlignment="Center" Foreground="Gray"/>
+                           
+                           <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
+                               <TextBox Text="{Binding DiscountPercent, UpdateSourceTrigger=PropertyChanged}" 
+                                        Width="40" HorizontalContentAlignment="Right"
+                                        materialDesign:HintAssist.Hint="%"
+                                        Style="{StaticResource MaterialDesignOutlinedTextBox}" Padding="2"/>
+                               <TextBlock Text="%" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                           </StackPanel>
+                           
+                           <TextBox Grid.Column="2" Text="{Binding DiscountAmount, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" 
+                                    Width="100" HorizontalContentAlignment="Right"
+                                    materialDesign:HintAssist.Hint="Số tiền giảm"
+                                    Style="{StaticResource MaterialDesignOutlinedTextBox}" Padding="2"
+                                    PreviewTextInput="NumberValidationTextBox"/>
+                        </Grid>
+                        
+                        <Separator Background="#EEE" Margin="0,5"/>
+                        
+                        <Grid Margin="0,5,0,20">
+                             <TextBlock Text="Khách cần trả:" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                             <TextBlock Text="{Binding FinalAmount, StringFormat={}{0:N0} đ}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <!-- Input Section -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Received Amount -->
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Khách đưa" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBox Text="{Binding ReceivedAmount, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" 
+                                         FontSize="16" FontWeight="Bold" HorizontalContentAlignment="Right"
+                                         materialDesign:HintAssist.Hint="Nhập số tiền"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         PreviewTextInput="NumberValidationTextBox"/>
+                            </StackPanel>
+            
+                            <!-- Change -->
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                <TextBlock Text="Tiền thừa" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <Border Background="#E8F5E9" CornerRadius="4" Height="42" BorderBrush="#C8E6C9" BorderThickness="1">
+                                    <TextBlock Text="{Binding Change, StringFormat={}{0:N0} đ}" 
+                                               VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,0"
+                                               FontSize="16" FontWeight="Bold" Foreground="#2E7D32"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+            
+                        <!-- Quick Suggestions -->
+                        <WrapPanel Margin="0,0,0,0" HorizontalAlignment="Center">
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="Chính xác" Margin="5"
+                                    Click="ExactAmount_Click"/>
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="500k" Margin="5" Click="Suggestion_Click" Tag="500000"/>
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="200k" Margin="5" Click="Suggestion_Click" Tag="200000"/>
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="100k" Margin="5" Click="Suggestion_Click" Tag="100000"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!-- TRANSFER / QR PAYMENT UI -->
+                <Grid Grid.Row="1" Visibility="{Binding IsTransferPayment, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="650"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Settings & Info (Left Panel) -->
+                    <StackPanel Grid.Column="0" Margin="0,0,25,0" VerticalAlignment="Top">
+                        <!-- Amount Display -->
+                        <Grid Margin="0,0,0,15">
+                            <TextBlock Text="Khách cần trả:" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding FinalAmount, StringFormat={}{0:N0} đ}" FontSize="36" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Right"/>
+                        </Grid>
+                        
+                        <Separator Background="#DDD" Margin="0,0,0,30"/>
+
+                        <TextBlock Text="Thông tin tài khoản nhận tiền" FontWeight="Bold" FontSize="18" Margin="0,0,0,15"/>
+                        
+                        <!-- Bank Selection -->
+                        <ComboBox ItemsSource="{Binding Banks}" SelectedItem="{Binding SelectedBank}"
+                                  DisplayMemberPath="DisplayName"
+                                  materialDesign:HintAssist.Hint="Chọn ngân hàng"
+                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                  FontSize="18" Height="60"
+                                  Margin="0,0,0,25"/>
+                        
+                        <!-- Account Number -->
+                        <TextBox Text="{Binding BankAccountNumber, UpdateSourceTrigger=PropertyChanged}"
+                                 materialDesign:HintAssist.Hint="Số tài khoản"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 FontSize="20" FontWeight="SemiBold" Height="60"
+                                 Margin="0,0,0,25"/>
+                                 
+                        <!-- Account Name -->
+                        <TextBox Text="{Binding BankAccountName, UpdateSourceTrigger=PropertyChanged}"
+                                 materialDesign:HintAssist.Hint="Tên chủ tài khoản (Không dấu)"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 CharacterCasing="Upper"
+                                 FontSize="18" Height="60"
+                                 Margin="0,0,0,20"/>
+                        
+                        <TextBlock Text="* Lưu ý: Vui lòng kiểm tra kỹ trạng thái chuyển khoản thành công trên ứng dụng ngân hàng."
+                                   FontSize="14" Foreground="#666" TextWrapping="Wrap" Margin="0,25,0,0"/>
+
+                    </StackPanel>
+
+                    <!-- QR Code Panel (Right) -->
+                    <Border Grid.Column="1" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="12" 
+                            Background="#F9F9F9" Padding="20" VerticalAlignment="Top">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <!-- VietQR Logo Header -->
+                            <Image Source="https://img.vietqr.io/image/vietqr.png" Height="50" Margin="0,0,0,20" Opacity="0.9"/>
+                            
+                            <!-- QR Code Image -->
+                            <Border Background="White" CornerRadius="8" Padding="10" Margin="0,0,0,20" Effect="{StaticResource MaterialDesignShadowDepth1}">
+                                <Image Source="{Binding QrImageUrl}" Height="600" Width="600" RenderOptions.BitmapScalingMode="HighQuality"/>
+                            </Border>
+                            
+                            <!-- Scan instruction -->
+                            <TextBlock Text="Quét mã để thanh toán" HorizontalAlignment="Center" 
+                                       FontWeight="Bold" FontSize="16" Foreground="#333" Margin="0,0,0,5"/>
+                            
+                            <!-- Bank Info Summary -->
+                            <Border Background="White" CornerRadius="6" Padding="10,5" Margin="0,5,0,0" BorderBrush="#EEE" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding SelectedBank.ShortName}" FontWeight="Bold" FontSize="14" 
+                                               HorizontalAlignment="Center" Foreground="#1976D2"/>
+                                    <TextBlock Text="{Binding BankAccountNumber}" FontSize="13" 
+                                               HorizontalAlignment="Center" Foreground="#555" Margin="0,2,0,0"/>
+                                    <TextBlock Text="{Binding BankAccountName}" FontSize="13" 
+                                               HorizontalAlignment="Center" Foreground="#555"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- Footer -->
+            <Border Grid.Row="2" Background="#FAFAFA" BorderBrush="#EEE" BorderThickness="0,1,0,0" CornerRadius="0,0,10,10" Padding="20">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Hủy" Height="40" FontSize="16" Margin="0,0,10,0"
+                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                        <Button.CommandParameter>
+                            <sys:Boolean>False</sys:Boolean>
+                        </Button.CommandParameter>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignRaisedButton}" Content="Xác nhận đã thanh toán" Height="40" FontSize="16"
+                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                            IsEnabled="{Binding CanPay}">
+                        <Button.CommandParameter>
+                            <sys:Boolean>True</sys:Boolean>
+                        </Button.CommandParameter>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </materialDesign:Card>
+</UserControl>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurantPOS.API.Data;
 
@@ -11,9 +12,11 @@ using RestaurantPOS.API.Data;
 namespace RestaurantPOS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251208053034_AddPaymentTable")]
+    partial class AddPaymentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,51 +235,6 @@ namespace RestaurantPOS.API.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("RestaurantPOS.API.Models.PaymentSettings", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AccountName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("AccountNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("BankBin")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("BankName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentSettings");
                 });
 
             modelBuilder.Entity("RestaurantPOS.API.Models.Product", b =>
@@ -878,11 +836,11 @@ namespace RestaurantPOS.API.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 8, 6, 53, 3, 721, DateTimeKind.Utc).AddTicks(7040),
+                            CreatedAt = new DateTime(2025, 12, 8, 5, 30, 34, 434, DateTimeKind.Utc).AddTicks(6410),
                             Email = "admin@restaurantpos.com",
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = "$2a$11$L8T.ePeMXiBodwjj94MWhOc/N.z/noHV73/NdVPE8sy.3V80yhU46",
+                            PasswordHash = "$2a$11$NEk8rq/SqSX7QlWlwbt4KOJqn9frpYOqw0fDZgnH5OolhFVNdiiny",
                             Role = "Admin",
                             Username = "admin"
                         });
