@@ -4,16 +4,25 @@ using System.Text.Json.Serialization;
 
 namespace RestaurantPOS.Desktop.Models
 {
-    public class RevenueReportDto
+    public class DailyRevenueDto
     {
         [JsonPropertyName("date")]
         public DateTime Date { get; set; }
 
-        [JsonPropertyName("totalRevenue")]
-        public decimal TotalRevenue { get; set; }
+        [JsonPropertyName("revenue")]
+        public decimal Revenue { get; set; }
 
         [JsonPropertyName("orderCount")]
         public int OrderCount { get; set; }
+    }
+
+    public class RevenueReportResponse
+    {
+        [JsonPropertyName("dailyRevenue")]
+        public List<DailyRevenueDto> DailyRevenue { get; set; } = new();
+
+        [JsonPropertyName("totalRevenue")]
+        public decimal TotalRevenue { get; set; }
     }
 
     public class ProductReportDto
@@ -24,8 +33,8 @@ namespace RestaurantPOS.Desktop.Models
         [JsonPropertyName("productName")]
         public string ProductName { get; set; } = string.Empty;
 
-        [JsonPropertyName("quantitySold")]
-        public int QuantitySold { get; set; }
+        [JsonPropertyName("totalQuantitySold")]
+        public int TotalQuantitySold { get; set; }
 
         [JsonPropertyName("totalRevenue")]
         public decimal TotalRevenue { get; set; }
@@ -39,8 +48,8 @@ namespace RestaurantPOS.Desktop.Models
         [JsonPropertyName("totalRevenue")]
         public decimal TotalRevenue { get; set; }
 
-        [JsonPropertyName("percentage")]
-        public double Percentage { get; set; }
+        [JsonPropertyName("revenuePercentage")]
+        public double RevenuePercentage { get; set; }
     }
 
     public class SalesSummaryDto

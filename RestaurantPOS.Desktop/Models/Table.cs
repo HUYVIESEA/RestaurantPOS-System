@@ -47,12 +47,13 @@ namespace RestaurantPOS.Desktop.Models
         {
             if (IsAvailable || !OccupiedAt.HasValue)
             {
-                Duration = "";
+                if (!string.IsNullOrEmpty(Duration)) Duration = "";
             }
             else
             {
                 var span = DateTime.Now - OccupiedAt.Value;
-                Duration = $"{(int)span.TotalHours:D2}:{span.Minutes:D2}";
+                var newDuration = $"{(int)span.TotalHours:D2}:{span.Minutes:D2}";
+                if (Duration != newDuration) Duration = newDuration;
             }
         }
 

@@ -41,18 +41,18 @@ namespace RestaurantPOS.Desktop.Services
             }
         }
 
-        public async Task<List<RevenueReportDto>> GetRevenueReportAsync(DateTime startDate, DateTime endDate)
+        public async Task<List<DailyRevenueDto>> GetRevenueReportAsync(DateTime startDate, DateTime endDate)
         {
             try
             {
                 AddAuthHeader();
                 var url = $"{BaseUrl}/revenue?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}";
-                var result = await _httpClient.GetFromJsonAsync<List<RevenueReportDto>>(url);
-                return result ?? new List<RevenueReportDto>();
+                var result = await _httpClient.GetFromJsonAsync<RevenueReportResponse>(url);
+                return result?.DailyRevenue ?? new List<DailyRevenueDto>();
             }
             catch (Exception)
             {
-                return new List<RevenueReportDto>();
+                return new List<DailyRevenueDto>();
             }
         }
 
@@ -61,7 +61,7 @@ namespace RestaurantPOS.Desktop.Services
             try
             {
                 AddAuthHeader();
-                var url = $"{BaseUrl}/top-products?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&top={top}";
+                var url = $"{BaseUrl}/products/top-selling?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&topCount={top}";
                 var result = await _httpClient.GetFromJsonAsync<List<ProductReportDto>>(url);
                 return result ?? new List<ProductReportDto>();
             }
@@ -76,7 +76,7 @@ namespace RestaurantPOS.Desktop.Services
             try
             {
                 AddAuthHeader();
-                var url = $"{BaseUrl}/category-sales?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}";
+                var url = $"{BaseUrl}/categories?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}";
                 var result = await _httpClient.GetFromJsonAsync<List<CategoryReportDto>>(url);
                 return result ?? new List<CategoryReportDto>();
             }

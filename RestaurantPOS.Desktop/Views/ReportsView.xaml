@@ -35,10 +35,24 @@
                     <TextBlock Text="-" VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <DatePicker SelectedDate="{Binding EndDate}" Width="120" materialDesign:HintAssist.Hint="Đến ngày" Margin="0,0,20,0" VerticalAlignment="Center"/>
                     
-                    <Button Command="{Binding LoadReportCommand}" Style="{StaticResource MaterialDesignRaisedButton}">
+                    <Button Command="{Binding LoadReportCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <fa:IconImage Icon="Sync" Foreground="White" Height="16" Width="16" Margin="0,0,10,0"/>
                             <TextBlock Text="Xem báo cáo"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding ExportCommand}" CommandParameter="PDF" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,10,0" ToolTip="Xuất PDF">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="FilePdf" Foreground="#D32F2F" Height="16" Width="16" Margin="0,0,10,0"/>
+                            <TextBlock Text="Xuất PDF"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding ExportCommand}" CommandParameter="Excel" Style="{StaticResource MaterialDesignOutlinedButton}" ToolTip="Xuất Excel">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="FileExcel" Foreground="#388E3C" Height="16" Width="16" Margin="0,0,10,0"/>
+                            <TextBlock Text="Xuất Excel"/>
                         </StackPanel>
                     </Button>
 

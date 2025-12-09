@@ -23,6 +23,13 @@
             <utils:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
             <utils:InverseBooleanConverter x:Key="InverseBooleanConverter" />
             <utils:SubstringConverter x:Key="SubstringConverter" />
+            
+            <!-- Global Text Rendering Optimization -->
+            <Style TargetType="{x:Type Window}">
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+                <Setter Property="UseLayoutRounding" Value="True"/>
+            </Style>
             <utils:BooleanToContentConverter x:Key="BooleanToContentConverter" />
             <utils:StringIsEmptyToVisibilityConverter x:Key="StringIsEmptyToVisibilityConverter" />
             <utils:StringIsNotEmptyToVisibilityConverter x:Key="StringIsNotEmptyToVisibilityConverter" />

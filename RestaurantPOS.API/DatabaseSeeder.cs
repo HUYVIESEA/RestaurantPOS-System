@@ -30,6 +30,7 @@ namespace RestaurantPOS.API
             await SeedDrinksDataAsync();
             await SeedGrilledDishesDataAsync();
             await SeedSideDishesDataAsync();
+            await SeedTablesDataAsync();
             await DisplayStatisticsAsync();
 
             Console.WriteLine("========================================");
@@ -599,6 +600,58 @@ namespace RestaurantPOS.API
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Seed data related to Tables
+        /// </summary>
+        private async Task SeedTablesDataAsync()
+        {
+            Console.WriteLine("\n--- Seeding Tables Data ---");
+
+            if (await _context.Tables.AnyAsync())
+            {
+                Console.WriteLine("⏭️  Tables already exist. Skipping...");
+                return;
+            }
+
+            var tables = new List<Table>();
+
+            // Definition of floors and their configurations
+            var floorConfigs = new[]
+            {
+                new { Name = "Tầng 1", Prefix = "T1", Count = 12, Capacity = 4 },
+                new { Name = "Tầng 2", Prefix = "T2", Count = 10, Capacity = 4 },
+                new { Name = "Tầng 3", Prefix = "T3", Count = 10, Capacity = 4 },
+                new { Name = "Tầng 4", Prefix = "T4", Count = 8, Capacity = 4 },
+                new { Name = "Tầng 5", Prefix = "T5", Count = 8, Capacity = 4 },
+                new { Name = "Tầng trệt", Prefix = "G", Count = 6, Capacity = 4 },
+                new { Name = "Tầng lửng", Prefix = "L", Count = 6, Capacity = 4 },
+                new { Name = "Sân thượng", Prefix = "ST", Count = 15, Capacity = 4 },
+                new { Name = "Khu VIP", Prefix = "VIP", Count = 5, Capacity = 10 },
+                new { Name = "Khu ngoài trời", Prefix = "NT", Count = 10, Capacity = 6 },
+                new { Name = "Khu gia đình", Prefix = "GĐ", Count = 8, Capacity = 8 }
+            };
+
+            foreach (var config in floorConfigs)
+            {
+                for (int i = 1; i <= config.Count; i++)
+                {
+                    tables.Add(new Table
+                    {
+                        TableNumber = $"{config.Prefix}-{i:00}",
+                        Capacity = config.Capacity,
+                        Floor = config.Name,
+                        IsAvailable = true,
+                        IsMerged = false
+                    });
+                }
+            }
+
+            await _context.Tables.AddRangeAsync(tables);
+            await _context.SaveChangesAsync();
+            
+            Console.WriteLine($"✅ Added {tables.Count} tables across {floorConfigs.Length} floors/areas");
         }
 
         /// <summary>

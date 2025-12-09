@@ -40,6 +40,8 @@
             <DataGrid ItemsSource="{Binding Orders}" AutoGenerateColumns="False" 
                       CanUserAddRows="False" IsReadOnly="True"
                       SelectionMode="Single" SelectionUnit="FullRow"
+                      EnableRowVirtualization="True" EnableColumnVirtualization="True"
+                      VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
                       materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
                       materialDesign:DataGridAssist.ColumnHeaderPadding="8">
                 <DataGrid.Columns>

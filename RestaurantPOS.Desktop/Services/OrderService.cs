@@ -78,7 +78,7 @@ namespace RestaurantPOS.Desktop.Services
             }
         }
 
-        public async Task<Order?> AddItemToOrderAsync(int orderId, int productId, int quantity)
+        public async Task<Order?> AddItemToOrderAsync(int orderId, int productId, int quantity, string? note = null)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace RestaurantPOS.Desktop.Services
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                var item = new { ProductId = productId, Quantity = quantity };
+                var item = new { ProductId = productId, Quantity = quantity, Note = note };
                 var response = await _httpClient.PostAsJsonAsync($"{Constants.ApiBaseUrl}/Orders/{orderId}/Items", item);
                 if (response.IsSuccessStatusCode)
                 {

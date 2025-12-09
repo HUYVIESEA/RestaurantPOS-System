@@ -25,6 +25,15 @@
         <vm:MainViewModel/>
     </Window.DataContext>
 
+    <!-- Hotkeys -->
+    <Window.InputBindings>
+        <KeyBinding Key="F1" Command="{Binding CheckoutCommand}" />
+        <KeyBinding Key="F2" Command="{Binding SaveOrderCommand}" />
+        <KeyBinding Key="F3" Command="{Binding SearchCommand}" />
+        <KeyBinding Key="F5" Command="{Binding RefreshCommand}" />
+        <KeyBinding Key="Esc" Command="{Binding BackToTablesCommand}" />
+    </Window.InputBindings>
+
     <materialDesign:DialogHost Identifier="RootDialog">
         <materialDesign:DrawerHost x:Name="MainDrawerHost" OpenMode="Modal">
         <!-- Drawer Content (Navigation) -->
@@ -280,42 +289,63 @@
                     <Grid Visibility="{Binding IsTableSelectionMode, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="20">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Header Actions -->
+                        <!-- 1. Header & Stats -->
                         <Grid Grid.Row="0" Margin="0,0,0,20">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel>
+                                <TextBlock Text="Sơ đồ bàn" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource MaterialDesignBody}"/>
+                                <TextBlock Text="Quản lý trạng thái và phục vụ" FontSize="14" Foreground="Gray" Margin="0,5,0,0"/>
+                            </StackPanel>
+
+                            <!-- Merge Actions -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Button Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,10,0"
                                         Command="{Binding ToggleMergeModeCommand}"
+                                        materialDesign:ButtonAssist.CornerRadius="8"
+                                        BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
                                         Content="{Binding IsMergeMode, Converter={StaticResource BooleanToContentConverter}, ConverterParameter='Ghép bàn|Hủy ghép'}"/>
                                 
                                 <Button Style="{StaticResource MaterialDesignRaisedButton}" 
                                         Command="{Binding ConfirmMergeCommand}"
                                         Content="Xác nhận ghép"
+                                        materialDesign:ButtonAssist.CornerRadius="8"
                                         Visibility="{Binding IsMergeMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             </StackPanel>
                         </Grid>
 
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                            <StackPanel>
-                                <!-- Table Filters -->
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                                    <ComboBox ItemsSource="{Binding AvailableFloors}" 
-                                              SelectedItem="{Binding SelectedFloorFilter}"
-                                              materialDesign:HintAssist.Hint="Khu vực"
-                                              Style="{StaticResource MaterialDesignFilledComboBox}"
-                                              Width="150" Margin="0,0,20,0" VerticalAlignment="Center"/>
+                        <!-- 2. Filters -->
+                        <Border Grid.Row="1" Background="White" CornerRadius="10" Padding="15" Margin="0,0,0,20">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.05"/>
+                            </Border.Effect>
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox ItemsSource="{Binding AvailableFloors}" 
+                                            SelectedItem="{Binding SelectedFloorFilter}"
+                                            materialDesign:HintAssist.Hint="Khu vực"
+                                            Style="{StaticResource MaterialDesignFilledComboBox}"
+                                            Width="200" Margin="0,0,30,0" VerticalAlignment="Center"/>
 
-                                    <RadioButton Style="{StaticResource MaterialDesignChoiceChipPrimaryRadioButton}" IsChecked="True" Content="Tất cả" Margin="0,0,10,0" 
-                                                 Command="{Binding FilterTableCommand}" CommandParameter="All"/>
-                                    <RadioButton Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" Content="Trống" Margin="0,0,10,0" 
-                                                 Command="{Binding FilterTableCommand}" CommandParameter="Available"/>
-                                    <RadioButton Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" Content="Có người" Margin="0,0,10,0" 
-                                                 Command="{Binding FilterTableCommand}" CommandParameter="Occupied"/>
-                                </StackPanel>
+                                <RadioButton Style="{StaticResource MaterialDesignChoiceChipPrimaryRadioButton}" IsChecked="True" Content="Tất cả" Margin="0,0,10,0" 
+                                             Command="{Binding FilterTableCommand}" CommandParameter="All" Height="36"/>
+                                <RadioButton Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" Content="Bàn trống" Margin="0,0,10,0" 
+                                             Command="{Binding FilterTableCommand}" CommandParameter="Available" Height="36"/>
+                                <RadioButton Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" Content="Đang phục vụ" Margin="0,0,10,0" 
+                                             Command="{Binding FilterTableCommand}" CommandParameter="Occupied" Height="36"/>
+                            </StackPanel>
+                        </Border>
 
-                                <ItemsControl ItemsSource="{Binding TablesView}">
+                        <!-- 3. Table Grid (Premium SaaS Design) -->
+                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="5">
+                            <ItemsControl ItemsSource="{Binding TablesView}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel />
@@ -325,58 +355,119 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                                Width="150" Height="160" Margin="10" Padding="0"
+                                                Width="170" Height="140" Margin="12" Padding="0"
                                                 Command="{Binding DataContext.SelectTableCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}">
-                                            <materialDesign:Card UniformCornerRadius="10" Width="150" Height="160">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="*"/>
-                                                        <RowDefinition Height="Auto"/>
-                                                    </Grid.RowDefinitions>
-                                                    
-                                                    <!-- Table Icon/Status -->
-                                                    <Grid Grid.Row="0" Background="{Binding StatusColor}">
-                                                        <fa:IconImage Icon="Chair" Foreground="White" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,15"/>
-                                                        <TextBlock Text="{Binding TableNumber}" Foreground="White" FontSize="24" FontWeight="Bold" 
-                                                                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"/>
-                                                        
-                                                        <!-- Duration Timer (Overlay) -->
-                                                        <Border Background="#40000000" CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Padding="10,4"
-                                                                Visibility="{Binding HasDuration, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                <fa:IconImage Icon="Clock" Foreground="White" Height="12" Width="12" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                                                                <TextBlock Text="{Binding Duration}" Foreground="White" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
-                                                            </StackPanel>
-                                                        </Border>
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Grid>
+                                                        <!-- Main Card -->
+                                                        <Border x:Name="CardBorder" Background="White" CornerRadius="12" BorderBrush="#E0E0E0" BorderThickness="1">
+                                                            <Border.Effect>
+                                                                <DropShadowEffect BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.08"/>
+                                                            </Border.Effect>
+                                                            
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="6"/> <!-- Status Strip -->
+                                                                    <ColumnDefinition Width="*"/>
+                                                                </Grid.ColumnDefinitions>
 
-                                                        <!-- Merge Selection Indicator -->
-                                                        <CheckBox IsChecked="{Binding IsSelectedForMerge, Mode=OneWay}" 
-                                                                  Style="{StaticResource MaterialDesignAccentCheckBox}"
-                                                                  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"
-                                                                  Visibility="{Binding DataContext.IsMergeMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                            <CheckBox.LayoutTransform>
-                                                                <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
-                                                            </CheckBox.LayoutTransform>
-                                                        </CheckBox>
+                                                                <!-- Status Strip (Left Bar) -->
+                                                                <Border x:Name="StatusStrip" Grid.Column="0" Background="#4CAF50" CornerRadius="12,0,0,12"/>
+
+                                                                <!-- Content -->
+                                                                <Grid Grid.Column="1" Margin="10">
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto"/> <!-- Top: Timer & Merged Info -->
+                                                                        <RowDefinition Height="*"/>    <!-- Center: Number & Icon -->
+                                                                        <RowDefinition Height="Auto"/> <!-- Bottom: Status Text -->
+                                                                    </Grid.RowDefinitions>
+
+                                                                    <!-- Top Row -->
+                                                                    <Grid Grid.Row="0">
+                                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                                                    Visibility="{Binding IsMerged, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                                            <fa:IconImage Icon="Link" Height="10" Width="10" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                                                            <TextBlock Text="{Binding MergedTableNumbers}" FontSize="10" Foreground="Gray" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                                                        </StackPanel>
+
+                                                                        <Border x:Name="DurationBadge" HorizontalAlignment="Right" Background="#FEF3C7" CornerRadius="10" Padding="8,2" Visibility="Collapsed">
+                                                                            <StackPanel Orientation="Horizontal">
+                                                                                <fa:IconImage Icon="Clock" Foreground="#D97706" Height="10" Width="10" Margin="0,0,4,0"/>
+                                                                                <TextBlock Text="{Binding Duration}" Foreground="#D97706" FontSize="11" FontWeight="Bold"/>
+                                                                            </StackPanel>
+                                                                        </Border>
+                                                                    </Grid>
+
+                                                                    <!-- Center: Table Info -->
+                                                                    <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                        <TextBlock Text="{Binding TableNumber}" FontSize="28" FontWeight="Bold" Foreground="#263238" HorizontalAlignment="Center"/>
+                                                                        <fa:IconImage x:Name="CenterIcon" Icon="Chair" Height="16" Width="16" Foreground="#B0BEC5" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                                                                    </StackPanel>
+
+                                                                    <!-- Bottom: Status Text -->
+                                                                    <TextBlock x:Name="StatusText" Grid.Row="2" Text="Trống" FontSize="11" Foreground="#90A4AE" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                                                </Grid>
+
+                                                                <!-- Overlay: Merge Checkbox -->
+                                                                <Border Grid.ColumnSpan="2" Background="#20000000" CornerRadius="12"
+                                                                        Visibility="{Binding DataContext.IsMergeMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                        IsHitTestVisible="False"/>
+                                                                        
+                                                                <CheckBox Grid.ColumnSpan="2" IsChecked="{Binding IsSelectedForMerge, Mode=OneWay}" 
+                                                                          Style="{StaticResource MaterialDesignAccentCheckBox}"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"
+                                                                          Visibility="{Binding DataContext.IsMergeMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                                    <CheckBox.LayoutTransform>
+                                                                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                                                                    </CheckBox.LayoutTransform>
+                                                                </CheckBox>
+                                                            </Grid>
+                                                        </Border>
                                                     </Grid>
-                                                    
-                                                    <!-- Footer Info -->
-                                                    <Border Grid.Row="1" Background="White" BorderBrush="#EEE" BorderThickness="0,1,0,0" Height="45">
-                                                        <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="{Binding DisplayStatus}" HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="14"/>
-                                                            <TextBlock Text="{Binding MergedTableNumbers, StringFormat='(Ghép: {0})'}" 
-                                                                       HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource PrimaryHueMidBrush}" FontWeight="Bold"
-                                                                       Visibility="{Binding IsMerged, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                                        </StackPanel>
-                                                    </Border>
-                                                </Grid>
-                                            </materialDesign:Card>
+
+                                                    <ControlTemplate.Triggers>
+                                                        <!-- OCCUPIED STATE -->
+                                                        <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                            <Setter TargetName="StatusStrip" Property="Background" Value="#FF9800"/> <!-- Orange Strip -->
+                                                            <Setter TargetName="CardBorder" Property="Background" Value="#FFFDE7"/> <!-- Very Light Yellow/Orange BG -->
+                                                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#FFECB3"/>
+                                                            <Setter TargetName="DurationBadge" Property="Visibility" Value="Visible"/>
+                                                            <Setter TargetName="CenterIcon" Property="Icon" Value="User"/>
+                                                            <Setter TargetName="CenterIcon" Property="Foreground" Value="#FFA000"/>
+                                                            <Setter TargetName="StatusText" Property="Text" Value="Đang phục vụ"/>
+                                                            <Setter TargetName="StatusText" Property="Foreground" Value="#F57C00"/>
+                                                        </DataTrigger>
+
+                                                        <!-- SELECTED FOR MERGE STATE -->
+                                                        <DataTrigger Binding="{Binding IsSelectedForMerge}" Value="True">
+                                                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#2196F3"/>
+                                                            <Setter TargetName="CardBorder" Property="BorderThickness" Value="2"/>
+                                                            <Setter TargetName="CardBorder" Property="Background" Value="#E3F2FD"/>
+                                                            <Setter TargetName="StatusStrip" Property="Background" Value="#2196F3"/>
+                                                        </DataTrigger>
+
+                                                        <!-- HOVER EFFECT -->
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="CardBorder" Property="Effect">
+                                                                <Setter.Value>
+                                                                    <DropShadowEffect BlurRadius="12" ShadowDepth="4" Direction="270" Opacity="0.15"/>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                            <Setter TargetName="CardBorder" Property="RenderTransform">
+                                                                <Setter.Value>
+                                                                    <TranslateTransform Y="-2"/>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Button.Template>
                                         </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            </StackPanel>
                         </ScrollViewer>
                     </Grid>
 
@@ -421,7 +512,9 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <materialDesign:Card Width="200" Height="240" Margin="0,0,20,20" UniformCornerRadius="10">
+                                                <materialDesign:Card Width="200" Height="240" Margin="0,0,20,20" UniformCornerRadius="10"
+                                                                     materialDesign:ShadowAssist.ShadowDepth="Depth1"
+                                                                     CacheMode="BitmapCache">
                                                     <Grid>
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="140"/>

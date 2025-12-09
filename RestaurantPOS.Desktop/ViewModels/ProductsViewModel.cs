@@ -157,15 +157,26 @@ namespace RestaurantPOS.Desktop.ViewModels
 
         private async Task LoadProducts()
         {
-            var products = await _productService.GetProductsAsync();
+            var productsTask = _productService.GetProductsAsync();
+            var categoriesTask = _productService.GetCategoriesAsync();
+
+            await Task.WhenAll(productsTask, categoriesTask);
+
+            var products = productsTask.Result;
+            var categories = categoriesTask.Result;
+
             Products = new ObservableCollection<Product>(products);
             
-            UpdatePagination();
-            
-            var categories = await _productService.GetCategoriesAsync();
             categories.Insert(0, new Category { Id = 0, Name = "Tất cả" });
             Categories = new ObservableCollection<Category>(categories);
-            SelectedCategory = Categories.FirstOrDefault();
+            
+            // Only reset if null, otherwise try to keep selection
+            if (SelectedCategory == null)
+            {
+               SelectedCategory = Categories.FirstOrDefault();
+            }
+
+            UpdatePagination();
         }
 
         private void UpdatePagination()

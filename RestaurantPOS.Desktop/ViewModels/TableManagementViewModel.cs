@@ -49,13 +49,17 @@ namespace RestaurantPOS.Desktop.ViewModels
         private async void LoadTables()
         {
             IsLoading = true;
-            var tables = await _tableService.GetTablesAsync();
-            Tables.Clear();
-            foreach (var table in tables.OrderBy(t => t.TableNumber))
-            { 
-                Tables.Add(table);
+            try
+            {
+                var tables = await _tableService.GetTablesAsync();
+                var orderedTables = tables.OrderBy(t => t.TableNumber);
+                Tables = new ObservableCollection<Table>(orderedTables);
             }
-            IsLoading = false;
+            catch { /* Ignore or log */ }
+            finally 
+            {
+                IsLoading = false;
+            }
         }
 
         private void ExecuteRefresh(object? parameter)

@@ -36,14 +36,18 @@ namespace RestaurantPOS.Desktop.ViewModels
             _reportService = new ReportService();
             _orderService = new OrderService();
             _tableService = new TableService();
-            RecentOrders = new ObservableCollection<DashboardOrder>();
             
+            // Initialize defaults
+            _recentOrders = new ObservableCollection<DashboardOrder>();
+            RecentOrders = _recentOrders;
+            _revenueSeries = new SeriesCollection();
+            _revenueLabels = Array.Empty<string>();
+            _revenueFormatter = value => value.ToString("N0") + " đ";
+
             RefreshCommand = new RelayCommand(ExecuteRefresh);
             
-            LoadDashboardData();
-
-            // Chart Formatter
-            RevenueFormatter = value => value.ToString("N0") + " đ";
+            // Fire and forget
+            Task.Run(async () => await LoadDashboardData());
         }
 
         public SeriesCollection RevenueSeries
@@ -115,22 +119,24 @@ namespace RestaurantPOS.Desktop.ViewModels
             {
                 // 1. Get Active Tables first (needed for mapping)
                 var tables = await _tableService.GetTablesAsync();
-                ActiveTablesCount = tables.Count(t => !t.IsAvailable);
-
                 // 2. Get Today's Sales Summary
                 var summary = await _reportService.GetSalesSummaryAsync();
-                if (summary != null)
+                
+                System.Windows.Application.Current.Dispatcher.Invoke(() => 
                 {
-                    TodayRevenue = summary.TodayRevenue;
-                    TodayOrdersCount = summary.TodayOrders;
-                    StatusMessage = $"Cập nhật lúc {DateTime.Now:HH:mm:ss}";
-                }
-                else
-                {
-                    StatusMessage = "Không thể lấy dữ liệu báo cáo.";
-                    // TodayRevenue = 0; 
-                    // TodayOrdersCount = 0;
-                }
+                    ActiveTablesCount = tables.Count(t => !t.IsAvailable);
+                    
+                    if (summary != null)
+                    {
+                        TodayRevenue = summary.TodayRevenue;
+                        TodayOrdersCount = summary.TodayOrders;
+                        StatusMessage = $"Cập nhật lúc {DateTime.Now:HH:mm:ss}";
+                    }
+                    else
+                    {
+                        StatusMessage = "Không thể lấy dữ liệu báo cáo.";
+                    }
+                });
 
                 // 3. Get Revenue Chart Data (Last 7 Days)
                 var endDate = DateTime.Now;
@@ -144,40 +150,46 @@ namespace RestaurantPOS.Desktop.ViewModels
                 for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
                 {
                     var report = revenueData.FirstOrDefault(r => r.Date.Date == date);
-                    values.Add(report?.TotalRevenue ?? 0);
+                    values.Add(report?.Revenue ?? 0);
                     labels.Add(date.ToString("dd/MM"));
                 }
 
-                RevenueSeries = new SeriesCollection
+                System.Windows.Application.Current.Dispatcher.Invoke(() => 
                 {
-                    new LineSeries
+                    RevenueSeries = new SeriesCollection
                     {
-                        Title = "Doanh thu",
-                        Values = values,
-                        PointGeometry = DefaultGeometries.Circle,
-                        PointGeometrySize = 10,
-                        LineSmoothness = 0
-                    }
-                };
-                RevenueLabels = labels.ToArray();
+                        new LineSeries
+                        {
+                            Title = "Doanh thu",
+                            Values = values,
+                            PointGeometry = DefaultGeometries.Circle,
+                            PointGeometrySize = 10,
+                            LineSmoothness = 0
+                        }
+                    };
+                    RevenueLabels = labels.ToArray();
+                });
 
                 // 3. Get Recent Orders (Last 5)
                 var allOrders = await _orderService.GetAllOrdersAsync();
                 var recent = allOrders.OrderByDescending(o => o.CreatedAt).Take(5).ToList();
                 
-                RecentOrders.Clear();
-                foreach (var order in recent)
+                System.Windows.Application.Current.Dispatcher.Invoke(() => 
                 {
-                    var table = tables.FirstOrDefault(t => t.Id == order.TableId);
-                    RecentOrders.Add(new DashboardOrder
+                    RecentOrders.Clear();
+                    foreach (var order in recent)
                     {
-                        Id = order.Id,
-                        TableNumber = table?.TableNumber ?? order.TableId.ToString(),
-                        TotalAmount = order.TotalAmount,
-                        Status = order.Status,
-                        CreatedAt = order.CreatedAt
-                    });
-                }
+                        var table = tables.FirstOrDefault(t => t.Id == order.TableId);
+                        RecentOrders.Add(new DashboardOrder
+                        {
+                            Id = order.Id,
+                            TableNumber = table?.TableNumber ?? order.TableId.ToString(),
+                            TotalAmount = order.TotalAmount,
+                            Status = order.Status,
+                            CreatedAt = order.CreatedAt
+                        });
+                    }
+                });
             }
             catch (Exception ex)
             {

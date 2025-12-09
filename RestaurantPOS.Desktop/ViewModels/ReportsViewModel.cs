@@ -25,17 +25,20 @@ namespace RestaurantPOS.Desktop.ViewModels
         public ReportsViewModel()
         {
             _reportService = new ReportService();
-            _startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); // First day of current month
+            _startDate = DateTime.Now.AddDays(-30);
             _endDate = DateTime.Now;
 
             LoadReportCommand = new RelayCommand(ExecuteLoadReport);
+            ExportCommand = new RelayCommand(ExecuteExport);
             
-            // Load initial data
-            // Load initial data
-            // Load initial data
-            RefreshData();
+            // Initialize defaults to avoid CS8618
+            _revenueSeries = new SeriesCollection();
+            _revenueLabels = Array.Empty<string>();
+            _revenueFormatter = value => value.ToString("N0") + " đ";
+            _categorySeries = new SeriesCollection();
 
-            RevenueFormatter = value => value.ToString("N0") + " đ";
+            // Load initial data safely
+            Task.Run(async () => await RefreshData());
         }
 
         // Chart Properties
@@ -96,6 +99,7 @@ namespace RestaurantPOS.Desktop.ViewModels
         public ObservableCollection<CategoryReportDto> CategoryRevenue { get; } = new ObservableCollection<CategoryReportDto>();
 
         public ICommand LoadReportCommand { get; }
+        public ICommand ExportCommand { get; }
 
         public async Task RefreshData()
         {
@@ -112,12 +116,21 @@ namespace RestaurantPOS.Desktop.ViewModels
             IsLoading = false;
         }
 
+        private void ExecuteExport(object? parameter)
+        {
+            string type = parameter as string ?? "PDF";
+            System.Windows.MessageBox.Show($"Tính năng xuất báo cáo {type} đang được phát triển!", "Thông báo", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        }
+
         private async Task LoadSalesSummary()
         {
             var summary = await _reportService.GetSalesSummaryAsync();
             if (summary != null)
             {
-                SalesSummary = summary;
+                System.Windows.Application.Current.Dispatcher.Invoke(() => 
+                {
+                    SalesSummary = summary;
+                });
             }
         }
 
@@ -125,68 +138,76 @@ namespace RestaurantPOS.Desktop.ViewModels
         {
             // Top Products
             var products = await _reportService.GetTopSellingProductsAsync(StartDate, EndDate);
-            TopProducts.Clear();
-            if (products != null && products.Count > 0)
+            
+            System.Windows.Application.Current.Dispatcher.Invoke(() => 
             {
-                foreach (var p in products) TopProducts.Add(p);
-            }
-            else if (SalesSummary?.TopProducts != null && SalesSummary.TopProducts.Count > 0)
-            {
-                // Fallback to summary data if specific date range returns nothing (or if user selected same range as summary)
-                foreach (var p in SalesSummary.TopProducts) TopProducts.Add(p);
-            }
+                TopProducts.Clear();
+                if (products != null && products.Count > 0)
+                {
+                    foreach (var p in products) TopProducts.Add(p);
+                }
+                else if (SalesSummary?.TopProducts != null && SalesSummary.TopProducts.Count > 0)
+                {
+                    // Fallback to summary data
+                    foreach (var p in SalesSummary.TopProducts) TopProducts.Add(p);
+                }
+            });
 
             // Category Revenue
             var categories = await _reportService.GetCategoryReportAsync(StartDate, EndDate);
-            CategoryRevenue.Clear();
-            if (categories != null && categories.Count > 0)
+            
+            System.Windows.Application.Current.Dispatcher.Invoke(() => 
             {
-                foreach (var c in categories) CategoryRevenue.Add(c);
-            }
-            else if (SalesSummary?.CategoryBreakdown != null && SalesSummary.CategoryBreakdown.Count > 0)
-            {
-                // Fallback to summary data
-                foreach (var c in SalesSummary.CategoryBreakdown) CategoryRevenue.Add(c);
-            }
-
-            // Populate Category Chart
-            var catSeries = new SeriesCollection();
-            foreach (var cat in CategoryRevenue)
-            {
-                catSeries.Add(new PieSeries
+                CategoryRevenue.Clear();
+                if (categories != null && categories.Count > 0)
                 {
-                    Title = cat.CategoryName,
-                    Values = new ChartValues<decimal> { cat.TotalRevenue },
-                    DataLabels = true,
-                    LabelPoint = chartPoint => string.Format("{0} ({1:P})", cat.CategoryName, chartPoint.Participation)
-                });
-            }
-            CategorySeries = catSeries;
+                    foreach (var c in categories) CategoryRevenue.Add(c);
+                }
+                else if (SalesSummary?.CategoryBreakdown != null && SalesSummary.CategoryBreakdown.Count > 0)
+                {
+                    // Fallback to summary data
+                    foreach (var c in SalesSummary.CategoryBreakdown) CategoryRevenue.Add(c);
+                }
+
+                // Populate Category Chart
+                var catSeries = new SeriesCollection();
+                foreach (var cat in CategoryRevenue)
+                {
+                    catSeries.Add(new PieSeries
+                    {
+                        Title = cat.CategoryName,
+                        Values = new ChartValues<decimal> { cat.TotalRevenue },
+                        DataLabels = true,
+                        LabelPoint = chartPoint => string.Format("{0} ({1:P})", cat.CategoryName, chartPoint.Participation)
+                    });
+                }
+                CategorySeries = catSeries;
+            });
 
             // Revenue Chart
             var revenueData = await _reportService.GetRevenueReportAsync(StartDate, EndDate);
             var values = new ChartValues<decimal>();
             var labels = new List<string>();
 
-            // If range is small (<= 31 days), show every day. If large, maybe aggregate? For now show all.
-            // We should fill gaps if API doesn't return all days, but let's assume API returns what it has.
-            // Better to iterate dates.
             for (var date = StartDate.Date; date <= EndDate.Date; date = date.AddDays(1))
             {
                 var report = revenueData.FirstOrDefault(r => r.Date.Date == date);
-                values.Add(report?.TotalRevenue ?? 0);
+                values.Add(report?.Revenue ?? 0);
                 labels.Add(date.ToString("dd/MM"));
             }
 
-            RevenueSeries = new SeriesCollection
+            System.Windows.Application.Current.Dispatcher.Invoke(() => 
             {
-                new ColumnSeries // Use Column for reports
+                RevenueSeries = new SeriesCollection
                 {
-                    Title = "Doanh thu",
-                    Values = values
-                }
-            };
-            RevenueLabels = labels.ToArray();
+                    new ColumnSeries // Use Column for reports
+                    {
+                        Title = "Doanh thu",
+                        Values = values
+                    }
+                };
+                RevenueLabels = labels.ToArray();
+            });
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

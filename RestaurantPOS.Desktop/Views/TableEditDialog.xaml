@@ -25,10 +25,23 @@
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                      Margin="0,0,0,20"/>
 
-            <TextBox Text="{Binding Floor, UpdateSourceTrigger=PropertyChanged}"
-                     materialDesign:HintAssist.Hint="Khu vực / Tầng (VD: Tầng 1)"
-                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                     Margin="0,0,0,20"/>
+            <ComboBox Text="{Binding Floor, UpdateSourceTrigger=PropertyChanged}"
+                      materialDesign:HintAssist.Hint="Khu vực / Tầng"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      IsEditable="True"
+                      Margin="0,0,0,20">
+                <sys:String>Tầng 1</sys:String>
+                <sys:String>Tầng 2</sys:String>
+                <sys:String>Tầng 3</sys:String>
+                <sys:String>Tầng 4</sys:String>
+                <sys:String>Tầng 5</sys:String>
+                <sys:String>Tầng trệt</sys:String>
+                <sys:String>Tầng lửng</sys:String>
+                <sys:String>Sân thượng</sys:String>
+                <sys:String>Khu VIP</sys:String>
+                <sys:String>Khu gia đình</sys:String>
+                <sys:String>Khu ngoài trời</sys:String>
+            </ComboBox>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Hủy"

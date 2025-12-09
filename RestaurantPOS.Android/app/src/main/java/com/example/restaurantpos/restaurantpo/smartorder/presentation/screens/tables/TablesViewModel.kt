@@ -14,7 +14,11 @@ import javax.inject.Inject
 data class TablesUiState(
     val tables: List<Table> = emptyList(),
     val selectedFloor: String = "Tầng 1",
-    val floors: List<String> = listOf("Tầng 1", "Tầng 2", "Tầng 3"),
+    val floors: List<String> = listOf(
+        "Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4", "Tầng 5", 
+        "Tầng trệt", "Tầng lửng", "Sân thượng", 
+        "Khu VIP", "Khu gia đình", "Khu ngoài trời"
+    ),
     val selectedStatus: String = "Tất cả", // NEW: Status filter
     val selectedTables: Set<Int> = emptySet(),
     val isLoading: Boolean = false,

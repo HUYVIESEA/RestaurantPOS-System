@@ -32,7 +32,7 @@ namespace RestaurantPOS.Desktop.ViewModels
         private bool _isMergeMode;
         private ObservableCollection<Table> _selectedTablesForMerge = new ObservableCollection<Table>();
 
-        public ICollectionView ProductsView { get; }
+        public ICollectionView ProductsView { get; set; }
 
         public string SearchQuery
         {
@@ -92,7 +92,10 @@ namespace RestaurantPOS.Desktop.ViewModels
             ConfirmMergeCommand = new RelayCommand(ExecuteConfirmMerge);
             SplitTableCommand = new RelayCommand(ExecuteSplitTable);
             ViewDetailsCommand = new RelayCommand(ExecuteViewDetails);
+            ViewDetailsCommand = new RelayCommand(ExecuteViewDetails);
             PrintOrderCommand = new RelayCommand(ExecutePrintOrder);
+            RefreshCommand = new RelayCommand(_ => LoadData()); // F5 Refresh
+            SearchCommand = new RelayCommand(_ => { /* Focus Search Box logic to be handled by View */ });
             
             // Load data
             LoadData();
@@ -143,16 +146,22 @@ namespace RestaurantPOS.Desktop.ViewModels
             IsLoading = true;
             try
             {
-                // Load Products
-                var products = await _productService.GetProductsAsync();
-                Products.Clear();
-                foreach (var p in products)
-                {
-                    Products.Add(p);
-                }
-                
-                // Load Tables
-                var latestTables = await _tableService.GetTablesAsync();
+                // Load Data in Parallel
+                var productsTask = _productService.GetProductsAsync();
+                var tablesTask = _tableService.GetTablesAsync();
+
+                await Task.WhenAll(productsTask, tablesTask);
+
+                var products = productsTask.Result;
+                var latestTables = tablesTask.Result;
+
+                // Update Products (Bulk)
+                _allProducts = products; // Keep raw list for lookups
+                Products = new ObservableCollection<Product>(products);
+                // Re-bind View
+                ProductsView = CollectionViewSource.GetDefaultView(Products);
+                ProductsView.Filter = FilterProduct;
+                OnPropertyChanged(nameof(ProductsView));
                 
                 // Smart Update: Update existing tables instead of clearing
                 foreach (var latestTable in latestTables)
@@ -180,15 +189,42 @@ namespace RestaurantPOS.Desktop.ViewModels
                 }
 
                 // Update Floors List
-                var floors = latestTables.Select(t => t.Floor).Distinct().OrderBy(f => f).ToList();
-                if (!floors.Contains("Tầng 1")) floors.Insert(0, "Tầng 1"); 
+                var activeFloors = latestTables
+                    .Select(t => t.Floor)
+                    .Where(f => !string.IsNullOrWhiteSpace(f))
+                    .Distinct()
+                    .OrderBy(f => f)
+                    .ToList();
                 
-                foreach(var floor in floors)
+                // 1. Add new floors
+                foreach (var floor in activeFloors)
                 {
-                   if (floor != null && !AvailableFloors.Contains(floor))
-                   {
-                       AvailableFloors.Add(floor);
-                   }
+                    if (!AvailableFloors.Contains(floor))
+                    {
+                        AvailableFloors.Add(floor);
+                    }
+                }
+
+                // 2. Remove floors that no longer exist (except "All")
+                var floorsToRemove = AvailableFloors
+                    .Where(f => f != "All" && !activeFloors.Contains(f))
+                    .ToList();
+                    
+                foreach(var f in floorsToRemove)
+                {
+                    AvailableFloors.Remove(f);
+                }
+
+                // 3. Ensure 'All' exists
+                if (!AvailableFloors.Contains("All"))
+                {
+                    AvailableFloors.Insert(0, "All");
+                }
+
+                // 4. Validate Selection
+                if (!AvailableFloors.Contains(SelectedFloorFilter))
+                {
+                    SelectedFloorFilter = "All";
                 }
 
                 // Remove deleted tables
@@ -381,6 +417,9 @@ namespace RestaurantPOS.Desktop.ViewModels
         public RelayCommand ConfirmMergeCommand { get; }
         public RelayCommand SplitTableCommand { get; }
         public RelayCommand ViewDetailsCommand { get; private set; }
+        public RelayCommand PrintOrderCommand { get; private set; }
+        public RelayCommand RefreshCommand { get; private set; }
+        public RelayCommand SearchCommand { get; private set; } // Added for F3
 
 
         private void ExecuteToggleMergeMode(object? parameter)
@@ -663,7 +702,8 @@ namespace RestaurantPOS.Desktop.ViewModels
                     Items = CartItems.Select(c => new CreateOrderItemRequest 
                     { 
                         ProductId = c.Product.Id, 
-                        Quantity = c.Quantity 
+                        Quantity = c.Quantity,
+                        Note = c.Note
                     }).ToList()
                 };
 
@@ -693,7 +733,7 @@ namespace RestaurantPOS.Desktop.ViewModels
                 var newItems = CartItems.Where(c => c.IsNew).ToList();
                 foreach (var item in newItems)
                 {
-                    var updatedOrder = await _orderService.AddItemToOrderAsync(_currentOrder.Id, item.Product.Id, item.Quantity);
+                    var updatedOrder = await _orderService.AddItemToOrderAsync(_currentOrder.Id, item.Product.Id, item.Quantity, item.Note);
                     if (updatedOrder == null) allSuccess = false;
                     else updatesCount++;
                 }
@@ -766,6 +806,15 @@ namespace RestaurantPOS.Desktop.ViewModels
                     if (success)
                     {
                         ShowNotification($"Thanh toán thành công cho bàn {SelectedTable.TableNumber}!", NotificationType.Success);
+                        
+                        // Print Receipt Prompt
+                        var printResult = MessageBox.Show("Thanh toán thành công! Bạn có muốn in hóa đơn không?", "In hóa đơn", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        if (printResult == MessageBoxResult.Yes)
+                        {
+                            var printingService = new ReceiptPrintingService();
+                            printingService.PrintReceipt(_currentOrder, amountPaid, paymentVm.Change, method, CurrentUserName);
+                        }
+
                         CartItems.Clear();
                         _currentOrder = null;
                         OnPropertyChanged(nameof(TotalAmount));
@@ -838,13 +887,23 @@ namespace RestaurantPOS.Desktop.ViewModels
         private async void LoadOrders()
         {
             IsLoading = true;
-            var orders = await _orderService.GetAllOrdersAsync();
-            Orders.Clear();
-            foreach (var order in orders.OrderByDescending(o => o.CreatedAt))
+            try 
             {
-                Orders.Add(order);
+                var orders = await _orderService.GetAllOrdersAsync();
+                var orderedList = orders.OrderByDescending(o => o.CreatedAt);
+                
+                // Bulk Update
+                Orders = new ObservableCollection<Order>(orderedList);
             }
-            IsLoading = false;
+            catch (Exception ex)
+            {
+                // Optionally log
+                ShowNotification("Lỗi tải danh sách đơn hàng", NotificationType.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private async void ExecuteViewDetails(object? parameter)
@@ -864,22 +923,28 @@ namespace RestaurantPOS.Desktop.ViewModels
         {
              if (parameter is Order order)
             {
-                // Simulate printing
-                ShowNotification($"Đang in hóa đơn #{order.Id}...", NotificationType.Info);
-                
-                // In a real app, this would send data to a thermal printer
-                // For now, we just show a success message after a short delay
-                Task.Delay(1000).ContinueWith(_ => 
+                var result = MessageBox.Show($"Bạn muốn in loại phiếu nào cho đơn #{order.Id}?\n\nYes: Hóa đơn thanh toán\nNo: Phiếu báo bếp\nCancel: Hủy", "Chọn loại in", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Cancel) return;
+
+                var printingService = new ReceiptPrintingService();
+
+                if (result == MessageBoxResult.Yes)
                 {
-                    Application.Current.Dispatcher.Invoke(() => 
-                    {
-                         ShowNotification($"Đã in hóa đơn #{order.Id} thành công!", NotificationType.Success);
-                    });
-                });
+                    // Print Receipt (Reprints receipt with 0 paid/change since it's just a reprint or view)
+                    // Or we could try to fetch payment info if available. For now, assuming reprint.
+                    // We'll pass 0 for paid/change as it might be a pre-bill check.
+                    printingService.PrintReceipt(order, order.TotalAmount, 0, "Reprint", CurrentUserName);
+                }
+                else if (result == MessageBoxResult.No)
+                {
+                    // Print Kitchen Ticket
+                    printingService.PrintKitchenTicket(order, "In lại bởi quản lý");
+                }
             }
         }
 
-        public RelayCommand PrintOrderCommand { get; private set; }
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
