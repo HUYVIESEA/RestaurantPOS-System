@@ -21,9 +21,6 @@ class AuthInterceptor @Inject constructor(
             request.addHeader("Authorization", "Bearer $it")
         }
         
-        // Bypass Ngrok warning page for all requests
-        request.addHeader("ngrok-skip-browser-warning", "true")
-        
         return chain.proceed(request.build())
     }
 }

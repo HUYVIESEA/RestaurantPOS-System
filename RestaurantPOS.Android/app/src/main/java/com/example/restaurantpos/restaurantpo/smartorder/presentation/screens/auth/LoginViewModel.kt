@@ -18,48 +18,11 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
-    private val serverDiscovery: com.example.restaurantpos.restaurantpo.smartorder.data.remote.discovery.ServerDiscovery,
-    private val settingsManager: com.example.restaurantpos.restaurantpo.smartorder.data.local.SettingsManager
+    private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
-    
-    private val _discoveryStatus = MutableStateFlow<String?>(null)
-    val discoveryStatus: StateFlow<String?> = _discoveryStatus
-
-    init {
-        startDiscovery()
-    }
-
-    private fun startDiscovery() {
-        viewModelScope.launch {
-            // Start listening for UDP broadcasts
-            launch {
-                serverDiscovery.startListening()
-            }
-            
-            // Observer discovered URL
-            serverDiscovery.serverUrl.collect { url ->
-                if (url != null) {
-                    val currentUrl = settingsManager.getBaseUrl()
-                    // Only update and restart if URL changed significantly
-                    if (!currentUrl.contains(url) && url != currentUrl) {
-                         settingsManager.saveBaseUrl(url)
-                         _discoveryStatus.value = "Đã tìm thấy máy chủ: $url"
-                         // Note: In a real app, you might need to trigger a Retrofit Client rebuild here 
-                         // or ask user to restart app if DI graph is singleton
-                    }
-                }
-            }
-        }
-    }
-    
-    override fun onCleared() {
-        super.onCleared()
-        serverDiscovery.stopListening()
-    }
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
