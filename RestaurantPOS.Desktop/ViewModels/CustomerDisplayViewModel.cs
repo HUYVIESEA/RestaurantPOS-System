@@ -11,7 +11,7 @@ namespace RestaurantPOS.Desktop.ViewModels
         private ObservableCollection<CartItem> _cartItems = new ObservableCollection<CartItem>();
         private decimal _totalAmount;
         private decimal _paymentAmount;
-        private string _qrCodeUrl;
+        private string _qrCodeUrl = string.Empty;
         private DisplayState _currentState = DisplayState.Idle;
 
         public enum DisplayState

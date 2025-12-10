@@ -8,8 +8,10 @@ using System.Windows.Input;
 using RestaurantPOS.Desktop.Models;
 using RestaurantPOS.Desktop.Services;
 using RestaurantPOS.Desktop.Utilities;
-using LiveCharts;
-using LiveCharts.Wpf;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 using System.Linq;
 
 namespace RestaurantPOS.Desktop.ViewModels
@@ -32,40 +34,40 @@ namespace RestaurantPOS.Desktop.ViewModels
             ExportCommand = new RelayCommand(ExecuteExport);
             
             // Initialize defaults to avoid CS8618
-            _revenueSeries = new SeriesCollection();
-            _revenueLabels = Array.Empty<string>();
-            _revenueFormatter = value => value.ToString("N0") + " đ";
-            _categorySeries = new SeriesCollection();
+            _revenueSeries = new ISeries[] { };
+            _revenueXAxes = new Axis[] { new Axis { Labels = new string[] { } } };
+            _revenueYAxes = new Axis[] { new Axis { Labeler = value => value.ToString("N0") + " đ" } };
+            _categorySeries = new ISeries[] { };
 
             // Load initial data safely
             Task.Run(async () => await RefreshData());
         }
 
         // Chart Properties
-        private SeriesCollection _revenueSeries;
-        private string[] _revenueLabels;
-        private Func<double, string> _revenueFormatter;
-        private SeriesCollection _categorySeries;
+        private ISeries[] _revenueSeries;
+        private Axis[] _revenueXAxes;
+        private Axis[] _revenueYAxes;
+        private ISeries[] _categorySeries;
 
-        public SeriesCollection RevenueSeries
+        public ISeries[] RevenueSeries
         {
             get => _revenueSeries;
             set { _revenueSeries = value; OnPropertyChanged(); }
         }
 
-        public string[] RevenueLabels
+        public Axis[] RevenueXAxes
         {
-            get => _revenueLabels;
-            set { _revenueLabels = value; OnPropertyChanged(); }
+            get => _revenueXAxes;
+            set { _revenueXAxes = value; OnPropertyChanged(); }
         }
 
-        public Func<double, string> RevenueFormatter
+        public Axis[] RevenueYAxes
         {
-            get => _revenueFormatter;
-            set { _revenueFormatter = value; OnPropertyChanged(); }
+            get => _revenueYAxes;
+            set { _revenueYAxes = value; OnPropertyChanged(); }
         }
 
-        public SeriesCollection CategorySeries
+        public ISeries[] CategorySeries
         {
             get => _categorySeries;
             set { _categorySeries = value; OnPropertyChanged(); }
@@ -116,10 +118,32 @@ namespace RestaurantPOS.Desktop.ViewModels
             IsLoading = false;
         }
 
-        private void ExecuteExport(object? parameter)
+        private async void ExecuteExport(object? parameter)
         {
-            string type = parameter as string ?? "PDF";
-            System.Windows.MessageBox.Show($"Tính năng xuất báo cáo {type} đang được phát triển!", "Thông báo", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+            try
+            {
+                IsLoading = true;
+                var exportService = new ReportExportService();
+                
+                // Ensure data is loaded
+                if (TopProducts.Count == 0 && CategoryRevenue.Count == 0)
+                {
+                    await LoadSalesSummary();
+                    await LoadDetailedReports();
+                }
+
+                await exportService.ExportToCsvAsync(TopProducts, CategoryRevenue, StartDate, EndDate);
+                
+                await DialogHelper.ShowAlert("Thông báo", "Xuất báo cáo thành công!", "Success");
+            }
+            catch (Exception ex)
+            {
+                await DialogHelper.ShowAlert("Lỗi", $"Lỗi xuất báo cáo: {ex.Message}", "Error");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private async Task LoadSalesSummary()
@@ -170,43 +194,52 @@ namespace RestaurantPOS.Desktop.ViewModels
                 }
 
                 // Populate Category Chart
-                var catSeries = new SeriesCollection();
+                var catSeries = new List<ISeries>();
                 foreach (var cat in CategoryRevenue)
                 {
-                    catSeries.Add(new PieSeries
+                    catSeries.Add(new PieSeries<double>
                     {
-                        Title = cat.CategoryName,
-                        Values = new ChartValues<decimal> { cat.TotalRevenue },
-                        DataLabels = true,
-                        LabelPoint = chartPoint => string.Format("{0} ({1:P})", cat.CategoryName, chartPoint.Participation)
+                        Values = new double[] { (double)cat.TotalRevenue },
+                        Name = cat.CategoryName,
+                        DataLabelsSize = 12,
+                        DataLabelsFormatter = point => $"{point.Model:N0}",
+                        DataLabelsPaint = new SolidColorPaint(SKColors.White)
                     });
                 }
-                CategorySeries = catSeries;
+                CategorySeries = catSeries.ToArray();
             });
 
             // Revenue Chart
             var revenueData = await _reportService.GetRevenueReportAsync(StartDate, EndDate);
-            var values = new ChartValues<decimal>();
+            var values = new List<double>();
             var labels = new List<string>();
 
             for (var date = StartDate.Date; date <= EndDate.Date; date = date.AddDays(1))
             {
                 var report = revenueData.FirstOrDefault(r => r.Date.Date == date);
-                values.Add(report?.Revenue ?? 0);
+                values.Add((double)(report?.Revenue ?? 0));
                 labels.Add(date.ToString("dd/MM"));
             }
 
             System.Windows.Application.Current.Dispatcher.Invoke(() => 
             {
-                RevenueSeries = new SeriesCollection
+                RevenueSeries = new ISeries[]
                 {
-                    new ColumnSeries // Use Column for reports
+                    new ColumnSeries<double>
                     {
-                        Title = "Doanh thu",
-                        Values = values
+                        Name = "Doanh thu",
+                        Values = values.ToArray()
                     }
                 };
-                RevenueLabels = labels.ToArray();
+
+                RevenueXAxes = new Axis[]
+                {
+                     new Axis
+                     {
+                         Labels = labels,
+                         LabelsRotation = 15
+                     }
+                };
             });
         }
 

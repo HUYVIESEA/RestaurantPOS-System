@@ -33,12 +33,13 @@ namespace RestaurantPOS.Desktop.ViewModels
 
         public PaymentViewModel(decimal totalAmount, string tableName)
         {
+            _vietQrService = new VietQRService();
+            _tableName = tableName ?? "Unknown";
+
             try
             {
                 _originalTotalAmount = totalAmount;
-                _tableName = tableName ?? "Unknown";
                 _receivedAmount = totalAmount; // Default to exact amount
-                _vietQrService = new VietQRService();
                 
                 // Restore last used settings (from static cache)
                 _selectedBank = _lastSelectedBank;

@@ -54,6 +54,7 @@
                                      Command="{Binding NavigateCommand}" CommandParameter="Dashboard"
                                      IsChecked="{Binding IsDashboardView, Mode=OneWay}"
                                      Click="MenuButton_Click"
+                                     Visibility="{Binding CanViewReports, Converter={StaticResource BooleanToVisibilityConverter}}"
                                      HorizontalContentAlignment="Left" Padding="20,0"
                                      BorderBrush="Transparent" Margin="10,5">
                             <StackPanel Orientation="Horizontal">
@@ -90,6 +91,7 @@
                                      Command="{Binding NavigateCommand}" CommandParameter="Products"
                                      IsChecked="{Binding IsProductsView, Mode=OneWay}"
                                      Click="MenuButton_Click"
+                                     Visibility="{Binding CanManageProducts, Converter={StaticResource BooleanToVisibilityConverter}}"
                                      HorizontalContentAlignment="Left" Padding="20,0"
                                      BorderBrush="Transparent" Margin="10,5">
                             <StackPanel Orientation="Horizontal">
@@ -102,7 +104,7 @@
                                      Command="{Binding NavigateCommand}" CommandParameter="Reports"
                                      IsChecked="{Binding IsReportsView, Mode=OneWay}"
                                      Click="MenuButton_Click"
-                                     Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                     Visibility="{Binding CanViewReports, Converter={StaticResource BooleanToVisibilityConverter}}"
                                      HorizontalContentAlignment="Left" Padding="20,0"
                                      BorderBrush="Transparent" Margin="10,5">
                             <StackPanel Orientation="Horizontal">
@@ -112,10 +114,23 @@
                         </RadioButton>
 
                         <RadioButton Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" Height="50"
+                                     Command="{Binding NavigateCommand}" CommandParameter="Users"
+                                     IsChecked="{Binding IsUsersView, Mode=OneWay}"
+                                     Click="MenuButton_Click"
+                                     Visibility="{Binding CanManageUsers, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                     HorizontalContentAlignment="Left" Padding="20,0"
+                                     BorderBrush="Transparent" Margin="10,5">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Users" Width="24" Height="24" Foreground="Gray" Margin="0,0,20,0"/>
+                                <TextBlock Text="Người dùng" FontSize="16" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" Height="50"
                                      Command="{Binding NavigateCommand}" CommandParameter="Settings"
                                      IsChecked="{Binding IsSettingsView, Mode=OneWay}"
                                      Click="MenuButton_Click"
-                                     Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                     Visibility="{Binding CanAccessSettings, Converter={StaticResource BooleanToVisibilityConverter}}"
                                      HorizontalContentAlignment="Left" Padding="20,0"
                                      BorderBrush="Transparent" Margin="10,5">
                             <StackPanel Orientation="Horizontal">
@@ -129,6 +144,7 @@
         </materialDesign:DrawerHost.LeftDrawerContent>
 
         <!-- Main Content -->
+        <Grid>
         <Grid Background="#F0F2F5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="60"/> <!-- Header -->
@@ -512,7 +528,7 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <materialDesign:Card Width="200" Height="240" Margin="0,0,20,20" UniformCornerRadius="10"
+                                                <materialDesign:Card Width="200" Height="250" Margin="0,0,20,20" UniformCornerRadius="10"
                                                                      materialDesign:ShadowAssist.ShadowDepth="Depth1"
                                                                      CacheMode="BitmapCache">
                                                     <Grid>
@@ -520,13 +536,45 @@
                                                             <RowDefinition Height="140"/>
                                                             <RowDefinition Height="*"/>
                                                         </Grid.RowDefinitions>
-                                                        <Border Background="#EEE" CornerRadius="10,10,0,0">
-                                                            <fa:IconImage Icon="{Binding ImageUrl}" Foreground="Gray" Height="60" Width="60" Opacity="0.5"/>
-                                                        </Border>
-                                                        <StackPanel Grid.Row="1" Margin="15">
+                                                            <Border Background="#EEE" CornerRadius="10,10,0,0" ClipToBounds="True">
+                                                                <Grid>
+                                                                    <materialDesign:PackIcon Kind="Image" Width="60" Height="60" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray" Opacity="0.5">
+                                                                        <materialDesign:PackIcon.Style>
+                                                                            <Style TargetType="materialDesign:PackIcon">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="{x:Null}">
+                                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                                    </DataTrigger>
+                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="">
+                                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </materialDesign:PackIcon.Style>
+                                                                    </materialDesign:PackIcon>
+                                                                    
+                                                                    <Image Source="{Binding ImageUrl}" Stretch="UniformToFill">
+                                                                         <Image.Style>
+                                                                            <Style TargetType="Image">
+                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="{x:Null}">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                    </DataTrigger>
+                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                         </Image.Style>
+                                                                    </Image>
+                                                                </Grid>
+                                                            </Border>
+                                                        <StackPanel Grid.Row="1" Margin="10">
                                                             <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis"/>
                                                             <TextBlock Text="{Binding Price, StringFormat={}{0:N0} đ}" Foreground="{DynamicResource PrimaryHueMidBrush}" FontWeight="Bold" Margin="0,5,0,0"/>
-                                                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="30" Margin="0,10,0,0"
+                                                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="30" Margin="0,5,0,0"
                                                                     Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                     CommandParameter="{Binding}">
                                                                 <TextBlock Text="Thêm" FontSize="12"/>
@@ -649,14 +697,43 @@
                                         <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} đ}" HorizontalAlignment="Right" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                                     </Grid>
                                     
-                                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="50" Margin="20,0,20,10"
-                                            materialDesign:ButtonAssist.CornerRadius="10" FontSize="16"
-                                            Command="{Binding SaveOrderCommand}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <fa:IconImage Icon="Save" Foreground="{DynamicResource PrimaryHueMidBrush}" Height="20" Width="20" Margin="0,0,10,0"/>
-                                            <TextBlock Text="Lưu đơn"/>
-                                        </StackPanel>
-                                    </Button>
+                                    <Grid Margin="20,0,20,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="5"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="5"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <Button Grid.Column="0" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50"
+                                                materialDesign:ButtonAssist.CornerRadius="10" FontSize="14" Padding="5,0"
+                                                Command="{Binding SaveOrderCommand}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fa:IconImage Icon="Save" Foreground="{DynamicResource PrimaryHueMidBrush}" Height="16" Width="16" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Lưu"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Grid.Column="2" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50"
+                                                materialDesign:ButtonAssist.CornerRadius="10" FontSize="14" Padding="5,0"
+                                                Command="{Binding PrintKitchenCommand}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fa:IconImage Icon="Bell" Foreground="#FF9800" Height="16" Width="16" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Báo bếp"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button Grid.Column="4" Style="{StaticResource MaterialDesignOutlinedButton}" Height="50"
+                                                materialDesign:ButtonAssist.CornerRadius="10" FontSize="14" Padding="5,0"
+                                                Command="{Binding PrintOrderCommand}"
+                                                CommandParameter="{Binding CurrentOrder}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fa:IconImage Icon="Print" Foreground="{DynamicResource PrimaryHueMidBrush}" Height="16" Width="16" Margin="0,0,5,0"/>
+                                                <TextBlock Text="In phiếu"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
 
                                     <Button Style="{StaticResource MaterialDesignRaisedButton}" Height="50" Margin="20,0,20,20"
                                             materialDesign:ButtonAssist.CornerRadius="10" FontSize="16"
@@ -674,23 +751,134 @@
 
                 <!-- OTHER VIEWS -->
                 <views:OrdersView Visibility="{Binding IsOrdersView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                
                 <Grid Visibility="{Binding IsProductsView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                             <Style.Triggers>
+                                <Trigger Property="Visibility" Value="Visible">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <views:ProductsView DataContext="{Binding ProductsVM}"/>
                 </Grid>
+
                 <Grid Visibility="{Binding IsReportsView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                     <Grid.Style>
+                        <Style TargetType="Grid">
+                             <Style.Triggers>
+                                <Trigger Property="Visibility" Value="Visible">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <views:ReportsView DataContext="{Binding ReportsVM}"/>
                 </Grid>
+
                 <Grid Visibility="{Binding IsDashboardView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                     <Grid.Style>
+                        <Style TargetType="Grid">
+                             <Style.Triggers>
+                                <Trigger Property="Visibility" Value="Visible">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <views:DashboardView DataContext="{Binding DashboardVM}"/>
                 </Grid>
+
                 <Grid Visibility="{Binding IsSettingsView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                     <Grid.Style>
+                        <Style TargetType="Grid">
+                             <Style.Triggers>
+                                <Trigger Property="Visibility" Value="Visible">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <views:SettingsView DataContext="{Binding SettingsVM}"/>
                 </Grid>
+
                 <Grid Visibility="{Binding IsTableManagementView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                     <Grid.Style>
+                        <Style TargetType="Grid">
+                             <Style.Triggers>
+                                <Trigger Property="Visibility" Value="Visible">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <views:TableManagementView DataContext="{Binding TableManagementVM}"/>
+                </Grid>
+
+                <Grid Visibility="{Binding IsUsersView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                     <Grid.Style>
+                        <Style TargetType="Grid">
+                             <Style.Triggers>
+                                <Trigger Property="Visibility" Value="Visible">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <views:UsersView DataContext="{Binding UsersVM}"/>
                 </Grid>
             </Grid>
         </Grid>
+            <!-- Global Loading Overlay -->
+            <Grid Visibility="{Binding IsGlobalLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Panel.ZIndex="9999">
+                <Border Background="Black" Opacity="0.3"/>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" 
+                                 Value="0" IsIndeterminate="True" 
+                                 Width="50" Height="50" Foreground="White"/>
+                    <TextBlock Text="Đang xử lý..." Foreground="White" Margin="0,10,0,0" FontWeight="Bold"/>
+                </StackPanel>
+            </Grid>
+            </Grid>
         </materialDesign:DrawerHost>
     </materialDesign:DialogHost>
 </Window>

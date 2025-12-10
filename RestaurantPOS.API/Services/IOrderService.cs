@@ -11,6 +11,7 @@ public interface IOrderService
         Task<Order?> UpdateOrderStatusAsync(int id, string status);
        Task<Order?> AddItemToOrderAsync(int orderId, OrderItem item); // ✅ NEW
      Task<Order?> UpdateItemQuantityAsync(int orderId, int itemId, int quantity); // ✅ NEW
+     Task<Order?> UpdateItemNoteAsync(int orderId, int itemId, string note); // ✅ NEW
         Task<Order?> RemoveItemFromOrderAsync(int orderId, int itemId); // ✅ NEW
       Task<SplitOrderResponse?> SplitOrderAsync(int orderId, List<int> itemIds); // ✅ NEW
         Task<Order?> CompleteOrderAsync(int orderId, double receivedAmount, string paymentMethod); // ✅ NEW

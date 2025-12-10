@@ -5,6 +5,7 @@ using RestaurantPOS.API.Data;
 using RestaurantPOS.API.Services;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Security.Claims;
 
 // using RestaurantPOS.API.Services.VnPay; // Disabled - using VietQR instead
 using RestaurantPOS.API.Hubs;
@@ -77,7 +78,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
+        RoleClaimType = ClaimTypes.Role // Explicitly tell middleware which claim is the role
     };
 });
 
@@ -149,9 +151,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Disable for local dev to avoid Auth header stripping on redirect
 
 app.UseCors("AllowAll");
+
+app.UseStaticFiles(); // Enable serving static files (images)
 
 app.UseAuthentication();
 app.UseAuthorization();

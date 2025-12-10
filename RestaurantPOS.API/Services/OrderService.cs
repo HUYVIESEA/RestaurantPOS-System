@@ -269,6 +269,27 @@ namespace RestaurantPOS.API.Services
             return await GetOrderByIdAsync(orderId);
         }
 
+        // ✅ NEW: Update item note
+        public async Task<Order?> UpdateItemNoteAsync(int orderId, int itemId, string note)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                return null;
+
+            var item = order.OrderItems?.FirstOrDefault(oi => oi.Id == itemId);
+            if (item == null)
+                return null;
+
+            // Update user note
+            item.Notes = note;
+
+            await _context.SaveChangesAsync();
+            return await GetOrderByIdAsync(orderId);
+        }
+
         // ✅ Remove item from order
         public async Task<Order?> RemoveItemFromOrderAsync(int orderId, int itemId)
         {

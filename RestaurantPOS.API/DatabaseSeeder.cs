@@ -151,7 +151,7 @@ namespace RestaurantPOS.API
                     Description = "Suất bún đậu truyền thống với đậu mơ rán giòn và mắm tôm pha ngon.", 
                     Price = 35000, 
                     CategoryId = category.Id, 
-                    ImageUrl = "https://example.com/bundau-thuong.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 new Product 
@@ -160,7 +160,7 @@ namespace RestaurantPOS.API
                     Description = "Bún đậu, thịt chân giò luộc, chả cốm, nem rán.", 
                     Price = 55000, 
                     CategoryId = category.Id, 
-                    ImageUrl = "https://example.com/bundau-full.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 new Product 
@@ -169,7 +169,7 @@ namespace RestaurantPOS.API
                     Description = "Suất đặc biệt đầy đủ các loại topping: Thịt, chả cốm, nem rán, dồi sụn.", 
                     Price = 75000, 
                     CategoryId = category.Id, 
-                    ImageUrl = "https://example.com/bundau-tala.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 
@@ -214,14 +214,17 @@ namespace RestaurantPOS.API
 
             foreach (var p in products)
             {
-                if (!await _context.Products.AnyAsync(x => x.Name == p.Name))
+                var existing = await _context.Products.FirstOrDefaultAsync(x => x.Name == p.Name);
+                if (existing == null)
                 {
                     _context.Products.Add(p);
                     Console.WriteLine($"✅ Added product '{p.Name}'");
                 }
                 else
                 {
-                    Console.WriteLine($"⏭️  Product '{p.Name}' already exists");
+                    existing.ImageUrl = p.ImageUrl;
+                    _context.Products.Update(existing);
+                    Console.WriteLine($"🔄 Updated product '{p.Name}' image");
                 }
             }
 
@@ -265,7 +268,7 @@ namespace RestaurantPOS.API
                     Description = "Trà xanh tươi hãm nóng, phục vụ với đá lạnh.",
                     Price = 5000,
                     CategoryId = category.Id,
-                    ImageUrl = "https://example.com/trada.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 new Product
@@ -274,7 +277,7 @@ namespace RestaurantPOS.API
                     Description = "Trà xanh pha với nước cốt chanh tươi và đường.",
                     Price = 15000,
                     CategoryId = category.Id,
-                    ImageUrl = "https://example.com/trachanh.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 new Product
@@ -283,7 +286,7 @@ namespace RestaurantPOS.API
                     Description = "Nước sấu ngâm đường gừng, chua ngọt thanh mát.",
                     Price = 15000,
                     CategoryId = category.Id,
-                    ImageUrl = "https://example.com/nuocsau.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 new Product
@@ -292,7 +295,7 @@ namespace RestaurantPOS.API
                     Description = "Nước mơ ngâm đường, giải nhiệt mùa hè.",
                     Price = 15000,
                     CategoryId = category.Id,
-                    ImageUrl = "https://example.com/nuocmo.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 new Product
@@ -301,7 +304,7 @@ namespace RestaurantPOS.API
                     Description = "Sữa đậu nành nhà làm, thơm ngon béo ngậy.",
                     Price = 15000,
                     CategoryId = category.Id,
-                    ImageUrl = "https://example.com/suadaunanh.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
 
@@ -341,7 +344,7 @@ namespace RestaurantPOS.API
                     Description = "Bia Hà Nội (Chai/Lon).",
                     Price = 25000,
                     CategoryId = category.Id,
-                    ImageUrl = "https://example.com/biahanoi.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 },
                 new Product
@@ -350,21 +353,24 @@ namespace RestaurantPOS.API
                     Description = "Bia Sài Gòn Lager (Chai/Lon).",
                     Price = 25000,
                     CategoryId = category.Id,
-                    ImageUrl = "https://example.com/biasaigon.jpg",
+                    ImageUrl = "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&q=80&w=800",
                     IsAvailable = true
                 }
             };
 
             foreach (var p in drinks)
             {
-                if (!await _context.Products.AnyAsync(x => x.Name == p.Name))
+                var existing = await _context.Products.FirstOrDefaultAsync(x => x.Name == p.Name);
+                if (existing == null)
                 {
                     _context.Products.Add(p);
                     Console.WriteLine($"✅ Added drink '{p.Name}'");
                 }
                 else
                 {
-                    Console.WriteLine($"⏭️  Drink '{p.Name}' already exists");
+                    existing.ImageUrl = p.ImageUrl;
+                    _context.Products.Update(existing);
+                    Console.WriteLine($"🔄 Updated drink '{p.Name}' image");
                 }
             }
 
@@ -468,14 +474,17 @@ namespace RestaurantPOS.API
 
             foreach (var p in grilledDishes)
             {
-                if (!await _context.Products.AnyAsync(x => x.Name == p.Name))
+                var existing = await _context.Products.FirstOrDefaultAsync(x => x.Name == p.Name);
+                if (existing == null)
                 {
                     _context.Products.Add(p);
                     Console.WriteLine($"✅ Added grilled dish '{p.Name}'");
                 }
                 else
                 {
-                    Console.WriteLine($"⏭️  Grilled dish '{p.Name}' already exists");
+                    existing.ImageUrl = p.ImageUrl;
+                    _context.Products.Update(existing);
+                    Console.WriteLine($"🔄 Updated grilled dish '{p.Name}' image");
                 }
             }
 
@@ -588,14 +597,17 @@ namespace RestaurantPOS.API
 
             foreach (var p in sideDishes)
             {
-                if (!await _context.Products.AnyAsync(x => x.Name == p.Name))
+                var existing = await _context.Products.FirstOrDefaultAsync(x => x.Name == p.Name);
+                if (existing == null)
                 {
                     _context.Products.Add(p);
                     Console.WriteLine($"✅ Added side dish '{p.Name}'");
                 }
                 else
                 {
-                    Console.WriteLine($"⏭️  Side dish '{p.Name}' already exists");
+                    existing.ImageUrl = p.ImageUrl;
+                    _context.Products.Update(existing);
+                    Console.WriteLine($"🔄 Updated side dish '{p.Name}' image");
                 }
             }
 

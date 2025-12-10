@@ -27,9 +27,25 @@
             <!-- Global Text Rendering Optimization -->
             <Style TargetType="{x:Type Window}">
                 <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
-                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="Linear"/> <!-- Optimize image rendering speed -->
                 <Setter Property="UseLayoutRounding" Value="True"/>
+                <Setter Property="FontFamily" Value="Segoe UI"/>
             </Style>
+
+            <!-- Global Virtualization Performance -->
+            <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MaterialDesignDataGrid}">
+                <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+                <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+                <Setter Property="EnableRowVirtualization" Value="True"/>
+                <Setter Property="EnableColumnVirtualization" Value="True"/>
+            </Style>
+
+            <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource MaterialDesignListBox}">
+                <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+                <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+                <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            </Style>
+
             <utils:BooleanToContentConverter x:Key="BooleanToContentConverter" />
             <utils:StringIsEmptyToVisibilityConverter x:Key="StringIsEmptyToVisibilityConverter" />
             <utils:StringIsNotEmptyToVisibilityConverter x:Key="StringIsNotEmptyToVisibilityConverter" />

@@ -27,7 +27,8 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,10,0" Content="Xuất Excel"/>
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,10,0" Content="Xuất Excel"
+                            Command="{Binding ExportOrdersCommand}"/>
                     <Button Style="{StaticResource MaterialDesignRaisedButton}" Content="Tạo đơn mới"
                             Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                             CommandParameter="Sales"/>

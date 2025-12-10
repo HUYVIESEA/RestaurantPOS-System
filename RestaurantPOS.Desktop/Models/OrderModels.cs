@@ -31,6 +31,7 @@ namespace RestaurantPOS.Desktop.Models
         
         public decimal TotalPrice => Quantity * UnitPrice;
 
+        [System.Text.Json.Serialization.JsonPropertyName("notes")]
         public string? Note { get; set; }
     }
 

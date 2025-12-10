@@ -115,6 +115,23 @@ namespace RestaurantPOS.API.Controllers
    return Ok(updatedOrder);
         }
 
+    // PATCH: api/Orders/5/Items/7/Note - Update item note
+    [HttpPatch("{orderId}/Items/{itemId}/Note")]
+    public async Task<ActionResult<Order>> UpdateItemNote(int orderId, int itemId, [FromBody] string note)
+    {
+        var updatedOrder = await _orderService.UpdateItemNoteAsync(orderId, itemId, note);
+
+        if (updatedOrder == null)
+        {
+            return NotFound();
+        }
+
+        // ✅ Broadcast to all clients
+        await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
+
+        return Ok(updatedOrder);
+    }
+
     // DELETE: api/Orders/5/Items/7 - Remove item from order
     [HttpDelete("{orderId}/Items/{itemId}")]
         public async Task<ActionResult<Order>> RemoveItemFromOrder(int orderId, int itemId)

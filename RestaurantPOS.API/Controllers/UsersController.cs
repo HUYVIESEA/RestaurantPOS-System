@@ -27,18 +27,19 @@ namespace RestaurantPOS.API.Controllers
         public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
       {
     var users = await _context.Users
-    .Select(u => new UserDto
-     {
-        Id = u.Id,
- Username = u.Username,
-   Email = u.Email,
-               FullName = u.FullName,
-        Role = u.Role,
-     IsActive = u.IsActive,
-         CreatedAt = u.CreatedAt
-     })
-   .OrderByDescending(u => u.CreatedAt)
-   .ToListAsync();
+            .Select(u => new UserDto
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+                FullName = u.FullName,
+                Role = u.Role,
+                IsActive = u.IsActive,
+                CreatedAt = u.CreatedAt
+            })
+            .AsNoTracking() // Optimize read-only query
+            .OrderByDescending(u => u.CreatedAt)
+            .ToListAsync();
 
             return Ok(users);
         }

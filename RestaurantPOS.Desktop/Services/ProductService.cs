@@ -177,5 +177,48 @@ namespace RestaurantPOS.Desktop.Services
                 return false;
             }
         }
+        public async Task<string?> UploadImageAsync(string filePath)
+        {
+            try
+            {
+                var token = UserSession.Instance.Token;
+                if (!string.IsNullOrEmpty(token))
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+
+                // Prepare file content
+                using (var form = new MultipartFormDataContent())
+                {
+                    using (var fileStream = System.IO.File.OpenRead(filePath))
+                    using (var fileContent = new StreamContent(fileStream))
+                    {
+                        fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg"); // Adjust based on file type if needed, or let generic
+                        // Generally, 'image/*' is safer if we detect map, but 'application/octet-stream' works too often.
+                        // Let's rely on filename extension for content type if possible, or just default.
+                        
+                        form.Add(fileContent, "file", System.IO.Path.GetFileName(filePath));
+
+                        var response = await _httpClient.PostAsync($"{Constants.ApiBaseUrl}/Upload/Image", form);
+                        
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var result = await response.Content.ReadFromJsonAsync<UploadResult>();
+                            return result?.Url;
+                        }
+                    }
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private class UploadResult
+        {
+            public string Url { get; set; }
+        }
     }
 }

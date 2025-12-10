@@ -7,7 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
              xmlns:utils="clr-namespace:RestaurantPOS.Desktop.Utilities"
-             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="1000">
     <UserControl.Resources>
@@ -46,6 +46,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Revenue Card -->
@@ -62,12 +63,12 @@
                                 <fa:IconImage Icon="DollarSign" Foreground="White" Height="20" Width="20" Opacity="0.5" HorizontalAlignment="Right"/>
                             </Grid>
                             <TextBlock Text="{Binding TodayRevenue, StringFormat={}{0:N0} đ}" 
-                                       Foreground="White" FontSize="28" FontWeight="Bold" Margin="0,10,0,0"/>
+                                       Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,10,0,0"/>
                         </StackPanel>
                     </materialDesign:Card>
 
                     <!-- Orders Card -->
-                    <materialDesign:Card Grid.Column="1" Margin="10,0,10,0" Padding="20" UniformCornerRadius="10">
+                    <materialDesign:Card Grid.Column="1" Margin="0,0,10,0" Padding="20" UniformCornerRadius="10">
                         <materialDesign:Card.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                 <GradientStop Color="#2196F3" Offset="0"/>
@@ -80,13 +81,30 @@
                                 <fa:IconImage Icon="ShoppingCart" Foreground="White" Height="20" Width="20" Opacity="0.5" HorizontalAlignment="Right"/>
                             </Grid>
                             <TextBlock Text="{Binding TodayOrdersCount}" 
-                                       Foreground="White" FontSize="28" FontWeight="Bold" Margin="0,10,0,0"/>
-                            <TextBlock Text="đơn hàng" Foreground="White" Opacity="0.7" FontSize="12" Margin="0,5,0,0"/>
+                                       Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- AOV Card (New) -->
+                    <materialDesign:Card Grid.Column="2" Margin="0,0,10,0" Padding="20" UniformCornerRadius="10">
+                        <materialDesign:Card.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#9C27B0" Offset="0"/>
+                                <GradientStop Color="#7B1FA2" Offset="1"/>
+                            </LinearGradientBrush>
+                        </materialDesign:Card.Background>
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="GIÁ TRỊ TB/ĐƠN" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="SemiBold"/>
+                                <fa:IconImage Icon="ChartArea" Foreground="White" Height="20" Width="20" Opacity="0.5" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <TextBlock Text="{Binding AverageOrderValue, StringFormat={}{0:N0} đ}" 
+                                       Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,10,0,0"/>
                         </StackPanel>
                     </materialDesign:Card>
 
                     <!-- Active Tables Card -->
-                    <materialDesign:Card Grid.Column="2" Margin="10,0,0,0" Padding="20" UniformCornerRadius="10">
+                    <materialDesign:Card Grid.Column="3" Margin="0,0,0,0" Padding="20" UniformCornerRadius="10">
                         <materialDesign:Card.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                 <GradientStop Color="#FF9800" Offset="0"/>
@@ -99,12 +117,12 @@
                                 <fa:IconImage Icon="Chair" Foreground="White" Height="20" Width="20" Opacity="0.5" HorizontalAlignment="Right"/>
                             </Grid>
                             <TextBlock Text="{Binding ActiveTablesCount}" 
-                                       Foreground="White" FontSize="28" FontWeight="Bold" Margin="0,10,0,0"/>
-                            <TextBlock Text="bàn" Foreground="White" Opacity="0.7" FontSize="12" Margin="0,5,0,0"/>
+                                       Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,10,0,0"/>
                         </StackPanel>
                     </materialDesign:Card>
                 </Grid>
 
+                <!-- Charts and Lists -->
                 <!-- Charts and Lists -->
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -112,67 +130,105 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Revenue Chart -->
-                    <materialDesign:Card Grid.Column="0" Margin="0,0,10,0" Padding="0" UniformCornerRadius="8" VerticalAlignment="Top">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="20,15">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:IconImage Icon="ChartLine" Foreground="#4CAF50" Height="16" Width="16" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Biểu đồ doanh thu 7 ngày qua" FontWeight="Bold" FontSize="16"/>
-                                </StackPanel>
-                            </Border>
-                            <lvc:CartesianChart Grid.Row="1" Series="{Binding RevenueSeries}" LegendLocation="None" Height="300" Margin="20">
-                                <lvc:CartesianChart.AxisX>
-                                    <lvc:Axis Title="Ngày" Labels="{Binding RevenueLabels}"/>
-                                </lvc:CartesianChart.AxisX>
-                                <lvc:CartesianChart.AxisY>
-                                    <lvc:Axis Title="Doanh thu" LabelFormatter="{Binding RevenueFormatter}"/>
-                                </lvc:CartesianChart.AxisY>
-                            </lvc:CartesianChart>
-                        </Grid>
-                    </materialDesign:Card>
-
-                    <!-- Recent Orders Section -->
-                    <materialDesign:Card Grid.Column="1" Padding="0" UniformCornerRadius="8" VerticalAlignment="Top">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="20,15">
-                                <StackPanel Orientation="Horizontal">
-                                    <fa:IconImage Icon="History" Foreground="#607D8B" Height="16" Width="16" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Đơn hàng gần đây" FontWeight="Bold" FontSize="16"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Grid Grid.Row="1" MinHeight="300">
-                                <DataGrid ItemsSource="{Binding RecentOrders}" AutoGenerateColumns="False" 
-                                          IsReadOnly="True" CanUserAddRows="False" HeadersVisibility="Column"
-                                          EnableRowVirtualization="True" EnableColumnVirtualization="True"
-                                          materialDesign:DataGridAssist.CellPadding="8" 
-                                          materialDesign:DataGridAssist.ColumnHeaderPadding="8"
-                                          BorderThickness="0">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Binding="{Binding TableNumber}" Header="Bàn" Width="60"/>
-                                        <DataGridTextColumn Binding="{Binding TotalAmount, StringFormat={}{0:N0}}" Header="Tổng" Width="*" FontWeight="Bold"/>
-                                        <DataGridTextColumn Binding="{Binding CreatedAt, StringFormat='HH:mm'}" Header="Giờ" Width="60"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-
-                                <!-- Empty State -->
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" 
-                                            Visibility="{Binding RecentOrders.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
-                                    <fa:IconImage Icon="Inbox" Foreground="#DDD" Height="40" Width="40" Margin="0,0,0,10"/>
-                                    <TextBlock Text="Chưa có đơn" Foreground="Gray"/>
-                                </StackPanel>
+                    <!-- Left Column: Revenue Chart + Recent Orders -->
+                    <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                        <!-- Revenue Chart -->
+                        <materialDesign:Card Margin="0,0,0,20" Padding="0" UniformCornerRadius="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="20,15">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:IconImage Icon="ChartLine" Foreground="#4CAF50" Height="16" Width="16" Margin="0,0,10,0"/>
+                                        <TextBlock Text="Biểu đồ doanh thu 7 ngày qua" FontWeight="Bold" FontSize="16"/>
+                                    </StackPanel>
+                                </Border>
+                                <lvc:CartesianChart Grid.Row="1" Series="{Binding RevenueSeries}" XAxes="{Binding RevenueXAxes}" YAxes="{Binding RevenueYAxes}" LegendPosition="Hidden" Height="280" Margin="20">
+                                </lvc:CartesianChart>
                             </Grid>
-                        </Grid>
-                    </materialDesign:Card>
+                        </materialDesign:Card>
+
+                        <!-- Recent Orders Section -->
+                        <materialDesign:Card Padding="0" UniformCornerRadius="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="20,15">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:IconImage Icon="History" Foreground="#607D8B" Height="16" Width="16" Margin="0,0,10,0"/>
+                                        <TextBlock Text="Đơn hàng gần đây" FontWeight="Bold" FontSize="16"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Grid Grid.Row="1" MinHeight="250">
+                                    <DataGrid ItemsSource="{Binding RecentOrders}" AutoGenerateColumns="False" 
+                                              IsReadOnly="True" CanUserAddRows="False" HeadersVisibility="Column"
+                                              EnableRowVirtualization="True" EnableColumnVirtualization="True"
+                                              materialDesign:DataGridAssist.CellPadding="8" 
+                                              materialDesign:DataGridAssist.ColumnHeaderPadding="8"
+                                              BorderThickness="0">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Binding="{Binding TableNumber}" Header="Bàn" Width="80"/>
+                                            <DataGridTextColumn Binding="{Binding TotalAmount, StringFormat={}{0:N0}}" Header="Tổng tiền" Width="*" FontWeight="Bold"/>
+                                            <DataGridTextColumn Binding="{Binding Status}" Header="TT" Width="80"/>
+                                            <DataGridTextColumn Binding="{Binding CreatedAt, StringFormat='HH:mm'}" Header="Giờ" Width="60"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <!-- Empty State -->
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                                Visibility="{Binding RecentOrders.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
+                                        <fa:IconImage Icon="Inbox" Foreground="#DDD" Height="40" Width="40" Margin="0,0,0,10"/>
+                                        <TextBlock Text="Chưa có đơn hàng nào" Foreground="Gray"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </materialDesign:Card>
+                    </StackPanel>
+
+                    <!-- Right Column: Pie Chart + Top Products -->
+                    <StackPanel Grid.Column="1">
+                        <!-- Pie Chart (Category Breakdown) -->
+                        <materialDesign:Card Margin="0,0,0,20" Padding="0" UniformCornerRadius="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="20,15">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:IconImage Icon="ChartPie" Foreground="#FF9800" Height="16" Width="16" Margin="0,0,10,0"/>
+                                        <TextBlock Text="Danh mục doanh thu" FontWeight="Bold" FontSize="16"/>
+                                    </StackPanel>
+                                </Border>
+                                <lvc:PieChart Grid.Row="1" Series="{Binding CategorySeries}" LegendPosition="Right" Height="250" Margin="10">
+                                </lvc:PieChart>
+                            </Grid>
+                        </materialDesign:Card>
+
+                        <!-- Top Products Chart -->
+                        <materialDesign:Card Padding="0" UniformCornerRadius="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border BorderBrush="#F0F0F0" BorderThickness="0,0,0,1" Padding="20,15">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:IconImage Icon="Star" Foreground="#FFC107" Height="16" Width="16" Margin="0,0,10,0"/>
+                                        <TextBlock Text="Top 5 Sản phẩm" FontWeight="Bold" FontSize="16"/>
+                                    </StackPanel>
+                                </Border>
+                                <lvc:CartesianChart Grid.Row="1" Series="{Binding TopProductsSeries}" XAxes="{Binding TopProductsXAxes}" YAxes="{Binding TopProductsYAxes}" 
+                                                    LegendPosition="Hidden" Height="300" Margin="10,0,10,10">
+                                </lvc:CartesianChart>
+                            </Grid>
+                        </materialDesign:Card>
+                    </StackPanel>
                 </Grid>
             </StackPanel>
         </ScrollViewer>

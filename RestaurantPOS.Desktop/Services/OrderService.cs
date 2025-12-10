@@ -123,6 +123,28 @@ namespace RestaurantPOS.Desktop.Services
             }
         }
 
+        public async Task<Order?> UpdateItemNoteAsync(int orderId, int itemId, string note)
+        {
+            try
+            {
+                SetToken();
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                var response = await _httpClient.PatchAsJsonAsync($"{Constants.ApiBaseUrl}/Orders/{orderId}/Items/{itemId}/Note", note);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<Order>(options);
+                }
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<bool> CompleteOrderAsync(int orderId, decimal receivedAmount, string paymentMethod = "Cash")
         {
             try

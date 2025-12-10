@@ -11,7 +11,7 @@ namespace RestaurantPOS.Desktop.Services
 {
     public class CustomerDisplayService
     {
-        private static CustomerDisplayService _instance;
+        private static CustomerDisplayService? _instance;
         public static CustomerDisplayService Instance => _instance ??= new CustomerDisplayService();
 
         private CustomerDisplayWindow? _window;

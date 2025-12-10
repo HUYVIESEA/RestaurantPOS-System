@@ -279,6 +279,47 @@ namespace RestaurantPOS.API.Migrations
                     b.ToTable("PaymentSettings");
                 });
 
+            modelBuilder.Entity("RestaurantPOS.API.Models.PosDevice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConnectionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeviceIdentifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastConnected")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RequestTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PosDevices");
+                });
+
             modelBuilder.Entity("RestaurantPOS.API.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -878,11 +919,11 @@ namespace RestaurantPOS.API.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 8, 6, 53, 3, 721, DateTimeKind.Utc).AddTicks(7040),
+                            CreatedAt = new DateTime(2025, 12, 9, 19, 46, 58, 914, DateTimeKind.Utc).AddTicks(6893),
                             Email = "admin@restaurantpos.com",
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = "$2a$11$L8T.ePeMXiBodwjj94MWhOc/N.z/noHV73/NdVPE8sy.3V80yhU46",
+                            PasswordHash = "$2a$11$OGeYyUPEujx7LBSfLjrbueqpnjDoCuN1qPZFinEXirEUVZmE5ZBiu",
                             Role = "Admin",
                             Username = "admin"
                         });

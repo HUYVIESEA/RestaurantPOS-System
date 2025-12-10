@@ -25,17 +25,24 @@ namespace RestaurantPOS.Desktop.Services
             {
                 var doc = CreateReceiptDocument(order, amountPaid, change, paymentMethod, cashierName);
                 
-                var printDialog = new System.Windows.Controls.PrintDialog();
-                if (printDialog.ShowDialog() == true)
-                {
-                    // Set flow document restrictions to match printer printable area
-                    doc.PageWidth = printDialog.PrintableAreaWidth;
-                    doc.PagePadding = new Thickness(10);
-                    doc.ColumnGap = 0;
-                    doc.ColumnWidth = printDialog.PrintableAreaWidth;
+                // Show Preview First
+                var previewWindow = new Views.ReceiptPreviewWindow(doc);
+                previewWindow.ShowDialog();
 
-                    IDocumentPaginatorSource idpSource = doc;
-                    printDialog.PrintDocument(idpSource.DocumentPaginator, $"Receipt_{order.Id}");
+                if (previewWindow.IsConfirmed)
+                {
+                    var printDialog = new System.Windows.Controls.PrintDialog();
+                    if (printDialog.ShowDialog() == true)
+                    {
+                        // Reset document restrictions for actual printing
+                        doc.PageWidth = printDialog.PrintableAreaWidth;
+                        doc.PagePadding = new Thickness(10);
+                        doc.ColumnGap = 0;
+                        doc.ColumnWidth = printDialog.PrintableAreaWidth;
+
+                        IDocumentPaginatorSource idpSource = doc;
+                        printDialog.PrintDocument(idpSource.DocumentPaginator, $"Receipt_{order.Id}");
+                    }
                 }
             }
             catch (Exception ex)
@@ -50,16 +57,23 @@ namespace RestaurantPOS.Desktop.Services
             {
                 var doc = CreateKitchenTicketDocument(order, note);
                 
-                var printDialog = new System.Windows.Controls.PrintDialog();
-                if (printDialog.ShowDialog() == true)
-                {
-                    doc.PageWidth = printDialog.PrintableAreaWidth;
-                    doc.PagePadding = new Thickness(10);
-                    doc.ColumnGap = 0;
-                    doc.ColumnWidth = printDialog.PrintableAreaWidth;
+                // Show Preview First
+                var previewWindow = new Views.ReceiptPreviewWindow(doc);
+                previewWindow.ShowDialog();
 
-                    IDocumentPaginatorSource idpSource = doc;
-                    printDialog.PrintDocument(idpSource.DocumentPaginator, $"Kitchen_{order.Id}");
+                if (previewWindow.IsConfirmed)
+                {
+                    var printDialog = new System.Windows.Controls.PrintDialog();
+                    if (printDialog.ShowDialog() == true)
+                    {
+                        doc.PageWidth = printDialog.PrintableAreaWidth;
+                        doc.PagePadding = new Thickness(10);
+                        doc.ColumnGap = 0;
+                        doc.ColumnWidth = printDialog.PrintableAreaWidth;
+
+                        IDocumentPaginatorSource idpSource = doc;
+                        printDialog.PrintDocument(idpSource.DocumentPaginator, $"Kitchen_{order.Id}");
+                    }
                 }
             }
             catch (Exception ex)
@@ -148,100 +162,132 @@ namespace RestaurantPOS.Desktop.Services
 
         private FlowDocument CreateReceiptDocument(Order order, decimal amountPaid, decimal change, string paymentMethod, string cashierName)
         {
-            var doc = new FlowDocument
+            var settings = LocalSettingsService.Instance.Settings;
+
+            FlowDocument doc = new FlowDocument
             {
-                FontFamily = new FontFamily("Arial"),
-                FontSize = 10,
-                PagePadding = new Thickness(5),
-                TextAlignment = TextAlignment.Left,
-                PageWidth = PageWidth
+                PagePadding = new Thickness(0),
+                FontFamily = new FontFamily("Segoe UI"),
+                FontSize = 11,
+                Background = Brushes.White
             };
 
-            // 1. Header
-            var header = new Paragraph();
-            header.TextAlignment = TextAlignment.Center;
-            header.Inlines.Add(new Run("RESTAURANT POS SYSTEM") { FontSize = 14, FontWeight = FontWeights.Bold });
+            // 1. HEADER
+            Paragraph header = new Paragraph
+            {
+                TextAlignment = TextAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+            header.Inlines.Add(new Run(settings.StoreName) { FontSize = 14, FontWeight = FontWeights.Bold });
             header.Inlines.Add(new LineBreak());
-            header.Inlines.Add(new Run("123 Đ. Lê Lợi, Q.1, TP.HCM"));
+            header.Inlines.Add(new Run(settings.StoreAddress));
             header.Inlines.Add(new LineBreak());
-            header.Inlines.Add(new Run("Hotline: 0901 234 567"));
+            header.Inlines.Add(new Run($"Hotline: {settings.StorePhone}"));
+            
             doc.Blocks.Add(header);
 
-            doc.Blocks.Add(new BlockUIContainer(new Separator()));
+            // ... (Invoice Info)
+            var createdDate = order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+            Paragraph invoiceInfo = new Paragraph
+            {
+                TextAlignment = TextAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+            invoiceInfo.Inlines.Add(new Run($"HÓA ĐƠN THANH TOÁN") { FontSize = 13, FontWeight = FontWeights.Bold });
+            invoiceInfo.Inlines.Add(new LineBreak());
+            invoiceInfo.Inlines.Add(new Run($"Số phiếu: #{order.Id}"));
+            invoiceInfo.Inlines.Add(new LineBreak());
+            invoiceInfo.Inlines.Add(new Run($"Ngày: {createdDate}"));
+            invoiceInfo.Inlines.Add(new LineBreak());
+            invoiceInfo.Inlines.Add(new Run($"Bàn: {order.TableId} - Thu ngân: {cashierName}"));
+            
+            doc.Blocks.Add(invoiceInfo);
 
-            // 2. Info
-            var info = new Paragraph();
-            info.Inlines.Add(new Run($"Hóa đơn #: {order.Id}"));
-            info.Inlines.Add(new LineBreak());
-            info.Inlines.Add(new Run($"Ngày: {DateTime.Now:dd/MM/yyyy HH:mm}"));
-            info.Inlines.Add(new LineBreak());
-            info.Inlines.Add(new Run($"Bàn: {order.TableId}")); // Ideally Table Name
-            info.Inlines.Add(new LineBreak());
-            info.Inlines.Add(new Run($"Thu ngân: {cashierName}"));
-            doc.Blocks.Add(info);
-
-            doc.Blocks.Add(new BlockUIContainer(new Separator()));
-
-            // 3. Items Table
-            var table = new System.Windows.Documents.Table();
-            table.CellSpacing = 0;
-            // Columns: Name (Product), Qty, Price, Amount
-            var col1 = new TableColumn { Width = new GridLength(3, GridUnitType.Star) }; // Name
-            var col2 = new TableColumn { Width = new GridLength(1, GridUnitType.Star) }; // Qty
-            var col3 = new TableColumn { Width = new GridLength(1.5, GridUnitType.Star) }; // Amount
-            table.Columns.Add(col1);
-            table.Columns.Add(col2);
-            table.Columns.Add(col3);
+            // ... (Table - Products)
+            System.Windows.Documents.Table table = new System.Windows.Documents.Table { CellSpacing = 0 };
+            table.Columns.Add(new TableColumn { Width = new GridLength(2, GridUnitType.Star) }); // Name
+            table.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) }); // Qty
+            table.Columns.Add(new TableColumn { Width = new GridLength(1.5, GridUnitType.Star) }); // Price
+            table.Columns.Add(new TableColumn { Width = new GridLength(1.5, GridUnitType.Star) }); // Total
 
             // Header Row
-            var rowGroup = new TableRowGroup();
-            var headerRow = new TableRow();
+            TableRowGroup headerGroup = new TableRowGroup();
+            TableRow headerRow = new TableRow();
             headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Tên món")) { FontWeight = FontWeights.Bold }));
             headerRow.Cells.Add(new TableCell(new Paragraph(new Run("SL")) { FontWeight = FontWeights.Bold, TextAlignment = TextAlignment.Center }));
+            headerRow.Cells.Add(new TableCell(new Paragraph(new Run("Đ.Giá")) { FontWeight = FontWeights.Bold, TextAlignment = TextAlignment.Right }));
             headerRow.Cells.Add(new TableCell(new Paragraph(new Run("T.Tiền")) { FontWeight = FontWeights.Bold, TextAlignment = TextAlignment.Right }));
-            rowGroup.Rows.Add(headerRow);
+            headerGroup.Rows.Add(headerRow);
+            table.RowGroups.Add(headerGroup);
 
-            // Data Rows
+            // Item Rows
+            TableRowGroup itemGroup = new TableRowGroup();
             foreach (var item in order.OrderItems)
             {
-                var row = new TableRow();
-                var productName = item.Product?.Name ?? "Món đã xóa";
+                TableRow row = new TableRow();
+                string productName = item.Product?.Name ?? "Món";
+                if (productName.Length > 20) productName = productName.Substring(0, 18) + "...";
+
                 row.Cells.Add(new TableCell(new Paragraph(new Run(productName))));
                 row.Cells.Add(new TableCell(new Paragraph(new Run(item.Quantity.ToString())) { TextAlignment = TextAlignment.Center }));
+                row.Cells.Add(new TableCell(new Paragraph(new Run(item.UnitPrice.ToString("N0"))) { TextAlignment = TextAlignment.Right }));
                 row.Cells.Add(new TableCell(new Paragraph(new Run(item.TotalPrice.ToString("N0"))) { TextAlignment = TextAlignment.Right }));
-                rowGroup.Rows.Add(row);
+                itemGroup.Rows.Add(row);
             }
-
-            table.RowGroups.Add(rowGroup);
+            table.RowGroups.Add(itemGroup);
             doc.Blocks.Add(table);
 
-            doc.Blocks.Add(new BlockUIContainer(new Separator()));
+            // Divider
+            Paragraph divider = new Paragraph(new Run("--------------------------------------------------")) { TextAlignment = TextAlignment.Center, Margin = new Thickness(0, 5, 0, 5) };
+            doc.Blocks.Add(divider);
 
-            // 4. Totals
-            var totals = new Paragraph();
-            totals.TextAlignment = TextAlignment.Right;
-            totals.Inlines.Add(new Run($"Tổng cộng:  {order.TotalAmount:N0} đ") { FontSize = 12, FontWeight = FontWeights.Bold });
-            totals.Inlines.Add(new LineBreak());
+            // Totals
+            System.Windows.Documents.Table totalTable = new System.Windows.Documents.Table { CellSpacing = 0 };
+            totalTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
+            totalTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
+
+            TableRowGroup totalGroup = new TableRowGroup();
             
-            // Assuming Discount Logic is handled in Final Amount logic elsewhere, 
-            // but here we just print what we have. 
-            // If discount exists in Order model, display it.
+            // Total
+            TableRow rowTotal = new TableRow();
+            rowTotal.Cells.Add(new TableCell(new Paragraph(new Run("Tổng cộng:")) { FontWeight = FontWeights.Bold }));
+            rowTotal.Cells.Add(new TableCell(new Paragraph(new Run(order.TotalAmount.ToString("N0") + " đ")) { TextAlignment = TextAlignment.Right, FontWeight = FontWeights.Bold }));
+            totalGroup.Rows.Add(rowTotal);
 
-            totals.Inlines.Add(new Run($"Khách đưa:  {amountPaid:N0} đ"));
-            totals.Inlines.Add(new LineBreak());
-            totals.Inlines.Add(new Run($"Tiền thừa:  {change:N0} đ"));
-            totals.Inlines.Add(new LineBreak());
-            totals.Inlines.Add(new Run($"TT: {paymentMethod}"));
-            doc.Blocks.Add(totals);
+            // Paid
+            if (paymentMethod != "Reprint")
+            {
+                TableRow rowPaid = new TableRow();
+                rowPaid.Cells.Add(new TableCell(new Paragraph(new Run("Khách đưa:"))));
+                rowPaid.Cells.Add(new TableCell(new Paragraph(new Run(amountPaid.ToString("N0") + " đ")) { TextAlignment = TextAlignment.Right }));
+                totalGroup.Rows.Add(rowPaid);
 
-            doc.Blocks.Add(new BlockUIContainer(new Separator()));
+                TableRow rowChange = new TableRow();
+                rowChange.Cells.Add(new TableCell(new Paragraph(new Run("Tiền thừa:"))));
+                rowChange.Cells.Add(new TableCell(new Paragraph(new Run(change.ToString("N0") + " đ")) { TextAlignment = TextAlignment.Right }));
+                totalGroup.Rows.Add(rowChange);
+            }
 
-            // 5. Footer
-            var footer = new Paragraph();
-            footer.TextAlignment = TextAlignment.Center;
-            footer.Inlines.Add(new Run("Cảm ơn quý khách & Hẹn gặp lại!") { FontStyle = FontStyles.Italic });
+            totalTable.RowGroups.Add(totalGroup);
+            doc.Blocks.Add(totalTable);
+
+            // Footer
+            Paragraph footer = new Paragraph
+            {
+                TextAlignment = TextAlignment.Center,
+                Margin = new Thickness(0, 10, 0, 0),
+                FontSize = 10,
+                FontStyle = FontStyles.Italic
+            };
+            footer.Inlines.Add(new Run("Cảm ơn quý khách và hẹn gặp lại!"));
             footer.Inlines.Add(new LineBreak());
-            footer.Inlines.Add(new Run("Wifi: Restaurant_Free / Pass: 12345678"));
+            if (!string.IsNullOrEmpty(settings.WifiSSID))
+            {
+                footer.Inlines.Add(new Run($"Wifi: {settings.WifiSSID} / Pass: {settings.WifiPassword}"));
+                footer.Inlines.Add(new LineBreak());
+            }
+            footer.Inlines.Add(new Run("Powered by RestaurantPOS"));
+            
             doc.Blocks.Add(footer);
 
             return doc;

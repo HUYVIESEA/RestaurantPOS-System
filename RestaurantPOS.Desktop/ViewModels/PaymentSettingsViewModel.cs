@@ -167,30 +167,25 @@ namespace RestaurantPOS.Desktop.ViewModels
                     Password
                 );
 
-                Application.Current.Dispatcher.Invoke(() =>
+                if (result.Success)
                 {
-                    if (result.Success)
-                    {
-                        StatusMessage = "✓ " + result.Message;
-                        Password = string.Empty; // Clear password for security
-                        IsConfigured = true;
-                        
-                        MessageBox.Show(
-                            "Cập nhật thông tin thanh toán thành công!\n\nThông tin sẽ được tự động điền khi thanh toán.",
-                            "Thành công",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        StatusMessage = "✗ " + result.Message;
-                        MessageBox.Show(
-                            result.Message,
-                            "Lỗi",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-                    }
-                });
+                    StatusMessage = "✓ " + result.Message;
+                    Password = string.Empty; // Clear password for security
+                    IsConfigured = true;
+                    
+                    await Utilities.DialogHelper.ShowAlert(
+                        "Thành công",
+                        "Cập nhật thông tin thanh toán thành công!\n\nThông tin sẽ được tự động điền khi thanh toán.",
+                        "Success");
+                }
+                else
+                {
+                    StatusMessage = "✗ " + result.Message;
+                    await Utilities.DialogHelper.ShowAlert(
+                        "Lỗi",
+                        result.Message,
+                        "Error");
+                }
             }
             catch (Exception ex)
             {

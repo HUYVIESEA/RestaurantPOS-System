@@ -1,0 +1,139 @@
+<UserControl x:Class="RestaurantPOS.Desktop.Views.UsersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Background="#F0F2F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <materialDesign:Card Grid.Row="0" Margin="20" Padding="20" UniformCornerRadius="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Quản lý người dùng" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+                    <TextBox Width="200" materialDesign:HintAssist.Hint="Tìm kiếm..."
+                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             VerticalAlignment="Bottom"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,10,0" 
+                            Command="{Binding LoadUsersCommand}" ToolTip="Làm mới">
+                         <fa:IconImage Icon="Sync" Height="16" Width="16"/>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignRaisedButton}" 
+                            Command="{Binding AddUserCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="Plus" Foreground="White" Height="16" Width="16" Margin="0,0,10,0"/>
+                            <TextBlock Text="Thêm mới"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </materialDesign:Card>
+
+        <!-- List -->
+        <materialDesign:Card Grid.Row="1" Margin="20,0,20,20" UniformCornerRadius="5" VerticalAlignment="Stretch">
+            <Grid>
+                 <DataGrid ItemsSource="{Binding UsersView}" AutoGenerateColumns="False" 
+                          CanUserAddRows="False" IsReadOnly="True"
+                          EnableRowVirtualization="True"
+                          EnableColumnVirtualization="True"
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          materialDesign:DataGridAssist.CellPadding="13 8 8 8" 
+                          materialDesign:DataGridAssist.ColumnHeaderPadding="8">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Id}" Header="ID" Width="50"/>
+                        <DataGridTextColumn Binding="{Binding Username}" Header="Tên đăng nhập" Width="150" FontWeight="Bold"/>
+                        <DataGridTextColumn Binding="{Binding FullName}" Header="Họ tên" Width="200"/>
+                        <DataGridTextColumn Binding="{Binding Email}" Header="Email" Width="180"/>
+                        
+                        <DataGridTemplateColumn Header="Vai trò" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="10" Padding="10,4" HorizontalAlignment="Left">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#E0F2F1"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Role}" Value="Admin">
+                                                        <Setter Property="Background" Value="#E3F2FD"/> <!-- Blue -->
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Role}" Value="Manager">
+                                                        <Setter Property="Background" Value="#F3E5F5"/> <!-- Purple -->
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding Role}" FontWeight="SemiBold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Trạng thái" Width="120">
+                           <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontWeight="Bold" VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="Dừng hoạt động"/>
+                                                <Setter Property="Foreground" Value="Gray"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                        <Setter Property="Text" Value="Hoạt động"/>
+                                                        <Setter Property="Foreground" Value="Green"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Thao tác" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Sửa"
+                                                Command="{Binding DataContext.EditUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <fa:IconImage Icon="Edit" Foreground="Gray" Height="16" Width="16"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Xóa"
+                                                Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <fa:IconImage Icon="Trash" Foreground="Red" Height="16" Width="16"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Value="0" IsIndeterminate="True"
+                             Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                             Width="50" Height="50"/>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

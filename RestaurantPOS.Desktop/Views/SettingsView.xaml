@@ -15,139 +15,340 @@
 
         <TextBlock Grid.Row="0" Text="Cài đặt hệ thống" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
 
-        <ScrollViewer Grid.Row="1">
-            <StackPanel MaxWidth="800" HorizontalAlignment="Left">
-                <!-- Store Info -->
-                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                             <fa:IconImage Icon="Store" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
-                             <TextBlock Text="Thông tin cửa hàng" FontSize="18" FontWeight="Bold"/>
-                        </StackPanel>
-                        
-                        <TextBox Text="{Binding StoreName}" materialDesign:HintAssist.Hint="Tên cửa hàng" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
-                        <TextBox Text="{Binding StoreAddress}" materialDesign:HintAssist.Hint="Địa chỉ" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
-                        <TextBox Text="{Binding StorePhone}" materialDesign:HintAssist.Hint="Số điện thoại" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
-                    </StackPanel>
-                </materialDesign:Card>
-
-                <!-- Printing -->
-                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                             <fa:IconImage Icon="Print" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
-                             <TextBlock Text="Cấu hình in ấn" FontSize="18" FontWeight="Bold"/>
-                        </StackPanel>
-
-                        <TextBox Text="{Binding PrinterName}" materialDesign:HintAssist.Hint="Tên máy in hóa đơn" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
-                        
-                        <CheckBox IsChecked="{Binding AutoPrint}" Content="Tự động in hóa đơn khi thanh toán" Margin="0,10,0,0"/>
-                    </StackPanel>
-                </materialDesign:Card>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
                 
-                <!-- Startup Options -->
-                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                             <fa:IconImage Icon="Rocket" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
-                             <TextBlock Text="Tùy chọn khởi động" FontSize="18" FontWeight="Bold"/>
-                        </StackPanel>
-
-                        <CheckBox IsChecked="{Binding StartWithWindows}" Content="Khởi động cùng Windows" Margin="0,0,0,10"/>
-                        <CheckBox IsChecked="{Binding StartInFullScreen}" Content="Mở toàn màn hình khi khởi động"/>
-                    </StackPanel>
-                </materialDesign:Card>
-
-                <!-- Utilities -->
-                 <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                             <fa:IconImage Icon="Tools" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
-                             <TextBlock Text="Tiện ích" FontSize="18" FontWeight="Bold"/>
-                        </StackPanel>
-
-                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left" Content="Sao lưu dữ liệu" Margin="0,0,0,10"/>
-                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left" 
-                                Content="Quản lý bàn" Margin="0,0,0,10"
-                                Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="TableManagement"/>
-                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left" Content="Đồng bộ lại danh mục"/>
-                    </StackPanel>
-                </materialDesign:Card>
-
-                <!-- Display Settings -->
-                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                             <fa:IconImage Icon="Desktop" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
-                             <TextBlock Text="Cấu hình hiển thị" FontSize="18" FontWeight="Bold"/>
-                        </StackPanel>
-
-                        <TextBlock Text="Chọn màn hình phụ dành cho khách hàng:" Margin="0,0,0,5"/>
-                        <Grid Margin="0,0,0,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            
-                            <ComboBox ItemsSource="{Binding AvailableScreens}" 
-                                      SelectedItem="{Binding SelectedCustomerScreen}"
-                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                                      Grid.Column="0" Margin="0,0,10,0"/>
-
-                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Grid.Column="1"
-                                    Command="{Binding RefreshScreensCommand}"
-                                    ToolTip="Làm mới danh sách">
-                                <fa:IconImage Icon="Sync" Width="16" Height="16"/>
-                            </Button>
-                        </Grid>
-                        
-                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left"
-                                Command="{Binding IdentifyScreensCommand}">
-                             <StackPanel Orientation="Horizontal">
-                                <fa:IconImage Icon="Eye" Width="16" Height="16" Margin="0,0,8,0"/>
-                                <TextBlock Text="Test hiển thị màn hình"/>
+                <!-- LEFT COLUMN -->
+                <StackPanel Grid.Column="0">
+                    <!-- Store Info -->
+                    <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                 <fa:IconImage Icon="Store" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                 <TextBlock Text="Thông tin cửa hàng" FontSize="18" FontWeight="Bold"/>
                             </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </materialDesign:Card>
+                            
+                            <TextBox Text="{Binding StoreName}" materialDesign:HintAssist.Hint="Tên cửa hàng" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                            <TextBox Text="{Binding StoreAddress}" materialDesign:HintAssist.Hint="Địa chỉ" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                            <TextBox Text="{Binding StorePhone}" materialDesign:HintAssist.Hint="Số điện thoại" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                        </StackPanel>
+                    </materialDesign:Card>
 
-                <!-- Payment Settings (Admin Only) -->
-                <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20" 
-                                     Background="#FFF3E0">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                            <fa:IconImage Icon="CreditCard" Foreground="#FF9800" Width="20" Height="20" Margin="0,0,10,0"/>
-                            <TextBlock Text="Cài đặt thanh toán VietQR" FontSize="18" FontWeight="Bold" Foreground="#E65100"/>
-                            <Border Background="#F44336" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="Admin" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                    <!-- Linked Devices -->
+                    <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20" Background="White">
+                        <StackPanel>
+                            <!-- Header & Tabs -->
+                            <Grid Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <fa:IconImage Icon="Link" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Thiết bị liên kết" FontSize="18" FontWeight="Bold"/>
+                                </StackPanel>
+                                
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" 
+                                                 IsChecked="{Binding IsLocalConnection}" 
+                                                 Content="Local Network"
+                                                 Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                                 Margin="0,0,5,0"/>
+                                    <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}" 
+                                                 IsChecked="{Binding IsInternetConnection}" 
+                                                 Content="Internet"
+                                                 Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Connection Info Area -->
+                            <Border Background="#E3F2FD" CornerRadius="8" Padding="15" Margin="0,0,0,20" BorderBrush="#BBDEFB" BorderThickness="1">
+                                <StackPanel>
+                                    <!-- Local Network Info -->
+                                    <StackPanel Visibility="{Binding IsLocalConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <TextBlock Text="Thông tin kết nối nội bộ (LAN)" FontWeight="Bold" Foreground="#1565C0" Margin="0,0,0,10"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="Địa chỉ IP:" Foreground="#546E7A" FontSize="12"/>
+                                                <TextBlock Text="{Binding LocalIpAddress}" FontSize="16" FontWeight="Bold" Foreground="#263238"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="Cổng (Port):" Foreground="#546E7A" FontSize="12"/>
+                                                <TextBlock Text="5000" FontSize="16" FontWeight="Bold" Foreground="#263238"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="Thiết bị cần kết nối vào cùng mạng Wi-Fi với máy tính này." 
+                                                   FontSize="11" Foreground="#78909C" FontStyle="Italic" Margin="0,10,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Internet Info -->
+                                    <StackPanel Visibility="{Binding IsInternetConnection, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <TextBlock Text="Thông tin kết nối Internet" FontWeight="Bold" Foreground="#1565C0" Margin="0,0,0,10"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="Mã cửa hàng (Store Code):" Foreground="#546E7A" FontSize="12"/>
+                                                <TextBlock Text="{Binding StoreCode}" FontSize="24" FontWeight="Bold" Foreground="#E65100"/>
+                                            </StackPanel>
+                                            
+                                            <Button Grid.Column="1" Style="{StaticResource MaterialDesignOutlinedButton}" 
+                                                    Command="{Binding RefreshStoreCodeCommand}"
+                                                    ToolTip="Làm mới mã" Padding="8,0" Height="30" VerticalAlignment="Bottom">
+                                                <fa:IconImage Icon="Sync" Width="14" Height="14"/>
+                                            </Button>
+                                        </Grid>
+                                        <TextBlock Text="Mã này có hiệu lực trong 10 phút. Sử dụng để kết nối từ xa qua Internet." 
+                                                   FontSize="11" Foreground="#78909C" FontStyle="Italic" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Pending Requests -->
+                            <StackPanel Visibility="{Binding PendingDevices.Count, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                 <TextBlock Text="Yêu cầu kết nối" FontWeight="Bold" Foreground="#F57C00" Margin="0,0,0,10"/>
+                                 <ItemsControl ItemsSource="{Binding PendingDevices}">
+                                     <ItemsControl.ItemTemplate>
+                                         <DataTemplate>
+                                             <Border Background="#FFF3E0" CornerRadius="5" Padding="10" Margin="0,0,0,10" BorderBrush="#FFE0B2" BorderThickness="1">
+                                                 <Grid>
+                                                     <Grid.ColumnDefinitions>
+                                                         <ColumnDefinition Width="Auto"/>
+                                                         <ColumnDefinition Width="*"/>
+                                                         <ColumnDefinition Width="Auto"/>
+                                                     </Grid.ColumnDefinitions>
+                                                     
+                                                     <Border Width="40" Height="40" CornerRadius="20" Background="White" Margin="0,0,15,0">
+                                                         <fa:IconImage Icon="{Binding Icon}" Foreground="#F57C00" Width="20" Height="20"/>
+                                                     </Border>
+                                                     
+                                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                         <StackPanel Orientation="Horizontal">
+                                                             <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                                             <Border Background="White" CornerRadius="3" Padding="4,1" Margin="10,0,0,0" BorderBrush="#FFCC80" BorderThickness="1">
+                                                                 <TextBlock Text="{Binding ConnectionType}" FontSize="9" Foreground="#F57C00"/>
+                                                             </Border>
+                                                         </StackPanel>
+                                                         <StackPanel Orientation="Horizontal">
+                                                             <TextBlock Text="{Binding IpAddress}" FontSize="12" Foreground="Gray" Margin="0,0,10,0"/>
+                                                             <TextBlock Text="{Binding RequestTime, StringFormat='{}{0:HH:mm}'}" FontSize="12" Foreground="Gray"/>
+                                                         </StackPanel>
+                                                     </StackPanel>
+                                                     
+                                                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                         <Button Style="{StaticResource MaterialDesignFlatButton}" Content="Từ chối" Foreground="Gray"
+                                                                 Command="{Binding DataContext.RejectDeviceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                 CommandParameter="{Binding}" Padding="10,0" Height="30" FontSize="12"/>
+                                                         <Button Style="{StaticResource MaterialDesignRaisedButton}" Content="Chấp nhận" Background="#4CAF50" BorderBrush="#4CAF50" Margin="5,0,0,0"
+                                                                 Command="{Binding DataContext.ApproveDeviceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                 CommandParameter="{Binding}" Padding="10,0" Height="30" FontSize="12"/>
+                                                     </StackPanel>
+                                                 </Grid>
+                                             </Border>
+                                         </DataTemplate>
+                                     </ItemsControl.ItemTemplate>
+                                 </ItemsControl>
+                                <Separator Background="#EEE" Margin="0,10,0,15"/>
+                            </StackPanel>
+
+                            <!-- Active Devices -->
+                            <TextBlock Text="Thiết bị đã kết nối" FontWeight="Bold" Foreground="Gray" Margin="0,0,0,10"/>
+                            <ItemsControl ItemsSource="{Binding ActiveDevices}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#F5F5F5" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <Border Width="40" Height="40" CornerRadius="20" Background="White" Margin="0,0,15,0">
+                                                    <fa:IconImage Icon="{Binding Icon}" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20"/>
+                                                </Border>
+                                                
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                                        <Border Background="White" CornerRadius="3" Padding="4,1" Margin="10,0,0,0" BorderBrush="#DDD" BorderThickness="1">
+                                                             <TextBlock Text="{Binding ConnectionType}" FontSize="9" Foreground="Gray"/>
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding IpAddress}" FontSize="12" Foreground="Gray"/>
+                                                </StackPanel>
+                                                
+                                                <Button Grid.Column="2" Style="{StaticResource MaterialDesignOutlinedButton}" 
+                                                        Command="{Binding DataContext.RevokeDeviceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="Hủy kết nối" Width="30" Height="30" Padding="0" BorderBrush="Transparent">
+                                                    <fa:IconImage Icon="TrashAlt" Foreground="Red" Width="14" Height="14"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                             
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left" Margin="0,10,0,0"
+                                    Command="{Binding GenerateQrCodeCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Qrcode" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Hiển thị mã QR kết nối" Visibility="{Binding IsQrVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                                    <TextBlock Text="Ẩn mã QR kết nối" Visibility="{Binding IsQrVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <Border BorderBrush="#DDD" BorderThickness="1" CornerRadius="5" HorizontalAlignment="Left" Margin="0,10,0,0"
+                                    Visibility="{Binding IsQrVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Padding="10">
+                                <StackPanel>
+                                    <Image Source="{Binding QrCodeSource}" Width="200" Height="200" Stretch="Uniform"/>
+                                    <TextBox Text="{Binding QrText}" IsReadOnly="True" 
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                             Margin="0,10,0,0" HorizontalAlignment="Center" 
+                                             TextAlignment="Center" FontWeight="Bold" Foreground="#1976D2"/>
+                                    <TextBlock Text="(Nhập mã này nếu không quét được QR)" 
+                                               HorizontalAlignment="Center" FontSize="10" Foreground="Gray" Margin="0,5,0,0"/>
+                                </StackPanel>
                             </Border>
                         </StackPanel>
-                        
-                        <TextBlock Text="Cấu hình tài khoản ngân hàng nhận thanh toán. Yêu cầu nhập mật khẩu để thay đổi." 
-                                   TextWrapping="Wrap" Foreground="#795548" Margin="0,0,0,15" FontSize="12"/>
+                    </materialDesign:Card>
 
-                        <Button Style="{StaticResource MaterialDesignRaisedButton}" 
-                                HorizontalAlignment="Left" 
-                                Background="#FF9800"
-                                Click="OpenPaymentSettings_Click">
-                            <StackPanel Orientation="Horizontal">
-                                <fa:IconImage Icon="Lock" Foreground="White" Width="16" Height="16" Margin="0,0,8,0"/>
-                                <TextBlock Text="Cài đặt thanh toán" Foreground="White"/>
+                    <!-- Payment Settings (Admin Only) -->
+                    <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20" Background="#FFF3E0">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                <fa:IconImage Icon="CreditCard" Foreground="#FF9800" Width="20" Height="20" Margin="0,0,10,0"/>
+                                <TextBlock Text="Cài đặt thanh toán VietQR" FontSize="18" FontWeight="Bold" Foreground="#E65100"/>
+                                <Border Background="#F44336" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Admin" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                                </Border>
                             </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </materialDesign:Card>
+                            
+                            <TextBlock Text="Cấu hình tài khoản ngân hàng nhận thanh toán. Yêu cầu nhập mật khẩu để thay đổi." 
+                                       TextWrapping="Wrap" Foreground="#795548" Margin="0,0,0,15" FontSize="12"/>
 
-                <Button Style="{StaticResource MaterialDesignRaisedButton}" 
-                        Command="{Binding SaveSettingsCommand}"
-                        Width="150" Height="50" HorizontalAlignment="Left" Margin="0,20,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <fa:IconImage Icon="Save" Foreground="White" Width="20" Height="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Lưu cài đặt"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}" 
+                                    HorizontalAlignment="Left" 
+                                    Background="#FF9800"
+                                    Click="OpenPaymentSettings_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Lock" Foreground="White" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Cài đặt thanh toán" Foreground="White"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </StackPanel>
+
+                <!-- RIGHT COLUMN -->
+                <StackPanel Grid.Column="2">
+                     <!-- Display Settings -->
+                    <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                 <fa:IconImage Icon="Desktop" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                 <TextBlock Text="Cấu hình hiển thị" FontSize="18" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Chọn màn hình phụ dành cho khách hàng:" Margin="0,0,0,5"/>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <ComboBox ItemsSource="{Binding AvailableScreens}" 
+                                          SelectedItem="{Binding SelectedCustomerScreen}"
+                                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                          Grid.Column="0" Margin="0,0,10,0"/>
+
+                                <Button Style="{StaticResource MaterialDesignOutlinedButton}" Grid.Column="1"
+                                        Command="{Binding RefreshScreensCommand}"
+                                        ToolTip="Làm mới danh sách">
+                                    <fa:IconImage Icon="Sync" Width="16" Height="16"/>
+                                </Button>
+                            </Grid>
+                            
+                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" HorizontalAlignment="Left"
+                                    Command="{Binding IdentifyScreensCommand}">
+                                 <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="Eye" Width="16" Height="16" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Test hiển thị màn hình"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- Printing -->
+                    <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                 <fa:IconImage Icon="Print" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                 <TextBlock Text="Cấu hình in ấn" FontSize="18" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <TextBox Text="{Binding PrinterName}" materialDesign:HintAssist.Hint="Tên máy in hóa đơn" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,0,0,10" FontSize="14"/>
+                            
+                            <CheckBox IsChecked="{Binding AutoPrint}" Content="Tự động in hóa đơn khi thanh toán" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- Startup Options -->
+                    <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                 <fa:IconImage Icon="Rocket" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                 <TextBlock Text="Tùy chọn khởi động" FontSize="18" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <CheckBox IsChecked="{Binding StartWithWindows}" Content="Khởi động cùng Windows" Margin="0,0,0,10"/>
+                            <CheckBox IsChecked="{Binding StartInFullScreen}" Content="Mở toàn màn hình khi khởi động"/>
+                        </StackPanel>
+                    </materialDesign:Card>
+                    
+                    <!-- Utilities -->
+                     <materialDesign:Card Margin="0,0,0,20" UniformCornerRadius="10" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                 <fa:IconImage Icon="Tools" Foreground="{DynamicResource PrimaryHueMidBrush}" Width="20" Height="20" Margin="0,0,10,0"/>
+                                 <TextBlock Text="Tiện ích" FontSize="18" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <WrapPanel>
+                                <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="Sao lưu dữ liệu" Margin="0,0,10,10"/>
+                                <Button Style="{StaticResource MaterialDesignOutlinedButton}" 
+                                        Content="Quản lý bàn" Margin="0,0,10,10"
+                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="TableManagement"/>
+                                <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="Đồng bộ danh mục" Margin="0,0,0,10"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                     <!-- Save Button -->
+                    <Button Style="{StaticResource MaterialDesignRaisedButton}" 
+                            Command="{Binding SaveSettingsCommand}"
+                            Height="50" HorizontalAlignment="Right"
+                            Margin="0,10,0,20" Width="200">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="Save" Foreground="White" Width="20" Height="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Lưu tất cả cài đặt" FontSize="16"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </UserControl>

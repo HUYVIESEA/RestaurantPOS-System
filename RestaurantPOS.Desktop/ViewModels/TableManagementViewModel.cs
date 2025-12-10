@@ -13,7 +13,7 @@ namespace RestaurantPOS.Desktop.ViewModels
     public class TableManagementViewModel : INotifyPropertyChanged
     {
         private readonly TableService _tableService;
-        private ObservableCollection<Table> _tables;
+        private ObservableCollection<Table> _tables = new ObservableCollection<Table>();
         private bool _isLoading;
 
         public ObservableCollection<Table> Tables
@@ -85,11 +85,11 @@ namespace RestaurantPOS.Desktop.ViewModels
                 if (success)
                 {
                     LoadTables();
-                    MessageBox.Show("Thêm bàn thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await DialogHelper.ShowAlert("Thông báo", "Thêm bàn thành công!", "Success");
                 }
                 else
                 {
-                    MessageBox.Show("Lỗi khi thêm bàn!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await DialogHelper.ShowAlert("Lỗi", "Lỗi khi thêm bàn!", "Error");
                 }
             }
         }
@@ -123,11 +123,11 @@ namespace RestaurantPOS.Desktop.ViewModels
                     if (success)
                     {
                         LoadTables();
-                        MessageBox.Show("Cập nhật bàn thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await DialogHelper.ShowAlert("Thông báo", "Cập nhật bàn thành công!", "Success");
                     }
                     else
                     {
-                        MessageBox.Show("Lỗi khi cập nhật bàn!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                         await DialogHelper.ShowAlert("Lỗi", "Lỗi khi cập nhật bàn!", "Error");
                     }
                 }
             }
@@ -137,7 +137,7 @@ namespace RestaurantPOS.Desktop.ViewModels
         {
             if (parameter is Table table)
             {
-                if (MessageBox.Show($"Bạn có chắc chắn muốn xóa bàn {table.TableNumber} không?", "Xác nhận xóa", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                if (await DialogHelper.ShowConfirm("Xác nhận xóa", $"Bạn có chắc chắn muốn xóa bàn {table.TableNumber} không?"))
                 {
                     IsLoading = true;
                     var success = await _tableService.DeleteTableAsync(table.Id);
@@ -146,10 +146,11 @@ namespace RestaurantPOS.Desktop.ViewModels
                     if (success)
                     {
                         LoadTables();
+                         await DialogHelper.ShowAlert("Thông báo", "Đã xóa bàn thành công!", "Success");
                     }
                     else
                     {
-                        MessageBox.Show("Không thể xóa bàn này (có thể đang có đơn hàng hoặc lỗi server).", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                        await DialogHelper.ShowAlert("Lỗi", "Không thể xóa bàn này (có thể đang có đơn hàng hoặc lỗi server).", "Error");
                     }
                 }
             }

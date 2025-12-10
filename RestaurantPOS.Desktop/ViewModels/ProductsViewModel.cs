@@ -17,11 +17,11 @@ namespace RestaurantPOS.Desktop.ViewModels
     public class ProductsViewModel : INotifyPropertyChanged
     {
         private readonly ProductService _productService;
-        private ObservableCollection<Product> _products;
-        private ICollectionView _productsView; // Use ICollectionView for filtering
-        private ObservableCollection<Category> _categories;
+        private ObservableCollection<Product> _products = new ObservableCollection<Product>();
+        private ICollectionView? _productsView; // Use ICollectionView for filtering
+        private ObservableCollection<Category> _categories = new ObservableCollection<Category>();
         private Category? _selectedCategory;
-        private string _searchQuery;
+        private string _searchQuery = string.Empty;
         private bool _isLoading;
         private int _currentPage = 1;
         private int _pageSize = 15;
@@ -34,7 +34,7 @@ namespace RestaurantPOS.Desktop.ViewModels
             _productService = new ProductService();
             Products = new ObservableCollection<Product>();
             ProductsView = CollectionViewSource.GetDefaultView(Products);
-            ProductsView.Filter = FilterProduct;
+            if (ProductsView != null) ProductsView.Filter = FilterProduct;
             Categories = new ObservableCollection<Category>();
 
             LoadProductsCommand = new RelayCommand(ExecuteLoadProducts);
@@ -45,8 +45,11 @@ namespace RestaurantPOS.Desktop.ViewModels
             ManageCategoriesCommand = new RelayCommand(ExecuteManageCategories);
             AddCategoryCommand = new RelayCommand(ExecuteAddCategory);
             EditCategoryCommand = new RelayCommand(ExecuteEditCategory);
+            EditCategoryCommand = new RelayCommand(ExecuteEditCategory);
             DeleteCategoryCommand = new RelayCommand(ExecuteDeleteCategory);
             
+            ImportExcelCommand = new RelayCommand(ExecuteImportExcel);
+
             NextPageCommand = new RelayCommand(ExecuteNextPage, _ => CanGoNext);
             PreviousPageCommand = new RelayCommand(ExecutePreviousPage, _ => CanGoPrevious);
             
@@ -59,7 +62,7 @@ namespace RestaurantPOS.Desktop.ViewModels
             set { _products = value; OnPropertyChanged(); }
         }
 
-        public ICollectionView ProductsView
+        public ICollectionView? ProductsView
         {
             get => _productsView;
             set { _productsView = value; OnPropertyChanged(); }
@@ -136,6 +139,8 @@ namespace RestaurantPOS.Desktop.ViewModels
         public ICommand NextPageCommand { get; }
         public ICommand PreviousPageCommand { get; }
 
+        public ICommand ImportExcelCommand { get; }
+
         private async void LoadData()
         {
             IsLoading = true;
@@ -146,6 +151,86 @@ namespace RestaurantPOS.Desktop.ViewModels
         private async void ExecuteLoadProducts(object? parameter)
         {
             await LoadDataAsync();
+        }
+
+        private async void ExecuteImportExcel(object? parameter)
+        {
+            var importService = new DataImportService();
+            var importedItems = await importService.ImportProductsFromCsvAsync();
+
+            if (importedItems.Count > 0)
+            {
+                IsLoading = true;
+                int count = 0;
+                int errors = 0;
+
+                // Refresh categories to ensure we have latest
+                await _productService.GetCategoriesAsync();
+                var allCategories = await _productService.GetCategoriesAsync();
+
+                foreach (var item in importedItems)
+                {
+                    // Map DTO to Product Model
+                    var product = new Product
+                    {
+                        Name = item.Name,
+                        Price = item.Price,
+                        Description = item.Description,
+                        ImageUrl = item.ImageUrl,
+                        Unit = "Phần" // Default unit
+                    };
+
+                    // Map Category
+                    var category = allCategories.FirstOrDefault(c => c.Name.Equals(item.CategoryName, StringComparison.OrdinalIgnoreCase));
+                    if (category != null)
+                    {
+                        product.CategoryId = category.Id;
+                    }
+                    else
+                    {
+                        // Create Category if not exists
+                        if (!string.IsNullOrEmpty(item.CategoryName))
+                        {
+                            var newCat = new Category { Name = item.CategoryName, Description = "Imported" };
+                            if (await _productService.AddCategoryAsync(newCat))
+                            {
+                                // Reload to get ID
+                                allCategories = await _productService.GetCategoriesAsync(); 
+                                category = allCategories.FirstOrDefault(c => c.Name.Equals(item.CategoryName, StringComparison.OrdinalIgnoreCase));
+                                if (category != null) product.CategoryId = category.Id;
+                            }
+                        }
+                    }
+
+                    // Default to first category if still 0
+                    if (product.CategoryId == 0 && allCategories.Any())
+                    {
+                         product.CategoryId = allCategories.First().Id;
+                    }
+                    else if (product.CategoryId == 0)
+                    {
+                         // If no categories exist at all, strictly speaking we should fail or create a default one.
+                         // But let's skip for now or it will fail on API if FK is required.
+                    }
+
+                    if (await _productService.AddProductAsync(product))
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        errors++;
+                    }
+                }
+                
+                IsLoading = false;
+                await LoadDataAsync();
+                
+                string msg = $"Đã nhập thành công {count} món.";
+                if (errors > 0) msg += $" Có {errors} món lỗi.";
+                
+                await DialogHelper.ShowAlert("Kết quả nhập liệu", msg, errors > 0 ? "Warning" : "Success");
+            }
         }
 
         private async Task LoadDataAsync()
@@ -255,12 +340,12 @@ namespace RestaurantPOS.Desktop.ViewModels
 
                 if (success)
                 {
-                    MessageBox.Show("Thêm sản phẩm thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await DialogHelper.ShowAlert("Thông báo", "Thêm sản phẩm thành công!", "Success");
                     await LoadDataAsync();
                 }
                 else
                 {
-                    MessageBox.Show("Lỗi khi thêm sản phẩm!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await DialogHelper.ShowAlert("Lỗi", "Lỗi khi thêm sản phẩm!", "Error");
                 }
             }
         }
@@ -298,12 +383,12 @@ namespace RestaurantPOS.Desktop.ViewModels
 
                     if (success)
                     {
-                        MessageBox.Show("Cập nhật sản phẩm thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await DialogHelper.ShowAlert("Thông báo", "Cập nhật sản phẩm thành công!", "Success");
                         await LoadDataAsync();
                     }
                     else
                     {
-                        MessageBox.Show("Lỗi khi cập nhật sản phẩm!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                        await DialogHelper.ShowAlert("Lỗi", "Lỗi khi cập nhật sản phẩm!", "Error");
                     }
                 }
             }
@@ -313,7 +398,7 @@ namespace RestaurantPOS.Desktop.ViewModels
         {
             if (parameter is Product product)
             {
-                if (MessageBox.Show($"Bạn có chắc chắn muốn xóa sản phẩm '{product.Name}'?", "Xác nhận xóa", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                if (await DialogHelper.ShowConfirm("Xác nhận xóa", $"Bạn có chắc chắn muốn xóa sản phẩm '{product.Name}'?"))
                 {
                     IsLoading = true;
                     var success = await _productService.DeleteProductAsync(product.Id);
@@ -321,12 +406,12 @@ namespace RestaurantPOS.Desktop.ViewModels
 
                     if (success)
                     {
-                        MessageBox.Show("Đã xóa sản phẩm!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await DialogHelper.ShowAlert("Thông báo", "Đã xóa sản phẩm!", "Success");
                         await LoadDataAsync();
                     }
                     else
                     {
-                        MessageBox.Show("Lỗi khi xóa sản phẩm!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                         await DialogHelper.ShowAlert("Lỗi", "Lỗi khi xóa sản phẩm!", "Error");
                     }
                 }
             }
@@ -358,12 +443,12 @@ namespace RestaurantPOS.Desktop.ViewModels
 
                 if (success)
                 {
-                    MessageBox.Show("Thêm nhóm hàng thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await DialogHelper.ShowAlert("Thông báo", "Thêm nhóm hàng thành công!", "Success");
                     await LoadCategories();
                 }
                 else
                 {
-                    MessageBox.Show("Lỗi khi thêm nhóm hàng!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await DialogHelper.ShowAlert("Lỗi", "Lỗi khi thêm nhóm hàng!", "Error");
                 }
             }
         }
@@ -393,12 +478,12 @@ namespace RestaurantPOS.Desktop.ViewModels
 
                     if (success)
                     {
-                        MessageBox.Show("Cập nhật nhóm hàng thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await DialogHelper.ShowAlert("Thông báo", "Cập nhật nhóm hàng thành công!", "Success");
                         await LoadCategories();
                     }
                     else
                     {
-                        MessageBox.Show("Lỗi khi cập nhật nhóm hàng!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                        await DialogHelper.ShowAlert("Lỗi", "Lỗi khi cập nhật nhóm hàng!", "Error");
                     }
                 }
             }
@@ -408,7 +493,7 @@ namespace RestaurantPOS.Desktop.ViewModels
         {
             if (parameter is Category category)
             {
-                if (MessageBox.Show($"Bạn có chắc chắn muốn xóa nhóm hàng '{category.Name}'?", "Xác nhận xóa", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                if (await DialogHelper.ShowConfirm("Xác nhận xóa", $"Bạn có chắc chắn muốn xóa nhóm hàng '{category.Name}'?"))
                 {
                     IsLoading = true;
                     var success = await _productService.DeleteCategoryAsync(category.Id);
@@ -416,12 +501,12 @@ namespace RestaurantPOS.Desktop.ViewModels
 
                     if (success)
                     {
-                        MessageBox.Show("Đã xóa nhóm hàng!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await DialogHelper.ShowAlert("Thông báo", "Đã xóa nhóm hàng!", "Success");
                         await LoadCategories();
                     }
                     else
                     {
-                        MessageBox.Show("Lỗi khi xóa nhóm hàng!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                         await DialogHelper.ShowAlert("Lỗi", "Lỗi khi xóa nhóm hàng!", "Error");
                     }
                 }
             }
@@ -441,19 +526,77 @@ namespace RestaurantPOS.Desktop.ViewModels
         }
     }
 
-    public class ProductDialogViewModel
+    public class ProductDialogViewModel : INotifyPropertyChanged
     {
         public Product Product { get; }
         public string Title { get; }
-        
-        // In a real app, you'd load categories from API
         public ObservableCollection<Category> Categories { get; }
+        
+        private bool _isUploading;
+        public bool IsUploading
+        {
+            get => _isUploading;
+            set { _isUploading = value; OnPropertyChanged(); }
+        }
+
+        public ICommand SelectImageCommand { get; }
+
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set { _errorMessage = value; OnPropertyChanged(); }
+        }
 
         public ProductDialogViewModel(Product product, string title, ObservableCollection<Category> categories)
         {
             Product = product;
             Title = title;
             Categories = categories;
+            SelectImageCommand = new RelayCommand(ExecuteSelectImage);
+        }
+
+        private async void ExecuteSelectImage(object? parameter)
+        {
+            ErrorMessage = string.Empty;
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg|All files (*.*)|*.*"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try 
+                {
+                    IsUploading = true;
+                    var productService = new ProductService(); // Or inject/pass existing instance
+                    var imageUrl = await productService.UploadImageAsync(openFileDialog.FileName);
+                    
+                    if (!string.IsNullOrEmpty(imageUrl))
+                    {
+                        Product.ImageUrl = imageUrl;
+                        OnPropertyChanged(nameof(Product)); 
+                    }
+                    else
+                    {
+                        ErrorMessage = "Không thể tải ảnh lên. Vui lòng kiểm tra kết nối server.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                     ErrorMessage = $"Lỗi tải ảnh: {ex.Message}";
+                }
+                finally
+                {
+                    IsUploading = false;
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
     public class CategoryDialogViewModel
