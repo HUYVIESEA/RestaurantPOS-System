@@ -205,6 +205,25 @@ namespace RestaurantPOS.Manager
             }
         }
 
+        private void Nav_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is RadioButton rb && rb.Tag is string viewName)
+            {
+                View_Dashboard.Visibility = Visibility.Collapsed;
+                View_Services.Visibility = Visibility.Collapsed;
+                View_Database.Visibility = Visibility.Collapsed;
+                View_Maintenance.Visibility = Visibility.Collapsed;
+
+                switch (viewName)
+                {
+                    case "Dashboard": View_Dashboard.Visibility = Visibility.Visible; break;
+                    case "Services": View_Services.Visibility = Visibility.Visible; break;
+                    case "Database": View_Database.Visibility = Visibility.Visible; break;
+                    case "Maintenance": View_Maintenance.Visibility = Visibility.Visible; break;
+                }
+            }
+        }
+
         // Event Handlers
 
         private void BtnStartApi_Click(object sender, RoutedEventArgs e)
