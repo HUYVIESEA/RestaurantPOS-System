@@ -16,8 +16,8 @@ namespace RestaurantPOS.Desktop.Services
 
         public OrderService()
         {
-            // Sử dụng Helper để tạo Client có sẵn Header Bypass Ngrok
-            _httpClient = ConfigurationService.CreateHttpClient();
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri(Constants.ApiBaseUrl);
         }
 
         public async Task<List<Order>> GetOrdersByTableAsync(int tableId)

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestaurantPOS.Desktop", "Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestaurantPOS.Manager", "RestaurantPOS.Manager\RestaurantPOS.Manager.csproj", "{392DD45F-6D6B-41DB-A3F8-12EF79D1A774}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestaurantPOS.Tests", "RestaurantPOS.Tests\RestaurantPOS.Tests.csproj", "{6FC3F720-05D7-4056-815C-CD85153D128D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestaurantPOS.LoadTest", "RestaurantPOS.LoadTest\RestaurantPOS.LoadTest.csproj", "{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,30 @@ Global
 		{392DD45F-6D6B-41DB-A3F8-12EF79D1A774}.Release|x64.Build.0 = Release|Any CPU
 		{392DD45F-6D6B-41DB-A3F8-12EF79D1A774}.Release|x86.ActiveCfg = Release|Any CPU
 		{392DD45F-6D6B-41DB-A3F8-12EF79D1A774}.Release|x86.Build.0 = Release|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Debug|x64.Build.0 = Debug|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Debug|x86.Build.0 = Debug|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Release|x64.ActiveCfg = Release|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Release|x64.Build.0 = Release|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Release|x86.ActiveCfg = Release|Any CPU
+		{6FC3F720-05D7-4056-815C-CD85153D128D}.Release|x86.Build.0 = Release|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Debug|x64.Build.0 = Debug|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Debug|x86.Build.0 = Debug|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Release|x64.ActiveCfg = Release|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Release|x64.Build.0 = Release|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Release|x86.ActiveCfg = Release|Any CPU
+		{21A6D43C-71D0-4CCD-82D1-CE0550EB5752}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

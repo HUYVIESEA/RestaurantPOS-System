@@ -54,7 +54,7 @@ namespace RestaurantPOS.API.Services
                     Data = data
                 };
 
-                BatchResponse response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
+                BatchResponse response = await FirebaseMessaging.DefaultInstance.SendEachForMulticastAsync(message);
                 _logger.LogInformation($"{response.SuccessCount} messages were sent successfully");
                 return $"{response.SuccessCount} messages sent";
             }

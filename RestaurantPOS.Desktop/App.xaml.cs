@@ -21,8 +21,34 @@ namespace RestaurantPOS.Desktop
         {
             base.OnStartup(e);
             
-            // Tự động cấu hình URL (Ngrok hoặc Localhost) - Giờ chỉ là Localhost
+            // Cấu hình Localhost
             await Utilities.ConfigurationService.InitializeAsync();
+
+            // Kiểm tra kết nối API
+            bool isConnected = false;
+            while (!isConnected)
+            {
+                isConnected = await Utilities.ConfigurationService.CheckApiConnectionAsync();
+
+                if (!isConnected)
+                {
+                    var result = MessageBox.Show(
+                        $"Không thể kết nối đến Máy chủ API tại: {Utilities.Constants.ApiBaseUrl}\n\n" +
+                        "Vui lòng đảm bảo:\n" +
+                        "1. Dự án 'RestaurantPOS.API' ĐANG CHẠY (Port 5000).\n" +
+                        "2. Không bị chặn bởi Firewall.\n\n" +
+                        "Bạn có muốn thử lại không?",
+                        "Lỗi Kết Nối Máy Chủ",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.No)
+                    {
+                        Shutdown();
+                        return;
+                    }
+                }
+            }
         }
 
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

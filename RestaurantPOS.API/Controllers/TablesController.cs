@@ -22,7 +22,7 @@ namespace RestaurantPOS.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Table>>> GetTables()
         {
-            return await _context.Tables.ToListAsync();
+            return await _context.Tables.AsNoTracking().ToListAsync();
         }
 
         // GET: api/Tables/5
@@ -43,14 +43,14 @@ namespace RestaurantPOS.API.Controllers
         [HttpGet("Available")]
         public async Task<ActionResult<IEnumerable<Table>>> GetAvailableTables()
         {
-            return await _context.Tables.Where(t => t.IsAvailable).ToListAsync();
+            return await _context.Tables.AsNoTracking().Where(t => t.IsAvailable).ToListAsync();
         }
 
         // GET: api/Tables/Floor/Tầng 1
         [HttpGet("Floor/{floor}")]
         public async Task<ActionResult<IEnumerable<Table>>> GetTablesByFloor(string floor)
         {
-            return await _context.Tables.Where(t => t.Floor == floor).ToListAsync();
+            return await _context.Tables.AsNoTracking().Where(t => t.Floor == floor).ToListAsync();
         }
 
         // POST: api/Tables
@@ -247,7 +247,7 @@ namespace RestaurantPOS.API.Controllers
                 .GroupBy(t => t.MergedGroupId)
                 .Select(g => new MergedTableGroup
                 {
-                    GroupId = g.Key.Value,
+                    GroupId = g.Key ?? 0,
                     TableNumbers = g.First().MergedTableNumbers,
                     TotalCapacity = g.Sum(t => t.Capacity),
                     TableCount = g.Count(),

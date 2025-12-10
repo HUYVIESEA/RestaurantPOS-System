@@ -22,7 +22,7 @@ namespace RestaurantPOS.API.Controllers
       [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
      {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories.AsNoTracking().ToListAsync();
         }
 
         // GET: api/Categories/5

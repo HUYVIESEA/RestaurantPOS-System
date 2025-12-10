@@ -25,7 +25,7 @@ namespace RestaurantPOS.API.Services
         {
             return await _context.Orders
                 .Include(o => o.Table)
-                .Include(o => o.OrderItems)
+                .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
@@ -35,7 +35,7 @@ namespace RestaurantPOS.API.Services
         {
             return await _context.Orders
                 .Include(o => o.Table)
-                .Include(o => o.OrderItems)
+                .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
@@ -44,7 +44,7 @@ namespace RestaurantPOS.API.Services
         {
             return await _context.Orders
                 .Include(o => o.Table)
-                .Include(o => o.OrderItems)
+                .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
                 .Where(o => o.TableId == tableId)
                 .OrderByDescending(o => o.OrderDate)
@@ -361,7 +361,7 @@ namespace RestaurantPOS.API.Services
     public async Task<SplitOrderResponse?> SplitOrderAsync(int orderId, List<int> itemIds)
         {
      var originalOrder = await _context.Orders
-           .Include(o => o.OrderItems)
+           .Include(o => o.OrderItems!)
     .ThenInclude(oi => oi.Product)
          .Include(o => o.Table)
          .FirstOrDefaultAsync(o => o.Id == orderId);

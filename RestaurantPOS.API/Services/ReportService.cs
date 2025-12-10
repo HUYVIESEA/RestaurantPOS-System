@@ -16,6 +16,9 @@ namespace RestaurantPOS.API.Services
         // Revenue Reports
         public async Task<RevenueReportDto> GetRevenueReportAsync(DateTime startDate, DateTime endDate)
         {
+            startDate = startDate.ToUniversalTime();
+            endDate = endDate.ToUniversalTime();
+
             var orders = await _context.Orders
                 .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate && o.Status == "Completed")
                 .ToListAsync();
@@ -47,6 +50,9 @@ namespace RestaurantPOS.API.Services
 
         public async Task<List<DailyRevenueDto>> GetDailyRevenueAsync(DateTime startDate, DateTime endDate)
         {
+            startDate = startDate.ToUniversalTime();
+            endDate = endDate.ToUniversalTime();
+
             var orders = await _context.Orders
                 .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate && o.Status == "Completed")
                 .GroupBy(o => o.OrderDate.Date)
@@ -83,14 +89,17 @@ namespace RestaurantPOS.API.Services
         // Product Reports
         public async Task<List<ProductReportDto>> GetTopSellingProductsAsync(DateTime startDate, DateTime endDate, int topCount = 10)
         {
+            startDate = startDate.ToUniversalTime();
+            endDate = endDate.ToUniversalTime();
+
             var productStats = await _context.OrderItems
                 .Include(oi => oi.Order)
                 .Include(oi => oi.Product)
-                    .ThenInclude(p => p.Category)
-                .Where(oi => oi.Order.OrderDate >= startDate && 
-                            oi.Order.OrderDate <= endDate && 
-                            oi.Order.Status == "Completed")
-                .GroupBy(oi => new { oi.ProductId, ProductName = oi.Product.Name, CategoryName = oi.Product.Category.Name })
+                    .ThenInclude(p => p!.Category)
+                .Where(oi => oi.Order!.OrderDate >= startDate && 
+                            oi.Order!.OrderDate <= endDate && 
+                            oi.Order!.Status == "Completed")
+                .GroupBy(oi => new { oi.ProductId, ProductName = oi.Product!.Name, CategoryName = oi.Product!.Category!.Name })
                 .Select(g => new ProductReportDto
                 {
                     ProductId = g.Key.ProductId,
@@ -113,11 +122,11 @@ namespace RestaurantPOS.API.Services
             var productStats = await _context.OrderItems
                 .Include(oi => oi.Order)
                 .Include(oi => oi.Product)
-                    .ThenInclude(p => p.Category)
-                .Where(oi => oi.Order.OrderDate >= startDate && 
-                            oi.Order.OrderDate <= endDate && 
-                            oi.Order.Status == "Completed")
-                .GroupBy(oi => new { oi.ProductId, ProductName = oi.Product.Name, CategoryName = oi.Product.Category.Name })
+                    .ThenInclude(p => p!.Category)
+                .Where(oi => oi.Order!.OrderDate >= startDate && 
+                            oi.Order!.OrderDate <= endDate && 
+                            oi.Order!.Status == "Completed")
+                .GroupBy(oi => new { oi.ProductId, ProductName = oi.Product!.Name, CategoryName = oi.Product!.Category!.Name })
                 .Select(g => new ProductReportDto
                 {
                     ProductId = g.Key.ProductId,
@@ -146,9 +155,9 @@ namespace RestaurantPOS.API.Services
             var stats = await _context.OrderItems
                 .Include(oi => oi.Order)
                 .Where(oi => oi.ProductId == productId &&
-                            oi.Order.OrderDate >= startDate &&
-                            oi.Order.OrderDate <= endDate &&
-                            oi.Order.Status == "Completed")
+                            oi.Order!.OrderDate >= startDate &&
+                            oi.Order!.OrderDate <= endDate &&
+                            oi.Order!.Status == "Completed")
                 .GroupBy(oi => oi.ProductId)
                 .Select(g => new
                 {
@@ -243,7 +252,7 @@ namespace RestaurantPOS.API.Services
             var tableStats = await _context.Orders
                 .Include(o => o.Table)
                 .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate && o.Status == "Completed")
-                .GroupBy(o => new { o.TableId, o.Table.TableNumber })
+                .GroupBy(o => new { o.TableId, o.Table!.TableNumber })
                 .Select(g => new TablePerformanceDto
                 {
                     TableId = g.Key.TableId ?? 0,
@@ -262,14 +271,17 @@ namespace RestaurantPOS.API.Services
         // Category Reports
         public async Task<List<CategoryReportDto>> GetCategoryReportAsync(DateTime startDate, DateTime endDate)
         {
+            startDate = startDate.ToUniversalTime();
+            endDate = endDate.ToUniversalTime();
+
             var categoryStats = await _context.OrderItems
                 .Include(oi => oi.Order)
                 .Include(oi => oi.Product)
-                    .ThenInclude(p => p.Category)
-                .Where(oi => oi.Order.OrderDate >= startDate && 
-                            oi.Order.OrderDate <= endDate && 
-                            oi.Order.Status == "Completed")
-                .GroupBy(oi => new { oi.Product.CategoryId, CategoryName = oi.Product.Category.Name })
+                    .ThenInclude(p => p!.Category)
+                .Where(oi => oi.Order!.OrderDate >= startDate && 
+                            oi.Order!.OrderDate <= endDate && 
+                            oi.Order!.Status == "Completed")
+                .GroupBy(oi => new { oi.Product!.CategoryId, CategoryName = oi.Product!.Category!.Name })
                 .Select(g => new CategoryReportDto
                 {
                     CategoryId = g.Key.CategoryId,
@@ -293,11 +305,11 @@ namespace RestaurantPOS.API.Services
         // Sales Summary
         public async Task<SalesSummaryDto> GetSalesSummaryAsync()
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.Date;
             var yesterday = today.AddDays(-1);
             var weekStart = today.AddDays(-(int)today.DayOfWeek);
-            var monthStart = new DateTime(today.Year, today.Month, 1);
-            var yearStart = new DateTime(today.Year, 1, 1);
+            var monthStart = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var yearStart = new DateTime(today.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
             var todayRevenue = await GetRevenueForPeriodAsync(today, today.AddDays(1));
             var yesterdayRevenue = await GetRevenueForPeriodAsync(yesterday, today);

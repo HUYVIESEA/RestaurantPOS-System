@@ -31,6 +31,7 @@ namespace RestaurantPOS.API
             await SeedGrilledDishesDataAsync();
             await SeedSideDishesDataAsync();
             await SeedTablesDataAsync();
+            await SeedSampleOrdersAsync();
             await DisplayStatisticsAsync();
 
             Console.WriteLine("========================================");
@@ -664,6 +665,93 @@ namespace RestaurantPOS.API
             await _context.SaveChangesAsync();
             
             Console.WriteLine($"✅ Added {tables.Count} tables across {floorConfigs.Length} floors/areas");
+        }
+
+
+        /// <summary>
+        /// Seed sample orders for dashboard testing
+        /// </summary>
+        private async Task SeedSampleOrdersAsync()
+        {
+            Console.WriteLine("\n--- Seeding Sample Orders ---");
+
+            if (await _context.Orders.CountAsync() > 200)
+            {
+                Console.WriteLine("⏭️  Orders already exist (>200). Skipping...");
+                return;
+            }
+
+            var products = await _context.Products.ToListAsync();
+            var tables = await _context.Tables.ToListAsync();
+            var users = await _context.Users.ToListAsync();
+            var staff = users.FirstOrDefault(u => u.Role == "Staff") ?? users.First();
+
+            if (!products.Any() || !tables.Any())
+            {
+                Console.WriteLine("⚠️  Cannot seed orders: No products or tables found.");
+                return;
+            }
+
+            var random = new Random();
+            var orders = new List<Order>();
+
+            for (int i = 0; i < 100; i++)
+            {
+                var daysAgo = random.Next(0, 7);
+                // Fix: Use UtcNow.Date and offset for VN hours (0-15h UTC = 7-22h VN)
+                var orderDate = DateTime.UtcNow.Date.AddDays(-daysAgo).AddHours(random.Next(0, 16)); 
+                var isCompleted = daysAgo > 0 || random.NextDouble() > 0.2; // Past orders are completed
+                var status = isCompleted ? "Completed" : (random.NextDouble() > 0.5 ? "Pending" : "Processing");
+                var table = tables[random.Next(tables.Count)];
+
+                var order = new Order
+                {
+                    TableId = table.Id,
+                    // UserId removed
+                    OrderDate = orderDate,
+                    Status = status,
+                    TotalAmount = 0, // Will be calculated
+                    PaymentMethod = isCompleted ? (random.NextDouble() > 0.3 ? "Cash" : "Transfer") : "Pending",
+                    // OriginalTotalAmount removed
+                    // CreatedByUserId removed
+                    // CreatedAt, UpdatedAt removed if not in model (Order.cs didn't show them, except OrderDate)
+                };
+
+                // Add random items (2-5 items per order)
+                var itemCount = random.Next(2, 6);
+                var orderItems = new List<OrderItem>();
+                decimal total = 0;
+
+                for (int j = 0; j < itemCount; j++)
+                {
+                    var product = products[random.Next(products.Count)];
+                    var quantity = random.Next(1, 4);
+                    
+                    orderItems.Add(new OrderItem
+                    {
+                        ProductId = product.Id,
+                        // ProductName removed if not in model. OrderItem.cs didn't show ProductName.
+                        Quantity = quantity,
+                        UnitPrice = product.Price,
+                        // TotalPrice removed if not in model
+                        Notes = random.NextDouble() > 0.8 ? "Ít cay" : null // Changed Note to Notes
+                    });
+
+                    total += product.Price * quantity;
+                }
+
+                order.OrderItems = orderItems;
+                order.TotalAmount = total;
+                // OriginalTotalAmount removed
+
+                orders.Add(order);
+            }
+
+            // Add batch
+            await _context.Orders.AddRangeAsync(orders);
+            await _context.SaveChangesAsync();
+            
+            Console.WriteLine($"✅ Created {orders.Count} sample orders for the last 7 days.");
         }
 
         /// <summary>

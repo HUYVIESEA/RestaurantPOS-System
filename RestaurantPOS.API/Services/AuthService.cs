@@ -223,6 +223,8 @@ return false;
        return false;
             var user = resetToken.User;
 
+        if (user == null) return false;
+
        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
     // Mark token as used
