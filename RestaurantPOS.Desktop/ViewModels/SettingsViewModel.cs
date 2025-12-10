@@ -166,14 +166,14 @@ namespace RestaurantPOS.Desktop.ViewModels
         public RelayCommand GenerateQrCodeCommand { get; }
         public RelayCommand RefreshStoreCodeCommand { get; }
 
-        private string _qrCodeSource;
+        private string _qrCodeSource = string.Empty;
         public string QrCodeSource
         {
             get => _qrCodeSource;
             set { _qrCodeSource = value; OnPropertyChanged(); }
         }
 
-        private string _qrText;
+        private string _qrText = string.Empty;
         public string QrText
         {
             get => _qrText;

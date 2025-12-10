@@ -58,7 +58,7 @@ namespace RestaurantPOS.Desktop.Services
                                     Price = decimal.TryParse(parts[1], out var p) ? p : 0,
                                     CategoryName = parts.Count > 2 ? parts[2].Trim() : "Khác",
                                     Description = parts.Count > 3 ? parts[3].Trim() : "",
-                                    ImageUrl = parts.Count > 4 ? parts[4].Trim() : null
+                                    ImageUrl = parts.Count > 4 ? parts[4].Trim() : string.Empty
                                 };
                                 products.Add(product);
                             }

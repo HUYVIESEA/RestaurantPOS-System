@@ -158,46 +158,54 @@ namespace RestaurantPOS.Desktop.ViewModels
             StatusMessage = "Đang cập nhật...";
             try
             {
-                // 1. Get Active Tables first (needed for mapping)
-                var tables = await _tableService.GetTablesAsync();
-                // 2. Get Today's Sales Summary
-                var summary = await _reportService.GetSalesSummaryAsync();
-                
+                var endDate = DateTime.Now;
+                var startDate = endDate.AddDays(-6);
+
+                // Start all tasks related to data fetching in parallel
+                var tablesTask = _tableService.GetTablesAsync();
+                var summaryTask = _reportService.GetSalesSummaryAsync();
+                var revenueReportTask = _reportService.GetRevenueReportAsync(startDate, endDate);
+                var allOrdersTask = _orderService.GetAllOrdersAsync();
+                var categoryReportTask = _reportService.GetCategoryReportAsync(startDate, endDate);
+                var topProductsTask = _reportService.GetTopSellingProductsAsync(startDate, endDate, 5);
+
+                await Task.WhenAll(tablesTask, summaryTask, revenueReportTask, allOrdersTask, categoryReportTask, topProductsTask);
+
+                var tables = tablesTask.Result;
+                var summary = summaryTask.Result;
+                var revenueData = revenueReportTask.Result;
+                var allOrders = allOrdersTask.Result;
+                var categoryReport = categoryReportTask.Result;
+                var topProducts = topProductsTask.Result;
+
                 System.Windows.Application.Current.Dispatcher.Invoke(() => 
                 {
+                    // 1. Update Active Tables
                     ActiveTablesCount = tables.Count(t => !t.IsAvailable);
-                    
+
+                    // 2. Update Sales Summary Cards
                     if (summary != null)
                     {
                         TodayRevenue = summary.TodayRevenue;
                         TodayOrdersCount = summary.TodayOrders;
                         AverageOrderValue = summary.TodayOrders > 0 ? summary.TodayRevenue / summary.TodayOrders : 0;
-                        StatusMessage = $"Cập nhật lúc {DateTime.Now:HH:mm:ss}";
                     }
                     else
                     {
                         StatusMessage = "Không thể lấy dữ liệu báo cáo.";
                     }
-                });
 
-                // 3. Get Revenue Chart Data (Last 7 Days)
-                var endDate = DateTime.Now;
-                var startDate = endDate.AddDays(-6);
-                var revenueData = await _reportService.GetRevenueReportAsync(startDate, endDate);
-                
-                var values = new List<double>();
-                var labels = new List<string>();
+                    // 3. Update Revenue Chart
+                    var values = new List<double>();
+                    var labels = new List<string>();
 
-                // Fill missing dates with 0
-                for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
-                {
-                    var report = revenueData.FirstOrDefault(r => r.Date.Date == date);
-                    values.Add((double)(report?.Revenue ?? 0));
-                    labels.Add(date.ToString("dd/MM"));
-                }
+                    for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
+                    {
+                        var report = revenueData.FirstOrDefault(r => r.Date.Date == date);
+                        values.Add((double)(report?.Revenue ?? 0));
+                        labels.Add(date.ToString("dd/MM"));
+                    }
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() => 
-                {
                     RevenueSeries = new ISeries[]
                     {
                         new LineSeries<double>
@@ -219,14 +227,9 @@ namespace RestaurantPOS.Desktop.ViewModels
                              LabelsRotation = 15
                          }
                     };
-                });
 
-                // 3. Get Recent Orders (Last 5)
-                var allOrders = await _orderService.GetAllOrdersAsync();
-                var recent = allOrders.OrderByDescending(o => o.CreatedAt).Take(5).ToList();
-                
-                System.Windows.Application.Current.Dispatcher.Invoke(() => 
-                {
+                    // 4. Update Recent Orders
+                    var recent = allOrders.OrderByDescending(o => o.CreatedAt).Take(5).ToList();
                     RecentOrders.Clear();
                     foreach (var order in recent)
                     {
@@ -240,54 +243,33 @@ namespace RestaurantPOS.Desktop.ViewModels
                             CreatedAt = order.CreatedAt
                         });
                     }
-                });
 
-                // 4. Get Category Breakdown (Pie Chart)
-                var categoryReport = await _reportService.GetCategoryReportAsync(startDate, endDate);
-                var pieSeries = new List<ISeries>();
-                
-                // Limit to top 5 categories
-                foreach(var cat in categoryReport.Take(5))
-                {
-                    pieSeries.Add(new PieSeries<double>
+                    // 5. Update Category Pie Chart
+                    var pieSeries = new List<ISeries>();
+                    foreach(var cat in categoryReport.Take(5))
                     {
-                        Values = new double[] { (double)cat.TotalRevenue },
-                        Name = cat.CategoryName,
-                        InnerRadius = 50,
-                        DataLabelsSize = 12,
-                        DataLabelsPosition = LiveChartsCore.Measure.PolarLabelsPosition.Middle,
-                        ToolTipLabelFormatter = point => $"{point.Context.Series.Name}: {point.Coordinate.PrimaryValue:N0} đ"
-                    });
-                }
-                
-                System.Windows.Application.Current.Dispatcher.Invoke(() => 
-                {
+                        pieSeries.Add(new PieSeries<double>
+                        {
+                            Values = new double[] { (double)cat.TotalRevenue },
+                            Name = cat.CategoryName,
+                            InnerRadius = 50,
+                            DataLabelsSize = 12,
+                            DataLabelsPosition = LiveChartsCore.Measure.PolarLabelsPosition.Middle,
+                            ToolTipLabelFormatter = point => $"{point.Context.Series.Name}: {point.Coordinate.PrimaryValue:N0} đ"
+                        });
+                    }
                     CategorySeries = pieSeries.ToArray();
-                });
 
-                // 6. Get Top Selling Products (Bar Chart - RowSeries)
-                var topProducts = await _reportService.GetTopSellingProductsAsync(startDate, endDate, 5);
-                var topProductSeries = new List<ISeries>();
-                var productNames = new List<string>();
-                var quantities = new List<int>();
+                    // 6. Update Top Products Chart
+                    var quantities = new List<int>();
+                    var productNames = new List<string>();
 
-                // Data for chart
-                // We want to show a single series where each bar is a product? 
-                // actually RowSeries usually takes a value. 
-                // For a simple "Top 5" bar chart, we can use one RowSeries with multiple points, but mapping colors is harder.
-                // Or one RowSeries<int> with all values.
-                
-                foreach(var p in topProducts)
-                {
-                     productNames.Add(p.ProductName);
-                     quantities.Add(p.TotalQuantitySold);
-                }
+                    foreach(var p in topProducts)
+                    {
+                         productNames.Add(p.ProductName);
+                         quantities.Add(p.TotalQuantitySold);
+                    }
 
-                // Reverse to show top at top in RowSeries? No, RowSeries usually plots bottom-up on Y.
-                // Let's keep order and see.
-
-                System.Windows.Application.Current.Dispatcher.Invoke(() => 
-                {
                     TopProductsSeries = new ISeries[]
                     {
                         new RowSeries<int>
@@ -320,6 +302,9 @@ namespace RestaurantPOS.Desktop.ViewModels
                              IsVisible = false 
                         }
                     };
+
+                    // Final Status Update
+                    StatusMessage = $"Cập nhật lúc {DateTime.Now:HH:mm:ss}";
                 });
             }
             catch (Exception ex)

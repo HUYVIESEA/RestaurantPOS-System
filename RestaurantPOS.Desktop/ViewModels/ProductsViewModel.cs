@@ -540,8 +540,8 @@ namespace RestaurantPOS.Desktop.ViewModels
         }
 
         public ICommand SelectImageCommand { get; }
-
-        private string _errorMessage;
+        
+        private string _errorMessage = string.Empty;
         public string ErrorMessage
         {
             get => _errorMessage;
