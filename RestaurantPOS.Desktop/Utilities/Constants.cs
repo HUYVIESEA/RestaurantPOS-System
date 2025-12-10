@@ -2,7 +2,7 @@ namespace RestaurantPOS.Desktop.Utilities
 {
     public static class Constants
     {
-        public const string ApiBaseUrl = "http://127.0.0.1:5000/api";
+        public const string ApiBaseUrl = "http://localhost:5000/api";
         
         // Restaurant Info
         public const string RestaurantName = "RESTAURANT POS SYSTEM";

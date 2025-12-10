@@ -15,8 +15,7 @@ namespace RestaurantPOS.Desktop.Services
 
         public TableService()
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri(Constants.ApiBaseUrl);
+            _httpClient = ConfigurationService.CreateHttpClient();
         }
 
         public async Task<List<Table>> GetTablesAsync()

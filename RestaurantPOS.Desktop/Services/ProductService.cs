@@ -15,8 +15,7 @@ namespace RestaurantPOS.Desktop.Services
 
         public ProductService()
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri(Constants.ApiBaseUrl);
+            _httpClient = ConfigurationService.CreateHttpClient();
         }
 
         public async Task<List<Product>> GetProductsAsync()

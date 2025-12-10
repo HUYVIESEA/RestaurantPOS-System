@@ -17,6 +17,14 @@ namespace RestaurantPOS.Desktop
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         }
 
+        protected override async void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            
+            // Tự động cấu hình URL (Ngrok hoặc Localhost) - Giờ chỉ là Localhost
+            await Utilities.ConfigurationService.InitializeAsync();
+        }
+
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             MessageBox.Show(

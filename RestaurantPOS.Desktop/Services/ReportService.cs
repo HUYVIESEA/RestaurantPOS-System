@@ -11,12 +11,11 @@ namespace RestaurantPOS.Desktop.Services
     public class ReportService
     {
         private readonly HttpClient _httpClient;
-        private string BaseUrl => $"{Constants.ApiBaseUrl}/Reports";
+        private string BaseUrl => "Reports"; // Relative to HttpClient BaseAddress
 
         public ReportService()
         {
-            _httpClient = new HttpClient();
-            // In a real app, use IHttpClientFactory
+            _httpClient = ConfigurationService.CreateHttpClient();
         }
 
         private void AddAuthHeader()

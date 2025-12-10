@@ -10,19 +10,11 @@ namespace RestaurantPOS.Desktop.Services
 {
     public class UserService
     {
-        private static readonly HttpClient _httpClient;
-
-        static UserService()
-        {
-            _httpClient = new HttpClient();
-            string baseUrl = Utilities.Constants.ApiBaseUrl;
-            if (!baseUrl.EndsWith("/")) baseUrl += "/";
-            _httpClient.BaseAddress = new Uri(baseUrl);
-        }
+        private readonly HttpClient _httpClient;
 
         public UserService()
         {
-            // Empty constructor
+            _httpClient = Utilities.ConfigurationService.CreateHttpClient();
         }
 
         private void SetAuthHeader()

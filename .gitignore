@@ -203,3 +203,5 @@ key.properties
 # .NET Secrets
 appsettings.Development.json
 secrets.json
+ngrok.exe
+ngrok.yml

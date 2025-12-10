@@ -13,8 +13,7 @@ namespace RestaurantPOS.Desktop.Services
 
         public AuthService()
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri(Constants.ApiBaseUrl);
+            _httpClient = ConfigurationService.CreateHttpClient();
         }
 
         public async Task<LoginResponse?> LoginAsync(string username, string password)

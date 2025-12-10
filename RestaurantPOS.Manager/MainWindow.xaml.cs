@@ -90,7 +90,8 @@ namespace RestaurantPOS.Manager
             CheckStatus();
         }
 
-        private void CheckStatus()
+
+        private async void CheckStatus()
         {
             // Check API (Port 5000)
             bool apiRunning = IsPortInUse(5000);
@@ -105,7 +106,12 @@ namespace RestaurantPOS.Manager
             ActiveProcessCount.Text = $"Active Processes: {processCount}";
 
             // Update CPU & RAM
-            if (_cpuCounter != null && _ramCounter != null)
+            UpdatePerformanceCounters();
+        }
+
+        private void UpdatePerformanceCounters()
+        {
+             if (_cpuCounter != null && _ramCounter != null)
             {
                 // Run in background to avoid UI freeze
                 Task.Run(() =>

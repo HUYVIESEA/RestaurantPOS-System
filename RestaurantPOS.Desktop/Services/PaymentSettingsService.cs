@@ -9,14 +9,14 @@ namespace RestaurantPOS.Desktop.Services
 {
     public class PaymentSettingsService
     {
-        private static readonly HttpClient _sharedHttpClient = new HttpClient();
+        private readonly HttpClient _sharedHttpClient;
         private static PaymentSettingsResponse? _cachedSettings;
         private static DateTime _lastFetchTime;
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
         public PaymentSettingsService()
         {
-            // Use shared HttpClient
+            _sharedHttpClient = ConfigurationService.CreateHttpClient();
         }
 
         private void SetToken()
