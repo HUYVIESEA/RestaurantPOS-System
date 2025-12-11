@@ -18,7 +18,7 @@ REM Create output directory
 if not exist "dist" mkdir dist
 
 echo.
-echo [1/3] Building Frontend...
+echo [1/5] Building Frontend...
 echo.
 
 cd restaurant-pos-client
@@ -50,7 +50,7 @@ if %errorLevel% == 0 (
 cd ..
 
 echo.
-echo [2/3] Building Backend...
+echo [2/5] Building Backend...
 echo.
 
 cd RestaurantPOS.API
@@ -82,7 +82,71 @@ if %errorLevel% == 0 (
 cd ..
 
 echo.
-echo [3/3] Creating deployment package...
+echo [3/5] Building Desktop...
+echo.
+
+cd RestaurantPOS.Desktop
+
+REM Clean previous build
+if exist publish (
+    echo Cleaning previous publish...
+    rmdir /s /q publish
+)
+
+REM Publish
+echo Publishing Desktop app...
+call dotnet publish -c Release -o publish
+
+if %errorLevel% == 0 (
+    echo [OK] Desktop build successful!
+    
+    REM Copy to main dist folder
+    echo Copying publish files...
+    xcopy /E /I /Y publish ..\dist\desktop
+    echo [OK] Files copied to dist/desktop
+) else (
+    echo [ERROR] Desktop build failed!
+    cd ..
+    pause
+    exit /b 1
+)
+
+cd ..
+
+echo.
+echo [4/5] Building Manager...
+echo.
+
+cd RestaurantPOS.Manager
+
+REM Clean previous build
+if exist publish (
+    echo Cleaning previous publish...
+    rmdir /s /q publish
+)
+
+REM Publish
+echo Publishing Manager app...
+call dotnet publish -c Release -o publish
+
+if %errorLevel% == 0 (
+    echo [OK] Manager build successful!
+    
+    REM Copy to main dist folder
+    echo Copying publish files...
+    xcopy /E /I /Y publish ..\dist\manager
+    echo [OK] Files copied to dist/manager
+) else (
+    echo [ERROR] Manager build failed!
+    cd ..
+    pause
+    exit /b 1
+)
+
+cd ..
+
+echo.
+echo [5/5] Creating deployment package...
 echo.
 
 REM Copy configuration files
@@ -102,6 +166,8 @@ echo.
 echo Contents:
 echo - frontend/ - React production build
 echo - backend/  - .NET published app
+echo - desktop/  - WPF Desktop POS app
+echo - manager/  - WPF Manager Admin app
 echo.
 echo Deployment Instructions:
 echo.
@@ -117,6 +183,18 @@ echo 3. Configure IIS/nginx/Apache
 echo 4. Update appsettings.json with production values
 echo 5. Setup SQL Server connection
 echo 6. Run migrations on production database
+echo.
+echo Desktop:
+echo 1. Copy contents of desktop/ to client machines
+echo 2. Install .NET Desktop Runtime
+echo 3. Configure appsettings.json to point to Backend API
+echo 4. Run RestaurantPOS.Desktop.exe
+echo.
+echo Manager:
+echo 1. Copy contents of manager/ to admin machines
+echo 2. Install .NET Desktop Runtime
+echo 3. Configure appsettings.json to point to Backend API
+echo 4. Run RestaurantPOS.Manager.exe
 echo.
 echo For detailed instructions, see:
 echo - doc/DEPLOYMENT.md
@@ -134,6 +212,8 @@ echo.
 echo Contents:
 echo - dist/frontend/ - Frontend production build
 echo - dist/backend/  - Backend published files
+echo - dist/desktop/  - Desktop POS application
+echo - dist/manager/  - Manager Admin application
 echo - dist/README.txt - Deployment instructions
 echo.
 echo Next steps:

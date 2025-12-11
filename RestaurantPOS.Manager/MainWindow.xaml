@@ -8,6 +8,7 @@
         Title="System Administration - Restaurant POS" Height="800" Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundColor}"
+        Icon="icons8-restaurant-94.ico"
         FontFamily="Segoe UI">
 
     <Window.Resources>

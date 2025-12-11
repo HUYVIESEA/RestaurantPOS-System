@@ -71,44 +71,64 @@ RestaurantPOS-System/
 │   ├── Data/                   # Database Context
 │   └── appsettings.json        # Configuration
 │
-├── restaurant-pos-client/      # Frontend (React + TypeScript)
+├── restaurant-pos-client/      # Web Client (React + TypeScript)
 │   ├── src/
 │   │   ├── components/         # React Components
 │   │   ├── contexts/           # Context Providers
-│   │   ├── services/           # API Services
-│   │   ├── styles/             # Global Styles
-│   │   ├── utils/              # Utility Functions
-│   │   └── types/              # TypeScript Types
-│   ├── public/                 # Static Assets
-│   └── package.json            # Dependencies
+│   │   └── services/           # API Services
+│   └── public/                 # Static Assets
+│
+├── RestaurantPOS.Desktop/      # POS Desktop App (WPF)
+│   ├── Views/                  # Pages & Windows
+│   ├── ViewModels/             # MVVM ViewModels
+│   └── Services/               # Desktop Services
+│
+├── RestaurantPOS.Manager/      # Manager Dashboard (WPF)
+│   ├── Views/                  # Manager Views
+│   └── ViewModels/             # Manager ViewModels
+│
+├── RestaurantPOS.Android/      # Mobile App (Kotlin)
+│   ├── app/
+│   └── src/
+│
+├── RestaurantPOS.Tests/        # Unit & Integration Tests
 │
 └── doc/                        # Documentation
     ├── INSTALLATION.md
     ├── API_DOCUMENTATION.md
-    ├── USER_GUIDE.md
-    └── DEVELOPER_GUIDE.md
+    └── USER_GUIDE.md
 ```
 
 ---
 
 ## 🎨 Tech Stack
 
-### Frontend
+### Web Frontend
 - **Framework:** React 18 + TypeScript
 - **Build Tool:** Vite
-- **Routing:** React Router v6
-- **HTTP Client:** Axios
-- **Styling:** CSS Variables + Theme System
-- **Icons:** FontAwesome 6
+- **UI Framework:** TailwindCSS + Custom Theme
 - **State Management:** Context API
+- **Maps:** Leaflet / OpenStreetMap
+
+### Desktop Applications (POS & Manager)
+- **Framework:** .NET 8.0 (WPF)
+- **Design:** Material DesignInXaml
+- **Architecture:** MVVM (CommunityToolkit.Mvvm)
+- **Communication:** HTTP Client (RestSharp/HttpClient)
+
+### Mobile App
+- **Language:** Kotlin
+- **Platform:** Android
+- **Networking:** Retrofit
+- **Image Loading:** Glide
 
 ### Backend
 - **Framework:** .NET 8.0
 - **Database:** SQL Server
 - **ORM:** Entity Framework Core
 - **Authentication:** JWT
-- **Email:** SMTP (Gmail)
-- **API:** RESTful
+- **Documentation:** Swagger/OpenAPI
+- **Testing:** xUnit
 
 ---
 
