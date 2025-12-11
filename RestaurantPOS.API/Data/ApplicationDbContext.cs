@@ -100,7 +100,16 @@ namespace RestaurantPOS.API.Data
        .OnDelete(DeleteBehavior.Cascade);
 
        modelBuilder.Entity<PasswordResetToken>()
-  .HasIndex(p => p.Token);
+            .HasIndex(p => p.Token);
+
+            // ✅ Performance Optimization: Add Indexes
+            modelBuilder.Entity<OrderItem>().HasIndex(oi => oi.OrderId);
+            modelBuilder.Entity<OrderItem>().HasIndex(oi => oi.ProductId);
+            modelBuilder.Entity<Order>().HasIndex(o => o.TableId);
+            modelBuilder.Entity<Order>().HasIndex(o => o.OrderDate); // For report filtering
+            modelBuilder.Entity<Payment>().HasIndex(p => p.OrderId);
+            modelBuilder.Entity<Product>().HasIndex(p => p.CategoryId);
+            modelBuilder.Entity<PaymentSettings>().HasIndex(ps => ps.IsActive); // For quick settings lookup
 
     // Seed admin user
    modelBuilder.Entity<User>().HasData(

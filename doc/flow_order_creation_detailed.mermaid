@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant U as User
+    participant UI as Order UI
+    participant S as Order Service
+    participant API as API Controller
+    participant Hub as SignalR Hub
+    participant DB as Database
+
+    U->>UI: Select Category -> Product
+    UI->>UI: Add to Temporary Cart
+    U->>UI: Convert "Ghi chú" (e.g., Ít đá)
+    U->>UI: Click "Gửi Bếp" (Submit)
+    
+    UI->>S: CreateOrderAsync(TableId, Items)
+    S->>API: POST /api/Orders
+    
+    API->>DB: Insert Order
+    API->>DB: Insert OrderItems
+    API->>DB: Update Table.Status = Occupied
+    DB-->>API: Success
+    
+    par Real-time Notify
+        API->>Hub: Send "OrderCreated"
+        Hub-->>UI: Notify All Clients
+        Hub-->>Kitchen: Notify Kitchen Screen
+    end
+    
+    API-->>S: Return Created Order
+    S-->>UI: Show Success Message
+    UI->>UI: Clear Cart & Show Order Details

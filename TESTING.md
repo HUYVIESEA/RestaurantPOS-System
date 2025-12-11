@@ -2,7 +2,19 @@
 
 Tài liệu này cung cấp danh sách các trường hợp kiểm thử (Test Cases) thủ công dành cho hệ thống Restaurant POS. Người kiểm thử vui lòng thực hiện tuần tự và đánh dấu vào các mục đã đạt.
 
-## 1. Kiểm Thử Hệ Thống (Desktop & Manager)
+## 1. Kiểm Thử Giao Diện Tự Động (Automated UI Tests)
+Dự án đã tích hợp kiểm thử giao diện tự động cho Desktop App sử dụng framework FlaUI.
+
+### Hướng dẫn chạy Test:
+1. Đảm bảo đã build dự án Desktop (`RestaurantPOS.Desktop`) ở chế độ Debug.
+2. Mở terminal tại thư mục gốc.
+3. Chạy lệnh:
+   ```bash
+   dotnet test RestaurantPOS.UITests
+   ```
+4. **Lưu ý:** Test sẽ tự động mở ứng dụng Desktop và thực hiện các thao tác chuột/bàn phím. Vui lòng không can thiệp vào máy khi test đang chạy.
+
+## 2. Kiểm Thử Hệ Thống (Manual)
 
 ### A. Quản Lý Dịch Vụ (Manager App)
 - [ ] **Khởi động:** Mở ứng dụng `RestaurantPOS.Manager`.

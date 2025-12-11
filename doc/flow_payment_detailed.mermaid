@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant U as User
+    participant UI as Payment Screen
+    participant Pay as Payment Service
+    participant API as API Controller
+    participant QR as VietQR Service
+    participant DB as Database
+
+    U->>UI: Click "Thanh Toán"
+    UI->>U: Show Total Amount
+    U->>UI: Select Method "Chuyển khoản QR"
+    
+    UI->>Pay: GetSettingsAsync()
+    Pay->>API: GET /api/PaymentSettings
+    API-->>Pay: Return Bank Info (VCB, AccNo)
+    
+    Pay->>QR: Generate QR Link (Amount, Content)
+    QR-->>UI: Return QR Image URL
+    UI->>U: Display QR & Wait
+    
+    U->>UI: Confirm "Khách đã chuyển"
+    UI->>Pay: CompleteOrderAsync(OrderId, Amount)
+    Pay->>API: PUT /api/Orders/{id}/Complete
+    
+    API->>DB: Update Order.Status = Completed
+    API->>DB: Insert Payment Record
+    API->>DB: Update Table.Status = Available
+    
+    API-->>Pay: Success
+    Pay-->>UI: Close Dialog
+    UI->>U: Print Receipt (Optional)

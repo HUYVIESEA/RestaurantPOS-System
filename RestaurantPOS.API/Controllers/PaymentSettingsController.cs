@@ -64,6 +64,14 @@ namespace RestaurantPOS.API.Controllers
                     return BadRequest(new { message = "Request body is required" });
                 }
 
+                if (string.IsNullOrWhiteSpace(request.BankName) || 
+                    string.IsNullOrWhiteSpace(request.BankBin) || 
+                    string.IsNullOrWhiteSpace(request.AccountNumber) || 
+                    string.IsNullOrWhiteSpace(request.AccountName))
+                {
+                    return BadRequest(new { message = "Vui lòng điền đầy đủ thông tin ngân hàng" });
+                }
+
                 if (string.IsNullOrEmpty(request.Password))
                 {
                     return BadRequest(new { message = "Mật khẩu là bắt buộc" });

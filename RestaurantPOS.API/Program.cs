@@ -24,6 +24,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
         // ✅ NEW: Force UTC timezone in DateTime serialization
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        // Fix: Enable case-insensitive property matching for JSON binding
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
 
 // Configure Entity Framework with PostgreSQL

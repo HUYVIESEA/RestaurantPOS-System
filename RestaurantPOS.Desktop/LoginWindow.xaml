@@ -55,6 +55,7 @@
                 <!-- Login Form -->
                 <StackPanel Grid.Row="1" Margin="50,0">
                     <TextBox materialDesign:HintAssist.Hint="Tên đăng nhập" 
+                             AutomationProperties.AutomationId="txtUsername"
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                              Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
                              FontSize="16" Margin="0,0,0,25"
@@ -67,6 +68,7 @@
 
                     <PasswordBox x:Name="txtPassword"
                                  materialDesign:HintAssist.Hint="Mật khẩu"
+                                 AutomationProperties.AutomationId="txtPassword"
                                  Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
                                  FontSize="16" Margin="0,0,0,10"
                                  PasswordChanged="PasswordBox_PasswordChanged"
@@ -80,6 +82,7 @@
                     <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextWrapping="Wrap" Margin="0,10,0,20" HorizontalAlignment="Center"/>
 
                     <Button Content="ĐĂNG NHẬP" Height="55" Margin="0,10,0,0"
+                            AutomationProperties.AutomationId="btnLogin"
                             Style="{StaticResource MaterialDesignRaisedButton}"
                             materialDesign:ButtonAssist.CornerRadius="27.5"
                             FontSize="18" FontWeight="Bold"

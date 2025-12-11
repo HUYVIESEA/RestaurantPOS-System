@@ -1,0 +1,38 @@
+flowchart TD
+    subgraph "1. Login Process"
+        A[Start App] --> B{Has Token?}
+        B -- Yes --> C[Validate Token]
+        B -- No --> D[Show Login Form]
+        D --> E[Enter Username/Password]
+        E --> F[Call API /login]
+        F -- Success --> G[Save Token]
+        F -- Fail --> H[Show Error]
+        G --> I[Connect SignalR]
+        I --> J[Load Main Dashboard]
+    end
+
+    subgraph "2. Order Process"
+        K[Select Table] --> L[Load Menu]
+        L --> M[Add Items to Cart]
+        M --> N{Is New Order?}
+        N -- Yes --> O[Create Order API]
+        N -- No --> P[Add Items API]
+        O --> Q[Database Save]
+        P --> Q
+        Q --> R[SignalR Broadcast]
+        R --> S[Update Kitchen/Table UI]
+    end
+
+    subgraph "3. Payment Process"
+        T[Request Checkout] --> U[Load Order Details]
+        U --> V[Select Payment Method]
+        V -- Cash --> W[Confirm Amount]
+        V -- QR Code --> X[Get Bank Info API]
+        X --> Y[Generate VietQR Link]
+        Y --> Z[Show QR on Screen]
+        Z --> AA[Confirm Payment]
+        W --> AB[Call API /pay]
+        AA --> AB
+        AB --> AC[Update Order Status]
+        AC --> AD[Free Table]
+    end

@@ -1,0 +1,59 @@
+flowchart TD
+    %% Define styles
+    classDef api fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef desktop fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef db fill:#bfb,stroke:#333,stroke-width:2px;
+    classDef signalr fill:#ffd700,stroke:#333,stroke-width:2px;
+
+    subgraph Desktop["Desktop App (WPF)"]
+        UI_Login["Login Window"]:::desktop
+        UI_Main["Main Window"]:::desktop
+        Service_Auth["AuthService.cs"]:::desktop
+        Service_Order["OrderService.cs"]:::desktop
+        Service_SignalR["SignalRService.cs"]:::desktop
+        UserSession["UserSession (Singleton)"]:::desktop
+        
+        UI_Login --> Service_Auth
+        Service_Auth --> UserSession
+        UI_Main --> Service_Order
+        UI_Main --> Service_SignalR
+        Service_SignalR --> UI_Main
+    end
+
+    subgraph API["Backend API (.NET 8)"]
+        Controller_Auth["AuthController.cs"]:::api
+        Controller_Order["OrdersController.cs"]:::api
+        Hub_Restaurant["RestaurantHub.cs"]:::signalr
+        Service_OrderCore["OrderService.cs (Core)"]:::api
+        
+        Controller_Auth --> DB_Users
+        Controller_Order --> Service_OrderCore
+        Service_OrderCore --> DB_Orders
+        Service_OrderCore --> Hub_Restaurant
+        Hub_Restaurant --> Service_SignalR
+    end
+
+    subgraph Database["PostgreSQL"]
+        DB_Users[("Users Table")]:::db
+        DB_Orders[("Orders Table")]:::db
+        DB_OrderItems[("OrderItems Table")]:::db
+        DB_Payments[("Payments Table")]:::db
+        
+        DB_Orders --- DB_OrderItems
+        DB_Orders --- DB_Payments
+    end
+
+    %% Data Flows
+    Service_Auth -- "POST /api/auth/login" --> Controller_Auth
+    Service_Order -- "POST /api/orders" --> Controller_Order
+    Service_Order -- "GET /api/orders/table/{id}" --> Controller_Order
+    Service_SignalR -- "Connect /restaurantHub" --> Hub_Restaurant
+    
+    %% Real-time Events
+    Hub_Restaurant -.->|"On('OrderCreated')"| Service_SignalR
+    Hub_Restaurant -.->|"On('TableUpdated')"| Service_SignalR
+
+    %% Detailed Logic Flow: Create Order
+    Service_OrderCore -- "1. Validate & Calc Total" --> Service_OrderCore
+    Service_OrderCore -- "2. Update Table Status" --> DB_Orders
+    Service_OrderCore -- "3. Broadcast Event" --> Hub_Restaurant
