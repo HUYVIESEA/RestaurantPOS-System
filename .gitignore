@@ -205,3 +205,5 @@ appsettings.Development.json
 secrets.json
 ngrok.exe
 ngrok.yml
+docker-compose.yml
+doc
