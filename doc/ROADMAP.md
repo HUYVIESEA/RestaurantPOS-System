@@ -1,7 +1,7 @@
 # 🗺️ Product Roadmap - Restaurant POS System
 
-**Version:** 2.0.0  
-**Last Updated:** January 15, 2024
+**Version:** 2.1.0-beta
+**Last Updated:** December 11, 2025
 
 This roadmap outlines the planned features and improvements for Restaurant POS System.
 
@@ -9,105 +9,56 @@ This roadmap outlines the planned features and improvements for Restaurant POS S
 
 ## 📋 Table of Contents
 
-1. [Current Version (v2.0)](#current-version-v20)
-2. [Next Release (v2.1)](#next-release-v21---q1-2024)
-3. [Version 3.0](#version-30---q2-2024)
-4. [Version 4.0](#version-40---q4-2024)
-5. [Future Considerations](#future-considerations)
-6. [Feature Requests](#feature-requests)
+1. [Current Version (v2.1)](#current-version-v21)
+2. [Next Release (v2.2)](#next-release-v22---q1-2026)
+3. [Version 3.0](#version-30---q2-2026)
+4. [Future Considerations](#future-considerations)
+5. [Feature Requests](#feature-requests)
 
 ---
 
-## ✅ Current Version (v2.0)
+## ✅ Current Version (v2.1)
 
-**Released:** January 15, 2024  
-**Status:** Production Ready
+**Released:** December 11, 2025
+**Status:** Pre-release / Beta
 
 ### Completed Features
 
 **Core Functionality:**
-- ✅ User authentication & authorization
-- ✅ Product management (CRUD)
-- ✅ Category management
-- ✅ Table management
-- ✅ Order management
-- ✅ Analytics dashboard
-- ✅ User management (Admin only)
-
-**UI/UX:**
-- ✅ Dark mode
-- ✅ Responsive design (mobile, tablet, desktop)
-- ✅ Toast notifications
-- ✅ Skeleton loading states
-- ✅ Modern, intuitive interface
+- ✅ **Material Design UI**: Desktop App completely redesigned.
+- ✅ **Reporting**: Export to CSV/Excel, Real-time Dashboard fixes.
+- ✅ **Packaging**: Inno Setup installer & Build Automation.
+- ✅ **Table Management**: Real-time filters and status updates.
 
 **Technical:**
-- ✅ React 18 + TypeScript
-- ✅ .NET 8.0 Web API
-- ✅ SQL Server database
-- ✅ JWT authentication
-- ✅ Email verification
-- ✅ Password reset
-- ✅ Comprehensive documentation
+- ✅ .NET 8.0 & React 18
+- ✅ Inno Setup integration
+- ✅ Automated CI Build script
 
 ---
 
-## 🚧 Next Release (v2.1) - Q1 2024
+## 🚧 Next Release (v2.2) - Q1 2026
 
-**Target:** March 2024  
-**Focus:** Testing, Polish & Minor Features
+**Target:** February 2026
+**Focus:** Performance & Android Integration
 
 ### Planned Features
 
-**Testing (High Priority):**
-- [ ] Frontend unit tests (Jest + React Testing Library)
-- [ ] Backend unit tests (xUnit)
-- [ ] Integration tests
-- [ ] E2E tests (Cypress)
-- [ ] Test coverage > 80%
+**Mobile App:**
+- [ ] Complete Android Order taking flow.
+- [ ] Sync with Desktop POS in real-time.
 
-**Improvements:**
-- [ ] Enhanced search functionality
-  - [ ] Advanced filters
-  - [ ] Full-text search
-  - [ ] Search history
-- [ ] Bulk operations
-  - [ ] Bulk product import (CSV)
-  - [ ] Bulk delete
-  - [ ] Bulk update
-- [ ] Enhanced reporting
-  - [ ] PDF export
-  - [ ] Excel export
-  - [ ] Custom date ranges
-  - [ ] More chart types
+**Optimization:**
+- [ ] React Native app Performance tuning.
+- [ ] Database index optimization for large datasets.
 
-**Bug Fixes:**
-- [ ] Fix minor UI glitches
-- [ ] Improve error messages
-- [ ] Edge case handling
-
-**Documentation:**
-- [ ] Video tutorials
-- [ ] Interactive demo
-- [ ] API examples collection
+**Packaging:**
+- [ ] Auto-update mechanism for Desktop App.
+- [ ] Signed Installer.
 
 ### Timeline
 
 ```
-Week 1-2:   Unit test infrastructure
-Week 3-4:   Write tests (Frontend)
-Week 5-6:   Write tests (Backend)
-Week 7-8:   Enhanced search & filters
-Week 9-10:  Bulk operations
-Week 11-12: Reporting enhancements
-Week 13:    Testing & bug fixes
-Week 14:    Release v2.1
-```
-
----
-
-## 🎯 Version 3.0 - Q2 2024
-
 **Target:** June 2024  
 **Focus:** Advanced Features & Integrations
 
@@ -224,9 +175,9 @@ Month 6:  Release v3.0
 
 ---
 
-## 🚀 Version 4.0 - Q4 2024
+## 🚀 Version 4.0 - Q4 2026
 
-**Target:** December 2024  
+**Target:** December 2026  
 **Focus:** Enterprise Features & Scale
 
 ### Major Features
@@ -397,7 +348,7 @@ Month 6:  KDS & Testing
 
 | Feature | Votes | Status | Planned |
 |---------|-------|--------|---------|
-| PDF/Excel Export | 45 | 📋 Planned | v2.1 |
+| PDF/Excel Export | 45 | ✅ Completed | v2.1 |
 | Payment Integration | 38 | 📋 Planned | v3.0 |
 | Mobile App | 32 | 📋 Planned | v3.0 |
 | Multi-language | 28 | 📋 Planned | v3.0 |
@@ -539,16 +490,15 @@ PATCH: Bug fixes
 
 ### Recent Updates
 
-**January 15, 2024:**
-- ✅ Released v2.0
-- 📋 Planned v2.1 features
-- 📋 Outlined v3.0 and v4.0
-
+**December 11, 2025:**
+- ✅ Released v2.1 Beta
+- 📋 Planned v2.2 features (Mobile Focus)
+- 📋 Outlined v3.0 and v4.0 (2026 plans)
+ 
 **Previous Milestones:**
+- January 2024: v2.0 Production Ready
 - December 2023: Dark mode completed
 - November 2023: Analytics dashboard
-- October 2023: User management
-- September 2023: MVP launched
 
 ---
 
@@ -563,8 +513,8 @@ Thank you for using Restaurant POS System!
 
 ---
 
-**Roadmap Version:** 2.0.0  
-**Last Updated:** January 15, 2024  
-**Next Review:** April 15, 2024
+**Roadmap Version:** 2.1.0-beta
+**Last Updated:** December 11, 2025
+**Next Review:** March 2026
 
 **The future is bright!** 🚀✨

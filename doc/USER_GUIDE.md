@@ -1,7 +1,7 @@
 # 📖 User Guide - Restaurant POS System
 
-**Version:** 2.0.0  
-**Last Updated:** January 15, 2024
+**Version:** 2.1.0-beta
+**Last Updated:** December 11, 2025
 
 Hướng dẫn chi tiết sử dụng hệ thống quản lý nhà hàng Restaurant POS.
 
@@ -444,6 +444,16 @@ Xem giờ có nhiều đơn nhất:
 - So sánh với tuần trước
 - Xu hướng
 
+### Xuất Báo Cáo
+ 
+**Các loại báo cáo hỗ trợ xuất ra Excel (.csv):**
+1. **Báo cáo doanh thu:** Chi tiết doanh thu theo ngày/tháng.
+2. **Danh sách đơn hàng:** Chi tiết từng đơn hàng.
+ 
+**Thao tác:**
+- Click nút **"Xuất Báo Cáo"** ở góc phải màn hình Báo cáo.
+- Chọn nơi lưu file trên máy tính.
+
 ---
 
 ## ⚙️ Cài Đặt Cá Nhân
@@ -601,9 +611,9 @@ Email: feedback@bundaumet.com
 
 ---
 
-**Phiên bản:** 2.0.0  
-**Cập nhật:** January 15, 2024  
-**© 2024 Restaurant POS Team**
+**Phiên bản:** 2.1.0-beta
+**Cập nhật:** December 11, 2025
+**© 2025 Restaurant POS Team**
 
 ---
 

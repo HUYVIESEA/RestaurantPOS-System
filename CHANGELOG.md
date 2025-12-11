@@ -7,7 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.1.0] - 2025-11-21
+## [2.1.0-beta] - 2025-12-11
+ 
+ ### 🚀 Major Updates
+ - **Material Design UI**: Complete visual overhaul for Desktop App using Material Design.
+ - **Reports System**: Fixed Dashboard data and added CSV export for Revenue/Orders.
+ - **Packaging**: Added `setup.iss` for Inno Setup and auto-build scripts.
+ 
+ ### Added
+ - ✨ **Desktop UI**:
+   - New Table Card design (cleaner, status indicators).
+   - Real-time table timer (updates every second).
+   - Table status filtering (All/Available/Occupied).
+ - 📊 **Reporting**:
+   - Export Revenue Report to CSV.
+   - Export Order List to CSV.
+ - 🛠️ **DevOps**:
+   - `setup.iss`: Installer script for Windows.
+   - `build-ci.bat`: Automated build and test script.
+   - All-in-One Server packaging.
+ 
+ ### Fixed
+ - 🐛 **Order Handling**: Fixed `Note` field not saving correctly in Orders.
+ - 🐛 **Dashboard**: Fixed zero-data issue in Revenue and Order counts.
+ - 🐛 **Startup**: Fixed Desktop App crash due to missing Material Design resources.
+ - 🐛 **Database**: Fixed Table status synchronization logic.
+ 
+ ---
+ 
+ ## [2.1.0] - 2025-11-21
 
 ### 🔐 Security & Authorization Update
 

@@ -1,22 +1,20 @@
 # 📊 Restaurant POS System - Project Summary
 
-**Version:** 2.0.0  
-**Status:** Production Ready  
-**Last Updated:** January 15, 2024
+**Version:** 2.1.0-beta (Latest)
+**Status:** Production Ready / Pre-release
+**Last Updated:** December 11, 2025
 
 ---
 
 ## 🎯 Project Overview
 
-**Restaurant POS System** là một hệ thống quản lý nhà hàng toàn diện, được xây dựng với công nghệ hiện đại, giao diện đẹp mắt và trải nghiệm người dùng tối ưu.
+**RestaurantPOS System** là hệ thống quản lý nhà hàng toàn diện, bao gồm Desktop App (WPF) cho thu ngân, Web Client (React) cho quản lý và Android App cho nhân viên phục vụ.
 
 ### Key Highlights
-- ✅ **100% Complete** - All planned features implemented
-- ✅ **Production Ready** - Tested and optimized
-- ✅ **Modern UI/UX** - Beautiful, intuitive interface
-- ✅ **Fully Responsive** - Works on all devices
-- ✅ **Dark Mode** - Complete theme system
-- ✅ **Well Documented** - Comprehensive documentation
+*   ✅ **Nâng cấp giao diện Desktop:** Tích hợp Material Design, cải thiện hiển thị danh sách bàn và bộ lọc.
+*   ✅ **Hoàn thiện chức năng Báo cáo:** Sửa lỗi hiển thị dữ liệu Dashboard, thêm chức năng xuất báo cáo CSV.
+*   ✅ **Sửa lỗi API:** Khắc phục lỗi lưu `Note` (ghi chú) đơn hàng và xử lý trạng thái bàn ăn.
+*   ✅ **Quy trình triển khai:** Tạo file cài đặt tự động (`setup.iss`, `build-ci.bat`), đóng gói All-in-One server.
 
 ---
 
@@ -25,23 +23,36 @@
 ### Code Metrics
 | Metric | Count |
 |--------|-------|
-| **Total Files** | 150+ |
-| **Lines of Code** | 15,000+ |
-| **Components** | 24 |
-| **API Endpoints** | 50+ |
-| **CSS Variables** | 200+ |
-| **Documentation Files** | 15+ |
+| **Total Files** | 180+ |
+| **Lines of Code** | 20,000+ |
+| **Components** | 35+ |
+| **API Endpoints** | 60+ |
+| **Documentation Files** | 22+ |
+| **Tests** | ~85% Coverage (Needs Update) |
 
-### Development Timeline
-| Phase | Duration | Status |
-|-------|----------|--------|
-| Planning & Design | 1 week | ✅ Complete |
-| Backend Development | 2 weeks | ✅ Complete |
-| Frontend Development | 3 weeks | ✅ Complete |
-| UI/UX Enhancement | 2 weeks | ✅ Complete |
-| Testing & Bug Fixes | 1 week | ✅ Complete |
-| Documentation | 1 week | ✅ Complete |
-| **Total** | **10 weeks** | ✅ Complete |
+---
+
+## 🛠️ Components Status
+
+### 🖥️ Desktop App (WPF)
+*   **Trạng thái:** Ổn định (Stable).
+*   **Giao diện:** Material Design (Card bàn ăn trực quan, Bộ lọc trạng thái).
+*   **Chức năng:** Order, Thanh toán, In hóa đơn, Báo cáo (Chart/Table), Xuất Excel/CSV.
+*   **Hiệu năng:** Tối ưu hóa Timer bàn ăn (Realtime).
+
+### 🌐 Web Client (React)
+*   **Trạng thái:** Hoàn thiện (Production Ready).
+*   **Giao diện:** Responsive, Dark Mode.
+*   **Chức năng:** Dashboard, Quản lý sản phẩm, Báo cáo từ xa.
+
+### 📱 Android App (Kotlin)
+*   **Trạng thái:** Đang phát triển (Beta).
+*   **Chức năng:** Xem menu, Order món tại bàn.
+
+### ⚙️ Backend API (.NET 8)
+*   **Trạng thái:** Ổn định.
+*   **Database:** SQL Server, Entity Framework Core 8.
+*   **API Response:** < 100ms trung bình.
 
 ---
 
@@ -240,30 +251,12 @@ var backendStack = new {
 
 ## 📚 Documentation
 
-### User Documentation
-1. **USER_GUIDE.md** - Complete user manual
-2. **QUICKSTART.md** - Quick start guide
-3. **FAQ.md** - Frequently asked questions
+Detailed documentation is available in the `doc/` directory:
 
-### Developer Documentation
-1. **INSTALLATION.md** - Setup instructions
-2. **DEVELOPER_GUIDE.md** - Development guide
-3. **API_DOCUMENTATION.md** - API reference
-4. **CONTRIBUTING.md** - Contribution guidelines
-
-### Technical Documentation
-1. **ARCHITECTURE.md** - System architecture
-2. **DATABASE_SCHEMA.md** - Database design
-3. **DARK_MODE_IMPLEMENTATION.md** - Dark mode guide
-4. **THEME_VARIABLES_REFERENCE.md** - CSS variables
-5. **TESTING_CHECKLIST.md** - Testing guide
-
-### Specialized Documentation
-1. **COMPONENT_AUDIT_REPORT.md** - Component status
-2. **NAVBAR_RESPONSIVE_TESTING.md** - Navbar testing
-3. **FORCE_REFRESH_GUIDE.md** - Cache clearing
-4. **CRITICAL_DARK_MODE_FIXES.md** - Dark mode fixes
-5. **ALL_FIXES_COMPLETED.md** - Fix summary
+*   **[USER_GUIDE.md](USER_GUIDE.md):** Hướng dẫn sử dụng chi tiết.
+*   **[INSTALLATION.md](INSTALLATION.md):** Hướng dẫn cài đặt và triển khai.
+*   **[API_DOCUMENTATION.md](API_DOCUMENTATION.md):** Tài liệu kỹ thuật API.
+*   **[ROADMAP.md](ROADMAP.md):** Kế hoạch phát triển.
 
 ---
 
@@ -338,30 +331,10 @@ var backendStack = new {
 
 ## 📦 Deployment
 
-### Production Checklist
-- [x] Environment variables configured
-- [x] Database migrations ready
-- [x] Production build tested
-- [x] Security audit passed
-- [x] Performance optimized
-- [x] Documentation complete
-- [x] Backup strategy defined
-- [x] Monitoring setup
-- [ ] SSL certificate (pending deployment)
-- [ ] Domain configured (pending deployment)
-
-### Deployment Options
-1. **Frontend:**
-   - Netlify
-   - Vercel
-   - Azure Static Web Apps
-   - AWS S3 + CloudFront
-
-2. **Backend:**
-   - Azure App Service
-   - AWS EC2
-   - Digital Ocean
-   - Self-hosted IIS
+Hệ thống hỗ trợ đóng gói tự động:
+*   **Build Script:** `build-ci.bat` (Clean build & Test).
+*   **Installer:** `setup.iss` (Tạo bộ cài đặt Windows).
+*   **All-in-One:** Server tích hợp sẵn Web Client.
 
 ---
 
@@ -424,45 +397,20 @@ var backendStack = new {
 
 ---
 
-## 🏆 Achievements
+## 🏆 Achievements (Dec 2025)
 
-### Milestones Reached
-- ✅ MVP Completed
-- ✅ UI/UX Overhaul Complete
-- ✅ Dark Mode Implemented
-- ✅ Responsive Design Complete
-- ✅ Production Ready
-- ✅ Full Documentation
-
-### Quality Metrics
-- ⭐⭐⭐⭐⭐ Code Quality
-- ⭐⭐⭐⭐⭐ UI/UX Design
-- ⭐⭐⭐⭐⭐ Performance
-- ⭐⭐⭐⭐⭐ Documentation
-- ⭐⭐⭐⭐☆ Test Coverage
-
-**Overall Rating: 4.9/5.0** ⭐⭐⭐⭐⭐
+*   ✅ **Packaging:** Hoàn thiện bộ cài đặt `.exe` cho khách hàng.
+*   ✅ **Reports:** Xuất dữ liệu doanh thu chính xác.
+*   ✅ **UI/UX:** Giao diện Desktop hiện đại, chuyên nghiệp với Material Design.
+*   ✅ **Performance:** Không còn tình trạng lag khi tải danh sách bàn lớn.
 
 ---
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) file for details.
+MIT License - See [LICENSE](../LICENSE) file for details.
 
 ---
 
-## 🎉 Conclusion
-
-**Restaurant POS System v2.0** is a complete, production-ready application with modern architecture, beautiful UI, and comprehensive features. It represents 10 weeks of development effort and includes everything needed for a professional restaurant management system.
-
-**Status:** ✅ **READY FOR PRODUCTION DEPLOYMENT**
-
----
-
-**Last Updated:** January 15, 2024  
-**Version:** 2.0.0  
 **Maintained by:** Restaurant POS Team
-
----
-
-**⭐ Star this project if you find it useful! ⭐**
+**Last Build:** December 2025
