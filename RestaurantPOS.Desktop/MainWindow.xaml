@@ -18,6 +18,8 @@
         TextElement.FontSize="14"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
+        RenderOptions.BitmapScalingMode="HighQuality"
+        RenderOptions.ClearTypeHint="Enabled"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}">
 
@@ -321,6 +323,20 @@
                                 <TextBlock Text="Quản lý trạng thái và phục vụ" FontSize="14" Foreground="Gray" Margin="0,5,0,0"/>
                             </StackPanel>
 
+                            <!-- Take Away Button -->
+                            <Button Grid.ColumnSpan="2" Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding SelectTakeAwayCommand}"
+                                    Width="120" Height="40"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Background="{DynamicResource PrimaryHueMidBrush}" BorderThickness="0"
+                                    materialDesign:ButtonAssist.CornerRadius="20"
+                                    ToolTip="Tạo đơn mang về">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:IconImage Icon="ShoppingBag" Foreground="White" Height="16" Width="16" Margin="0,0,10,0"/>
+                                    <TextBlock Text="Mang về" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Button>
+
                             <!-- Merge Actions -->
                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                 <Button Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,10,0"
@@ -360,7 +376,7 @@
                         </Border>
 
                         <!-- 3. Table Grid (Premium SaaS Design) -->
-                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="5">
+                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="5" PanningMode="VerticalOnly">
                             <ItemsControl ItemsSource="{Binding TablesView}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -380,7 +396,7 @@
                                                         <!-- Main Card -->
                                                         <Border x:Name="CardBorder" Background="White" CornerRadius="12" BorderBrush="#E0E0E0" BorderThickness="1">
                                                             <Border.Effect>
-                                                                <DropShadowEffect BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.08"/>
+                                                                <DropShadowEffect BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.08" RenderingBias="Performance"/>
                                                             </Border.Effect>
                                                             
                                                             <Grid>
@@ -468,7 +484,7 @@
                                                         <Trigger Property="IsMouseOver" Value="True">
                                                             <Setter TargetName="CardBorder" Property="Effect">
                                                                 <Setter.Value>
-                                                                    <DropShadowEffect BlurRadius="12" ShadowDepth="4" Direction="270" Opacity="0.15"/>
+                                                                    <DropShadowEffect BlurRadius="12" ShadowDepth="4" Direction="270" Opacity="0.15" RenderingBias="Performance"/>
                                                                 </Setter.Value>
                                                             </Setter>
                                                             <Setter TargetName="CardBorder" Property="RenderTransform">
@@ -519,69 +535,82 @@
                                              HorizontalAlignment="Center" VerticalAlignment="Center"
                                              Width="50" Height="50"/>
                                 
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" PanningMode="VerticalOnly" Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                                     <ItemsControl ItemsSource="{Binding ProductsView}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <WrapPanel />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <materialDesign:Card Width="200" Height="250" Margin="0,0,20,20" UniformCornerRadius="10"
-                                                                     materialDesign:ShadowAssist.ShadowDepth="Depth1"
-                                                                     CacheMode="BitmapCache">
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="140"/>
-                                                            <RowDefinition Height="*"/>
-                                                        </Grid.RowDefinitions>
-                                                            <Border Background="#EEE" CornerRadius="10,10,0,0" ClipToBounds="True">
+                                                <Button Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                                        Padding="0" Margin="0,0,20,20" Width="200" Height="250">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <materialDesign:Card x:Name="Card" UniformCornerRadius="10" materialDesign:ShadowAssist.ShadowDepth="Depth1" Background="White">
                                                                 <Grid>
-                                                                    <materialDesign:PackIcon Kind="Image" Width="60" Height="60" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray" Opacity="0.5">
-                                                                        <materialDesign:PackIcon.Style>
-                                                                            <Style TargetType="materialDesign:PackIcon">
-                                                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                                                <Style.Triggers>
-                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="{x:Null}">
-                                                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                                                    </DataTrigger>
-                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="">
-                                                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                                                    </DataTrigger>
-                                                                                </Style.Triggers>
-                                                                            </Style>
-                                                                        </materialDesign:PackIcon.Style>
-                                                                    </materialDesign:PackIcon>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="140"/>
+                                                                        <RowDefinition Height="*"/>
+                                                                    </Grid.RowDefinitions>
+                                                                    <Border Background="#F5F5F5" CornerRadius="10,10,0,0" ClipToBounds="True">
+                                                                        <Grid>
+                                                                            <materialDesign:PackIcon Kind="Image" Width="60" Height="60" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#BDBDBD"/> 
+                                                                            <Image Source="{Binding ImageUrl}" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                            
+                                                                            <!-- Hover Overlay -->
+                                                                            <Border x:Name="HoverOverlay" Background="#20000000" Opacity="0"/>
+                                                                        </Grid>
+                                                                    </Border>
                                                                     
-                                                                    <Image Source="{Binding ImageUrl}" Stretch="UniformToFill">
-                                                                         <Image.Style>
-                                                                            <Style TargetType="Image">
-                                                                                <Setter Property="Visibility" Value="Visible"/>
-                                                                                <Style.Triggers>
-                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="{x:Null}">
-                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                                                    </DataTrigger>
-                                                                                    <DataTrigger Binding="{Binding ImageUrl}" Value="">
-                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                                                    </DataTrigger>
-                                                                                </Style.Triggers>
-                                                                            </Style>
-                                                                         </Image.Style>
-                                                                    </Image>
+                                                                    <StackPanel Grid.Row="1" Margin="12">
+                                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis" Foreground="#424242"/>
+                                                                        <TextBlock Text="{Binding Price, StringFormat={}{0:N0} đ}" Foreground="{DynamicResource PrimaryHueMidBrush}" FontWeight="ExtraBold" FontSize="15" Margin="0,5,0,0"/>
+                                                                        
+                                                                        <!-- Add Action Hint -->
+                                                                        <Border x:Name="AddAction" Background="{DynamicResource PrimaryHueMidBrush}" CornerRadius="15" Height="30" Width="30" 
+                                                                                HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,-20,0,0" Opacity="0">
+                                                                            <fa:IconImage Icon="Plus" Foreground="White" Height="12" Width="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        </Border>
+                                                                    </StackPanel>
                                                                 </Grid>
-                                                            </Border>
-                                                        <StackPanel Grid.Row="1" Margin="10">
-                                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis"/>
-                                                            <TextBlock Text="{Binding Price, StringFormat={}{0:N0} đ}" Foreground="{DynamicResource PrimaryHueMidBrush}" FontWeight="Bold" Margin="0,5,0,0"/>
-                                                            <Button Style="{StaticResource MaterialDesignOutlinedButton}" Height="30" Margin="0,5,0,0"
-                                                                    Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                    CommandParameter="{Binding}">
-                                                                <TextBlock Text="Thêm" FontSize="12"/>
-                                                            </Button>
-                                                        </StackPanel>
-                                                    </Grid>
-                                                </materialDesign:Card>
+                                                                
+                                                                <materialDesign:Card.Effect>
+                                                                    <DropShadowEffect BlurRadius="5" ShadowDepth="1" Direction="270" Opacity="0.1" RenderingBias="Performance"/>
+                                                                </materialDesign:Card.Effect>
+                                                            </materialDesign:Card>
+                                                            
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Card" Property="Effect">
+                                                                        <Setter.Value>
+                                                                            <DropShadowEffect BlurRadius="15" ShadowDepth="5" Direction="270" Opacity="0.2" RenderingBias="Performance"/>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                    <Setter TargetName="HoverOverlay" Property="Opacity" Value="1"/>
+                                                                    <Setter TargetName="AddAction" Property="Opacity" Value="1"/>
+                                                                    <!-- Lift Effect -->
+                                                                    <Setter TargetName="Card" Property="RenderTransform">
+                                                                        <Setter.Value>
+                                                                             <TranslateTransform Y="-4"/>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Trigger>
+                                                                <Trigger Property="IsPressed" Value="True">
+                                                                    <Setter TargetName="Card" Property="RenderTransform">
+                                                                        <Setter.Value>
+                                                                             <ScaleTransform ScaleX="0.98" ScaleY="0.98" CenterX="100" CenterY="125"/>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -590,7 +619,7 @@
                         </Grid>
 
                         <!-- Order Panel (Bill) -->
-                        <materialDesign:Card Grid.Column="1" Background="White" UniformCornerRadius="10" VerticalAlignment="Stretch">
+                        <materialDesign:Card Grid.Column="1" Background="White" UniformCornerRadius="10" VerticalAlignment="Stretch" materialDesign:ShadowAssist.ShadowDepth="Depth1">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="60"/>
@@ -623,8 +652,28 @@
                                 </Border>
 
                                 <!-- Bill Items -->
-                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,10">
-                                    <ItemsControl ItemsSource="{Binding CartItems}">
+                                <Grid Grid.Row="1">
+                                    <!-- Empty State -->
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                Visibility="{Binding CartItems.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
+                                        <Image Source="pack://application:,,,/Res/icon/restaurant.ico" Height="60" Width="60" Opacity="0.2" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Chưa có món nào" Foreground="Gray" Margin="0,15,0,0" HorizontalAlignment="Center" FontSize="16"/>
+                                        <TextBlock Text="Vui lòng chọn món từ thực đơn" Foreground="Silver" Margin="0,5,0,0" HorizontalAlignment="Center" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- List -->
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,10">
+                                        <ScrollViewer.Style>
+                                            <Style TargetType="ScrollViewer" BasedOn="{StaticResource MaterialDesignScrollViewer}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding CartItems.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ScrollViewer.Style>
+                                        <ItemsControl ItemsSource="{Binding CartItems}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -680,6 +729,7 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </ScrollViewer>
+                                </Grid>
 
                                 <!-- Bill Summary & Actions -->
                                 <StackPanel Grid.Row="2" Background="#FAFAFA" Margin="0,10,0,0">
@@ -760,7 +810,7 @@
                                     <Trigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3" DecelerationRatio="0.9"/>
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </Trigger.EnterActions>
@@ -779,7 +829,7 @@
                                     <Trigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3" DecelerationRatio="0.9"/>
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </Trigger.EnterActions>
@@ -798,7 +848,7 @@
                                     <Trigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3" DecelerationRatio="0.9"/>
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </Trigger.EnterActions>
@@ -817,7 +867,7 @@
                                     <Trigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3" DecelerationRatio="0.9"/>
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </Trigger.EnterActions>
@@ -836,7 +886,7 @@
                                     <Trigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3" DecelerationRatio="0.9"/>
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </Trigger.EnterActions>
@@ -855,7 +905,7 @@
                                     <Trigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3" DecelerationRatio="0.9"/>
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </Trigger.EnterActions>

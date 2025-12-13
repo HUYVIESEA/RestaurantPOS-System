@@ -38,7 +38,7 @@ namespace RestaurantPOS.Desktop.Services
             }
         }
 
-        public async Task<List<Order>> GetAllOrdersAsync()
+        public async Task<PagedResult<Order>> GetOrdersAsync(int page = 1, int pageSize = 10)
         {
             try
             {
@@ -47,12 +47,12 @@ namespace RestaurantPOS.Desktop.Services
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                var orders = await _httpClient.GetFromJsonAsync<List<Order>>($"{Constants.ApiBaseUrl}/Orders", options);
-                return orders ?? new List<Order>();
+                var result = await _httpClient.GetFromJsonAsync<PagedResult<Order>>($"{Constants.ApiBaseUrl}/Orders?page={page}&pageSize={pageSize}", options);
+                return result ?? new PagedResult<Order>();
             }
             catch
             {
-                return new List<Order>();
+                return new PagedResult<Order>();
             }
         }
 

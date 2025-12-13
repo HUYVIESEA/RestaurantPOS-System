@@ -19,11 +19,10 @@ namespace RestaurantPOS.API.Services
             startDate = startDate.ToUniversalTime();
             endDate = endDate.ToUniversalTime();
 
-            var orders = await _context.Orders
+            // Perform grouping and aggregation in the database
+            var dailyRevenue = await _context.Orders
+                .AsNoTracking()
                 .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate && o.Status == "Completed")
-                .ToListAsync();
-
-            var dailyRevenue = orders
                 .GroupBy(o => o.OrderDate.Date)
                 .Select(g => new DailyRevenueDto
                 {
@@ -32,10 +31,11 @@ namespace RestaurantPOS.API.Services
                     OrderCount = g.Count()
                 })
                 .OrderBy(d => d.Date)
-                .ToList();
+                .ToListAsync();
 
-            var totalRevenue = orders.Sum(o => o.TotalAmount);
-            var totalOrders = orders.Count;
+            // Calculate totals from the aggregated data (avoiding another DB query or fetching all records)
+            var totalRevenue = dailyRevenue.Sum(d => d.Revenue);
+            var totalOrders = dailyRevenue.Sum(d => d.OrderCount);
 
             return new RevenueReportDto
             {
@@ -54,6 +54,7 @@ namespace RestaurantPOS.API.Services
             endDate = endDate.ToUniversalTime();
 
             var orders = await _context.Orders
+                .AsNoTracking()
                 .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate && o.Status == "Completed")
                 .GroupBy(o => o.OrderDate.Date)
                 .Select(g => new DailyRevenueDto
@@ -71,6 +72,7 @@ namespace RestaurantPOS.API.Services
         public async Task<List<MonthlyReportDto>> GetMonthlyRevenueAsync(int year)
         {
             var orders = await _context.Orders
+                .AsNoTracking()
                 .Where(o => o.OrderDate.Year == year && o.Status == "Completed")
                 .GroupBy(o => o.OrderDate.Month)
                 .Select(g => new MonthlyReportDto
@@ -93,6 +95,7 @@ namespace RestaurantPOS.API.Services
             endDate = endDate.ToUniversalTime();
 
             var productStats = await _context.OrderItems
+                .AsNoTracking()
                 .Include(oi => oi.Order)
                 .Include(oi => oi.Product)
                     .ThenInclude(p => p!.Category)
@@ -183,17 +186,25 @@ namespace RestaurantPOS.API.Services
         // Order Statistics
         public async Task<OrderStatisticsDto> GetOrderStatisticsAsync(DateTime startDate, DateTime endDate)
         {
-            var orders = await _context.Orders
+            var stats = await _context.Orders
+                .AsNoTracking()
                 .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
-                .ToListAsync();
+                .GroupBy(o => 1) // Fake group to aggregate all
+                .Select(g => new
+                {
+                    TotalOrders = g.Count(),
+                    CompletedOrders = g.Count(o => o.Status == "Completed"),
+                    PendingOrders = g.Count(o => o.Status == "Pending"),
+                    CancelledOrders = g.Count(o => o.Status == "Cancelled"),
+                    TotalRevenue = g.Sum(o => o.Status == "Completed" ? o.TotalAmount : 0)
+                })
+                .FirstOrDefaultAsync();
 
-            var totalOrders = orders.Count;
-            var completedOrders = orders.Count(o => o.Status == "Completed");
-            var pendingOrders = orders.Count(o => o.Status == "Pending");
-            var cancelledOrders = orders.Count(o => o.Status == "Cancelled");
-
-            var completedOrdersData = orders.Where(o => o.Status == "Completed").ToList();
-            var totalRevenue = completedOrdersData.Sum(o => o.TotalAmount);
+            int totalOrders = stats?.TotalOrders ?? 0;
+            int completedOrders = stats?.CompletedOrders ?? 0;
+            int pendingOrders = stats?.PendingOrders ?? 0;
+            int cancelledOrders = stats?.CancelledOrders ?? 0;
+            decimal totalRevenue = stats?.TotalRevenue ?? 0;
 
             return new OrderStatisticsDto
             {

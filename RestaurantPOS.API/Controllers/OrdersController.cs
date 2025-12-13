@@ -24,11 +24,11 @@ namespace RestaurantPOS.API.Controllers
 // GET: api/Orders
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")] // All staff can view orders
- public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public async Task<ActionResult<PagedResult<Order>>> GetOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-    var orders = await _orderService.GetAllOrdersAsync();
-     return Ok(orders);
-}
+            var result = await _orderService.GetOrdersAsync(page, pageSize);
+            return Ok(result);
+        }
 
    // GET: api/Orders/5
         [HttpGet("{id}")]

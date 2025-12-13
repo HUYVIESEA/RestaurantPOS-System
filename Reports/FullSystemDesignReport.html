@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Báo cáo Thiết kế Hệ thống RestaurantPOS</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        h3 { color: #16a085; }
+        .box { background: #f9f9f9; border-left: 5px solid #3498db; padding: 15px; margin: 20px 0; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Consolas', monospace; }
+        code { font-family: 'Consolas', monospace; background: #eee; padding: 2px 5px; border-radius: 3px; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <h1>Báo cáo Thiết kế Hệ thống RestaurantPOS</h1>
+    <p><strong>Ngày tạo:</strong> 2025-12-11</p>
+    <p><strong>Dự án:</strong> RestaurantPOS System</p>
+
+    <!-- SECTION 1 -->
+    <h2>1. Phân rã Chức năng (Functional Decomposition)</h2>
+    
+    <h3>1.1. Mức 1: Phân hệ & Mô-đun (Subsystems)</h3>
+    <div class="box">
+        <p>Hệ thống được chia thành 2 thành phần chính:</p>
+        <ul>
+            <li><strong>Desktop App:</strong> Ứng dụng bán hàng tại quầy.</li>
+            <li><strong>Backend API:</strong> Hệ thống xử lý trung tâm.</li>
+        </ul>
+    </div>
+    <p><em>(Sơ đồ cấu trúc tổng quan)</em></p>
+    <pre>
+graph TD
+    System[RestaurantPOS] --> Desktop[Desktop App]
+    System --> API[Backend API]
+
+    Desktop --> D_POS[Module Bán Hàng]
+    Desktop --> D_Catalog[Module Thực Đơn]
+    Desktop --> D_Report[Module Báo Cáo]
+    Desktop --> D_System[Module Quản trị]
+
+    API --> A_Auth[Service Xác thực]
+    API --> A_Business[Service Nghiệp vụ]
+    API --> A_Infra[Service Hạ tầng]
+    </pre>
+
+    <h3>1.2. Mức 2: Chi tiết Chức năng (Detailed Functions)</h3>
+    <p>Chi tiết các chức năng bên trong từng mô-đun:</p>
+    
+    <h4>A. Desktop Application</h4>
+    <table>
+        <tr>
+            <th>Module</th>
+            <th>Chức năng Chính</th>
+            <th>Chi tiết</th>
+        </tr>
+        <tr>
+            <td rowspan="4"><strong>Bán Hàng (POS)</strong></td>
+            <td>Quản lý Bàn</td>
+            <td>Theo dõi trạng thái, Chuyển/Gộp bàn</td>
+        </tr>
+        <tr>
+            <td>Order</td>
+            <td>Chọn món, Ghi chú, Topping, Takeaway</td>
+        </tr>
+        <tr>
+            <td>Thanh toán</td>
+            <td>Tính tiền, VietQR động, In hóa đơn</td>
+        </tr>
+        <tr>
+            <td>Thiết bị</td>
+            <td>In bếp, Màn hình khách hàng</td>
+        </tr>
+        <tr>
+            <td><strong>Thực Đơn</strong></td>
+            <td>Quản lý Catalog</td>
+            <td>CRUD Danh mục, Sản phẩm, Giá, Ảnh</td>
+        </tr>
+        <tr>
+            <td><strong>Báo Cáo</strong></td>
+            <td>Dashboard</td>
+            <td>Biểu đồ doanh thu, Món bán chạy</td>
+        </tr>
+    </table>
+
+    <h4>B. Backend API</h4>
+    <ul>
+        <li><strong>Auth Service:</strong> Đăng nhập, Phân quyền (Role-based).</li>
+        <li><strong>Business Service:</strong> Xử lý Orders, Tables, Products.</li>
+        <li><strong>Infrastructure:</strong> Upload ảnh, VietQR Gen, SignalR (Real-time).</li>
+    </ul>
+
+    <h3>1.3. Mức 3: Quy trình Xử lý (Process Flows)</h3>
+    <p>Mô tả luồng đi của các nghiệp vụ quan trọng.</p>
+
+    <h4>Quy trình Đặt món (Order Flow)</h4>
+    <pre>
+1. Chọn Bàn -> Kiểm tra trạng thái
+2. Nếu Bàn trống -> Mở Menu -> Chọn Món -> Note/Topping
+3. Gửi Order -> API Validate -> Lưu DB
+4. Cập nhật trạng thái Bàn -> SignalR báo Bếp -> In phiếu
+    </pre>
+
+    <h4>Quy trình Thanh toán (Payment Flow)</h4>
+    <pre>
+1. Chọn Đơn -> Tính Tổng tiền
+2. Chọn Phương thức:
+   - Tiền mặt: Nhập tiền khách đưa -> Tính tiền thừa
+   - VietQR: API tạo QR -> Khách quét -> Webhook xác nhận
+3. Xác nhận Thanh toán -> API Update -> In Hóa đơn -> Giải phóng bàn
+    </pre>
+
+    <!-- SECTION 2 -->
+    <h2>2. Thiết kế Cơ sở Dữ liệu (Database Schema)</h2>
+    <p>Các thực thể chính trong hệ thống:</p>
+
+    <h3>2.1. Quản lý Người dùng</h3>
+    <ul>
+        <li><strong>Users:</strong> ID, Username, PasswordHash, FullName, Role (Admin/Staff/Manager).</li>
+        <li><strong>UserDevices:</strong> Quản lý token thiết bị (Push Notification).</li>
+    </ul>
+
+    <h3>2.2. Vận hành (Operations)</h3>
+    <ul>
+        <li><strong>Tables:</strong> Số bàn, Sức chứa, Trạng thái, Khu vực (Tầng).</li>
+        <li><strong>Orders:</strong> Mã đơn, Tổng tiền, Trạng thái (Pending/Completed), Loại đơn.</li>
+        <li><strong>OrderItems:</strong> Chi tiết món, Số lượng, Giá, Ghi chú.</li>
+    </ul>
+
+    <h3>2.3. Danh mục & Tài chính</h3>
+    <ul>
+        <li><strong>Products:</strong> Tên, Giá, Ảnh, Danh mục ID.</li>
+        <li><strong>Payments:</strong> Lịch sử thanh toán, Phương thức, Transaction ID.</li>
+        <li><strong>PaymentSettings:</strong> Cấu hình tài khoản ngân hàng nhận tiền.</li>
+    </ul>
+
+    <!-- SECTION 3 -->
+    <h2>3. Biểu đồ Use Case</h2>
+    <div class="box">
+        <p><strong>Tác nhân (Actors):</strong></p>
+        <ol>
+            <li><strong>Nhân viên (Staff):</strong> Thao tác bán hàng, order, thanh toán.</li>
+            <li><strong>Quản lý (Manager):</strong> Quản trị menu, nhân sự, xem báo cáo (Kế thừa quyền Staff).</li>
+        </ol>
+    </div>
+    
+    <p><em>(Danh sách Use Case chính)</em></p>
+    <ul>
+        <li><strong>Hệ thống:</strong> Đăng nhập, Đổi mật khẩu.</li>
+        <li><strong>POS:</strong> Quản lý bàn, Gọi món, Thanh toán, In hóa đơn.</li>
+        <li><strong>Admin:</strong> Quản lý thực đơn, Cấu hình thanh toán, Xem Dashboard.</li>
+    </ul>
+
+    <hr>
+    <p style="text-align: center; color: #7f8c8d; font-size: 0.9em;">Tài liệu được tạo tự động bởi Assistant.</p>
+
+</body>
+</html>

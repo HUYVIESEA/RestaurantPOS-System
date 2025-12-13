@@ -144,6 +144,12 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSignalR();
 
+// Configure Response Compression
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -152,6 +158,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseResponseCompression(); // ✅ NEW: Enable Response Compression
 
 // app.UseHttpsRedirection(); // Disable for local dev to avoid Auth header stripping on redirect
 

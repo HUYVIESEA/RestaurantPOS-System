@@ -24,6 +24,7 @@ namespace RestaurantPOS.API.Services
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
             return await _context.Orders
+                .AsNoTracking()
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
@@ -31,9 +32,35 @@ namespace RestaurantPOS.API.Services
                 .ToListAsync();
         }
 
+        public async Task<PagedResult<Order>> GetOrdersAsync(int pageNumber, int pageSize)
+        {
+            var query = _context.Orders
+                .AsNoTracking();
+
+            var totalItems = await query.CountAsync();
+
+            var items = await query
+                .Include(o => o.Table)
+                .Include(o => o.OrderItems!)
+                .ThenInclude(oi => oi.Product)
+                .OrderByDescending(o => o.OrderDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Order>
+            {
+                Items = items,
+                TotalItems = totalItems,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<Order?> GetOrderByIdAsync(int id)
         {
             return await _context.Orders
+                .AsNoTracking()
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
@@ -43,6 +70,7 @@ namespace RestaurantPOS.API.Services
         public async Task<IEnumerable<Order>> GetOrdersByTableAsync(int tableId)
         {
             return await _context.Orders
+                .AsNoTracking()
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
@@ -58,12 +86,17 @@ namespace RestaurantPOS.API.Services
 
             // Calculate total amount
             decimal total = 0;
-            if (order.OrderItems != null)
+            if (order.OrderItems != null && order.OrderItems.Any())
             {
+                // Optimization: Fetch all products in one query instead of N queries
+                var productIds = order.OrderItems.Select(i => i.ProductId).Distinct().ToList();
+                var products = await _context.Products
+                    .Where(p => productIds.Contains(p.Id))
+                    .ToDictionaryAsync(p => p.Id);
+
                 foreach (var item in order.OrderItems)
                 {
-                    var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product != null)
+                    if (products.TryGetValue(item.ProductId, out var product))
                     {
                         item.UnitPrice = product.Price;
                         total += item.UnitPrice * item.Quantity;

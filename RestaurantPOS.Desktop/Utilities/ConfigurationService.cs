@@ -12,7 +12,11 @@ namespace RestaurantPOS.Desktop.Utilities
     {
         public static HttpClient CreateHttpClient()
         {
-            var client = new HttpClient();
+            var handler = new HttpClientHandler
+            {
+                AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+            };
+            var client = new HttpClient(handler);
             var url = Constants.ApiBaseUrl.EndsWith("/") ? Constants.ApiBaseUrl : Constants.ApiBaseUrl + "/";
             client.BaseAddress = new Uri(url);
             return client;
@@ -48,12 +52,12 @@ namespace RestaurantPOS.Desktop.Utilities
     public class NgrokApiResponse
     {
         [JsonPropertyName("tunnels")]
-        public List<NgrokTunnel> Tunnels { get; set; }
+        public List<NgrokTunnel> Tunnels { get; set; } = new();
     }
 
     public class NgrokTunnel
     {
         [JsonPropertyName("public_url")]
-        public string PublicUrl { get; set; }
+        public string PublicUrl { get; set; } = string.Empty;
     }
 }

@@ -39,6 +39,13 @@ namespace RestaurantPOS.Desktop.ViewModels
             get => _currentOrder;
             set { _currentOrder = value; OnPropertyChanged(); }
         }
+
+        private Table? _takeAwayTable;
+        public Table? TakeAwayTable
+        {
+            get => _takeAwayTable;
+            set { _takeAwayTable = value; OnPropertyChanged(); }
+        }
         private string _selectedCategory = "All";
         private string _selectedTableFilter = "All"; // All, Available, Occupied
         private string _searchQuery = "";
@@ -78,6 +85,7 @@ namespace RestaurantPOS.Desktop.ViewModels
             Tables = new ObservableCollection<Table>();
             TablesView = CollectionViewSource.GetDefaultView(Tables);
             TablesView.Filter = FilterTable;
+            TablesView.SortDescriptions.Add(new SortDescription(nameof(Table.TableNumber), ListSortDirection.Ascending));
 
             // ... view models ...
             ReportsVM = new ReportsViewModel();
@@ -114,8 +122,14 @@ namespace RestaurantPOS.Desktop.ViewModels
             PrintKitchenCommand = new RelayCommand(ExecutePrintKitchen);
             RefreshCommand = new RelayCommand(_ => _ = LoadData()); // F5 Refresh
             SearchCommand = new RelayCommand(_ => { /* Focus Search Box logic to be handled by View */ });
+            SearchCommand = new RelayCommand(_ => { /* Focus Search Box logic to be handled by View */ });
             ExportOrdersCommand = new RelayCommand(ExecuteExportOrders);
+            SelectTakeAwayCommand = new RelayCommand(ExecuteSelectTakeAway);
             
+            // Pagination
+            NextPageCommand = new RelayCommand(ExecuteNextPage, _ => CanGoNext);
+            PreviousPageCommand = new RelayCommand(ExecutePreviousPage, _ => CanGoPrevious);
+
             // Load data
             _ = LoadData();
 
@@ -149,11 +163,11 @@ namespace RestaurantPOS.Desktop.ViewModels
             if (item is Product product)
             {
                 // Filter by Category
-                bool categoryMatch = _selectedCategory == "All" || product.CategoryName == _selectedCategory;
+                bool categoryMatch = _selectedCategory == "All" || string.Equals(product.CategoryName, _selectedCategory, StringComparison.OrdinalIgnoreCase);
 
-                // Filter by Search
+                // Filter by Search - Optimized with IndexOf
                 bool searchMatch = string.IsNullOrEmpty(SearchQuery) || 
-                                   product.Name.ToLower().Contains(SearchQuery.ToLower());
+                                   product.Name.IndexOf(SearchQuery, StringComparison.OrdinalIgnoreCase) >= 0;
 
                 return categoryMatch && searchMatch;
             }
@@ -172,29 +186,58 @@ namespace RestaurantPOS.Desktop.ViewModels
                 await UsersVM.LoadUsersAsync();
 
                 // 2. Load Products & Tables in Parallel
-                var productsTask = _productService.GetProductsAsync();
-                var tablesTask = _tableService.GetTablesAsync();
+                await Task.WhenAll(LoadProductsAsync(), LoadTablesAsync());
 
-                await Task.WhenAll(productsTask, tablesTask);
+                if (!_timer.IsEnabled) _timer.Start();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LoadData Error: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+                IsGlobalLoading = false;
+            }
+        }
 
-                var products = productsTask.Result;
-                var latestTables = tablesTask.Result;
-
-                // 3. Update Products
+        public async Task LoadProductsAsync()
+        {
+            try
+            {
+                var products = await _productService.GetProductsAsync();
                 _allProducts = products.ToList();
                 
-                // Use Dispatcher for UI updates
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    Products.Clear();
-                    foreach (var p in _allProducts)
-                    {
-                        Products.Add(p);
-                    }
-                    ProductsView.Refresh();
+                    // Optimized: Replace collection instead of Clear/Add loop
+                    Products = new ObservableCollection<Product>(_allProducts);
                 });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LoadProducts Error: {ex.Message}");
+            }
+        }
 
-                // 4. Smart Update Tables
+        public async Task LoadTablesAsync()
+        {
+            try
+            {
+                var latestTables = await _tableService.GetTablesAsync();
+
+                // SPECIAL: Handler for "Mang ve" (Take Away)
+                var takeAway = latestTables.FirstOrDefault(t => 
+                    t.TableNumber.Equals("Mang về", StringComparison.OrdinalIgnoreCase) || 
+                    t.TableNumber.Equals("Mang ve", StringComparison.OrdinalIgnoreCase) ||
+                    t.TableNumber.Equals("Take Away", StringComparison.OrdinalIgnoreCase));
+                
+                if (takeAway != null)
+                {
+                    TakeAwayTable = takeAway;
+                    latestTables.Remove(takeAway); // Don't show in Grid
+                }
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     // Remove deleted tables
@@ -212,12 +255,12 @@ namespace RestaurantPOS.Desktop.ViewModels
                         if (existingTable != null)
                         {
                             // Update properties
-                            existingTable.IsAvailable = latestTable.IsAvailable;
-                            existingTable.OccupiedAt = latestTable.OccupiedAt;
-                            existingTable.Floor = latestTable.Floor;
-                            existingTable.IsMerged = latestTable.IsMerged;
-                            existingTable.MergedGroupId = latestTable.MergedGroupId;
-                            existingTable.MergedTableNumbers = latestTable.MergedTableNumbers;
+                            if (existingTable.IsAvailable != latestTable.IsAvailable) existingTable.IsAvailable = latestTable.IsAvailable;
+                            if (existingTable.OccupiedAt != latestTable.OccupiedAt) existingTable.OccupiedAt = latestTable.OccupiedAt;
+                            if (existingTable.Floor != latestTable.Floor) existingTable.Floor = latestTable.Floor;
+                            if (existingTable.IsMerged != latestTable.IsMerged) existingTable.IsMerged = latestTable.IsMerged;
+                            if (existingTable.MergedGroupId != latestTable.MergedGroupId) existingTable.MergedGroupId = latestTable.MergedGroupId;
+                            if (existingTable.MergedTableNumbers != latestTable.MergedTableNumbers) existingTable.MergedTableNumbers = latestTable.MergedTableNumbers;
                             existingTable.UpdateDuration();
                         }
                         else
@@ -235,18 +278,13 @@ namespace RestaurantPOS.Desktop.ViewModels
                     }
                     var floorsToRemove = AvailableFloors.Where(f => f != "All" && !activeFloors.Contains(f)).ToList();
                     foreach(var f in floorsToRemove) AvailableFloors.Remove(f);
+
+                    TablesView.Refresh();
                 });
-                
-                if (!_timer.IsEnabled) _timer.Start();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"LoadData Error: {ex.Message}");
-            }
-            finally
-            {
-                IsLoading = false;
-                IsGlobalLoading = false;
+                 System.Diagnostics.Debug.WriteLine($"LoadTables Error: {ex.Message}");
             }
         }
         
@@ -275,7 +313,16 @@ namespace RestaurantPOS.Desktop.ViewModels
         public ObservableCollection<Product> Products
         {
             get => _products;
-            set { _products = value; OnPropertyChanged(); }
+            set 
+            { 
+                _products = value; 
+                OnPropertyChanged();
+                
+                // Update View when collection changes
+                ProductsView = CollectionViewSource.GetDefaultView(_products);
+                ProductsView.Filter = FilterProduct;
+                OnPropertyChanged(nameof(ProductsView));
+            }
         }
 
         public ObservableCollection<CartItem> CartItems
@@ -416,6 +463,26 @@ namespace RestaurantPOS.Desktop.ViewModels
             set { _orders = value; OnPropertyChanged(); }
         }
 
+        // Pagination Properties
+        private int _currentPage = 1;
+        public int CurrentPage
+        {
+            get => _currentPage;
+            set { _currentPage = value; OnPropertyChanged(); OnPropertyChanged(nameof(CanGoNext)); OnPropertyChanged(nameof(CanGoPrevious)); }
+        }
+
+        private int _totalPages = 1;
+        public int TotalPages
+        {
+            get => _totalPages;
+            set { _totalPages = value; OnPropertyChanged(); OnPropertyChanged(nameof(CanGoNext)); OnPropertyChanged(nameof(CanGoPrevious)); }
+        }
+
+        private int _pageSize = 20; // Default page size
+
+        public bool CanGoNext => CurrentPage < TotalPages;
+        public bool CanGoPrevious => CurrentPage > 1;
+
         public ReportsViewModel ReportsVM { get; }
         public ProductsViewModel ProductsVM { get; }
         public DashboardViewModel DashboardVM { get; }
@@ -438,6 +505,10 @@ namespace RestaurantPOS.Desktop.ViewModels
         public RelayCommand LogoutCommand { get; }
         public RelayCommand CloseApplicationCommand { get; }
         public RelayCommand NavigateCommand { get; }
+        
+        // Pagination Commands
+        public RelayCommand NextPageCommand { get; }
+        public RelayCommand PreviousPageCommand { get; }
         public RelayCommand ToggleMergeModeCommand { get; }
         public RelayCommand ConfirmMergeCommand { get; }
         public RelayCommand SplitTableCommand { get; }
@@ -447,6 +518,139 @@ namespace RestaurantPOS.Desktop.ViewModels
         public RelayCommand RefreshCommand { get; private set; }
         public RelayCommand SearchCommand { get; private set; } // Added for F3
         public RelayCommand ExportOrdersCommand { get; private set; }
+        public RelayCommand SelectTakeAwayCommand { get; private set; }
+
+        private async void ExecuteSelectTakeAway(object? parameter)
+        {
+            if (TakeAwayTable == null)
+            {
+                ShowNotification("Không tìm thấy bàn 'Mang về' trong hệ thống!", NotificationType.Error);
+                return;
+            }
+
+            // Create VM in Loading State
+            var vm = new RestaurantPOS.Desktop.Views.Dialogs.TakeAwaySelectionViewModel(
+                new RelayCommand(o => {
+                    MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(null, null);
+                    if (o is Order selected) LoadTakeAwayOrder(selected);
+                }),
+                new RelayCommand(_ => {
+                    MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(null, null);
+                    StartNewTakeAwayOrder();
+                })
+            );
+
+            var view = new RestaurantPOS.Desktop.Views.Dialogs.TakeAwaySelectionDialog
+            {
+                DataContext = vm
+            };
+
+            // Show Dialog Immediately (Fire and wait)
+            // We launch the data loading in parallel AFTER dialog opens
+            var showDialogTask = MaterialDesignThemes.Wpf.DialogHost.Show(view, "RootDialog");
+
+            // Load Data Background
+            _ = Task.Run(async () => 
+            {
+                try
+                {
+                    // Artificial delay if needed for smooth animation, but here we want speed.
+                    var orders = await _orderService.GetOrdersByTableAsync(TakeAwayTable.Id);
+                    var activeOrders = orders.Where(o => o.Status != "Completed" && o.Status != "Cancelled").ToList();
+
+                    Application.Current.Dispatcher.Invoke(() => 
+                    {
+                        vm.IsLoading = false;
+                        if (activeOrders.Count == 0)
+                        {
+                            // No orders: Close dialog and Start New
+                            MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(null, null);
+                            StartNewTakeAwayOrder();
+                        }
+                        else
+                        {
+                            // Populate list
+                            vm.ActiveOrders = new ObservableCollection<Order>(activeOrders);
+                        }
+                    });
+                }
+                catch(Exception ex)
+                {
+                    Application.Current.Dispatcher.Invoke(() => 
+                    {
+                        vm.IsLoading = false;
+                        ShowNotification($"Lỗi tải đơn: {ex.Message}", NotificationType.Error);
+                        MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand.Execute(null, null);
+                    });
+                }
+            });
+
+            await showDialogTask;
+        }
+
+        private void StartNewTakeAwayOrder()
+        {
+            SelectedTable = TakeAwayTable;
+            IsTableSelectionMode = false;
+            CartItems.Clear();
+            CurrentOrder = null;
+            UpdateCustomerDisplay();
+        }
+
+        private async void LoadTakeAwayOrder(Order order)
+        {
+            // Close Dialog & Switch View
+            SelectedTable = TakeAwayTable;
+            IsTableSelectionMode = false;
+            IsLoading = true;
+
+            // Optional: Small delay to let the dialog close animation finish smoothly before heavy lifting
+            await Task.Delay(300);
+
+            try
+            {
+                CurrentOrder = order;
+                CartItems.Clear();
+
+                // Populate Cart
+                if (order.OrderItems != null)
+                {
+                    // Run calculation in background to prevent UI freeze if many items
+                    var cartItemsToAdd = await Task.Run(() => 
+                    {
+                        var list = new List<CartItem>();
+                        foreach (var item in order.OrderItems)
+                        {
+                            var product = _allProducts.FirstOrDefault(p => p.Id == item.ProductId) ?? item.Product;
+                            if (product != null)
+                            {
+                                var cartItem = new CartItem(product, item.Quantity, false, item.Id);
+                                cartItem.Note = item.Note ?? string.Empty;
+                                list.Add(cartItem);
+                            }
+                        }
+                        return list;
+                    });
+
+                    // Update UI
+                    foreach(var item in cartItemsToAdd)
+                    {
+                        CartItems.Add(item);
+                    }
+                }
+            
+                OnPropertyChanged(nameof(TotalAmount));
+                UpdateCustomerDisplay();
+            }
+            catch (Exception ex)
+            {
+                ShowNotification($"Lỗi tải đơn hàng: {ex.Message}", NotificationType.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
 
 
         private void ExecuteToggleMergeMode(object? parameter)
@@ -481,7 +685,7 @@ namespace RestaurantPOS.Desktop.ViewModels
                 IsMergeMode = false;
                 foreach(var t in SelectedTablesForMerge) t.IsSelectedForMerge = false;
                 SelectedTablesForMerge.Clear();
-                _ = LoadData(); // Refresh tables
+                _ = LoadTablesAsync(); // Refresh tables
             }
             else
             {
@@ -510,7 +714,7 @@ namespace RestaurantPOS.Desktop.ViewModels
             if (success)
             {
                 ShowNotification("Đã tách bàn thành công!", NotificationType.Success);
-                _ = LoadData(); // Refresh tables to clear merge status
+                _ = LoadTablesAsync(); // Refresh tables to clear merge status
                 ExecuteBackToTables(null);
             }
             else
@@ -546,42 +750,54 @@ namespace RestaurantPOS.Desktop.ViewModels
                     return;
                 }
 
+                // OPTIMISTIC UI: Switch view immediately
                 SelectedTable = table;
                 IsTableSelectionMode = false;
                 CartItems.Clear();
                 CurrentOrder = null;
-
-                // Always try to load existing order, regardless of table status (backend sync safety)
                 IsLoading = true;
-                var orders = await _orderService.GetOrdersByTableAsync(table.Id);
-                var activeOrder = orders.FirstOrDefault(o => o.Status != "Completed" && o.Status != "Cancelled");
-                
-                if (activeOrder != null)
+
+                // Load Data in Background
+                try 
                 {
-                    CurrentOrder = activeOrder;
-                    foreach (var item in activeOrder.OrderItems)
+                    // Always try to load existing order, regardless of table status (backend sync safety)
+                    var orders = await _orderService.GetOrdersByTableAsync(table.Id);
+                    var activeOrder = orders.FirstOrDefault(o => o.Status != "Completed" && o.Status != "Cancelled");
+                    
+                    if (activeOrder != null)
                     {
-                        // Map OrderItem to CartItem
-                        var product = _allProducts.FirstOrDefault(p => p.Id == item.ProductId) ?? item.Product;
-                        
-                        if (product != null)
+                        CurrentOrder = activeOrder;
+                        foreach (var item in activeOrder.OrderItems)
                         {
-                            var cartItem = new CartItem(product, item.Quantity, false, item.Id);
-                            cartItem.Note = item.Note ?? string.Empty; // Restore Note, handle potential null
-                            CartItems.Add(cartItem);
+                            // Map OrderItem to CartItem
+                            var product = _allProducts.FirstOrDefault(p => p.Id == item.ProductId) ?? item.Product;
+                            
+                            if (product != null)
+                            {
+                                var cartItem = new CartItem(product, item.Quantity, false, item.Id);
+                                cartItem.Note = item.Note ?? string.Empty; // Restore Note, handle potential null
+                                CartItems.Add(cartItem);
+                            }
+                        }
+                        OnPropertyChanged(nameof(TotalAmount));
+                        
+                        if (SelectedTable != null && SelectedTable.IsAvailable)
+                        {
+                            SelectedTable.IsAvailable = false;
+                            OnPropertyChanged(nameof(SelectedTable));
                         }
                     }
-                    OnPropertyChanged(nameof(TotalAmount));
-                    
-                    if (SelectedTable.IsAvailable)
-                    {
-                        SelectedTable.IsAvailable = false;
-                        OnPropertyChanged(nameof(SelectedTable));
-                    }
+                    // Show Empty Cart or Loaded Cart on Display
+                    UpdateCustomerDisplay();
                 }
-                // Show Empty Cart or Loaded Cart on Display
-                UpdateCustomerDisplay();
-                IsLoading = false;
+                catch (Exception ex)
+                {
+                    ShowNotification($"Lỗi tải đơn hàng: {ex.Message}", NotificationType.Error);
+                }
+                finally
+                {
+                    IsLoading = false;
+                }
             }
         }
 
@@ -592,7 +808,7 @@ namespace RestaurantPOS.Desktop.ViewModels
             CartItems.Clear();
             CurrentOrder = null;
             CustomerDisplayService.Instance.ShowIdle(); // Reset display
-            _ = LoadData(); // Refresh table status
+            _ = LoadTablesAsync(); // Refresh table status
         }
 
         private void UpdateCustomerDisplay()
@@ -954,11 +1170,13 @@ namespace RestaurantPOS.Desktop.ViewModels
             IsLoading = true;
             try 
             {
-                var orders = await _orderService.GetAllOrdersAsync();
-                var orderedList = orders.OrderByDescending(o => o.CreatedAt);
+                var result = await _orderService.GetOrdersAsync(CurrentPage, _pageSize);
+                
+                // Update Pagination
+                TotalPages = result.TotalPages;
                 
                 // Bulk Update
-                Orders = new ObservableCollection<Order>(orderedList);
+                Orders = new ObservableCollection<Order>(result.Items);
             }
             catch (Exception)
             {
@@ -968,6 +1186,26 @@ namespace RestaurantPOS.Desktop.ViewModels
             finally
             {
                 IsLoading = false;
+                // Force command refresh
+                System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
+        private void ExecuteNextPage(object? parameter)
+        {
+            if (CanGoNext)
+            {
+                CurrentPage++;
+                LoadOrders();
+            }
+        }
+
+        private void ExecutePreviousPage(object? parameter)
+        {
+            if (CanGoPrevious)
+            {
+                CurrentPage--;
+                LoadOrders();
             }
         }
 

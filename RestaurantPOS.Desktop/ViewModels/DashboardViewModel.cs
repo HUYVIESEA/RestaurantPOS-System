@@ -165,7 +165,7 @@ namespace RestaurantPOS.Desktop.ViewModels
                 var tablesTask = _tableService.GetTablesAsync();
                 var summaryTask = _reportService.GetSalesSummaryAsync();
                 var revenueReportTask = _reportService.GetRevenueReportAsync(startDate, endDate);
-                var allOrdersTask = _orderService.GetAllOrdersAsync();
+                var allOrdersTask = _orderService.GetOrdersAsync(1, 5);
                 var categoryReportTask = _reportService.GetCategoryReportAsync(startDate, endDate);
                 var topProductsTask = _reportService.GetTopSellingProductsAsync(startDate, endDate, 5);
 
@@ -174,7 +174,7 @@ namespace RestaurantPOS.Desktop.ViewModels
                 var tables = tablesTask.Result;
                 var summary = summaryTask.Result;
                 var revenueData = revenueReportTask.Result;
-                var allOrders = allOrdersTask.Result;
+                var recentOrdersResult = allOrdersTask.Result;
                 var categoryReport = categoryReportTask.Result;
                 var topProducts = topProductsTask.Result;
 
@@ -229,7 +229,7 @@ namespace RestaurantPOS.Desktop.ViewModels
                     };
 
                     // 4. Update Recent Orders
-                    var recent = allOrders.OrderByDescending(o => o.CreatedAt).Take(5).ToList();
+                    var recent = recentOrdersResult.Items;
                     RecentOrders.Clear();
                     foreach (var order in recent)
                     {
