@@ -10,13 +10,17 @@ import com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.Order
 import com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.ProductEntity
 import com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.TableEntity
 
+import com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.PaymentDao
+import com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.PaymentEntity
+
 @Database(
-    entities = [ProductEntity::class, TableEntity::class, OrderEntity::class, OrderItemEntity::class],
-    version = 3, // Increment version
+    entities = [ProductEntity::class, TableEntity::class, OrderEntity::class, OrderItemEntity::class, PaymentEntity::class],
+    version = 4, // Increment version
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun tableDao(): TableDao
     abstract fun orderDao(): OrderDao
+    abstract fun paymentDao(): PaymentDao
 }

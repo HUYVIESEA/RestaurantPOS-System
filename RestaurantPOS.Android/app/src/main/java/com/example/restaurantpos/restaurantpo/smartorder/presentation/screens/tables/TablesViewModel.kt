@@ -85,6 +85,10 @@ class TablesViewModel @Inject constructor(
                     is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.OrderCompleted,
                     is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.TableUpdated -> {
                         loadTables()
+                        // Ensure active Take Away dialog is also updated if open
+                        if (_uiState.value.showTakeAwayDialog && _uiState.value.takeAwayTable != null) {
+                             openTakeAway() // Reload take away orders
+                        }
                     }
                 }
             }

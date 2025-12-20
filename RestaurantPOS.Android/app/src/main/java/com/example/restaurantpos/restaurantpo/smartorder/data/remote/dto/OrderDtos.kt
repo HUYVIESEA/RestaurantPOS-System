@@ -40,3 +40,11 @@ data class CompleteOrderRequest(
 data class UpdateOrderStatusRequest(
     @SerializedName("status") val status: String
 )
+
+data class PaymentSettingsDto(
+    @SerializedName("isConfigured") val isConfigured: Boolean,
+    @SerializedName("bankName") val bankName: String?,
+    @SerializedName("bankBin") val bankBin: String?,
+    @SerializedName("accountNumber") val accountNumber: String?,
+    @SerializedName("accountName") val accountName: String?
+)

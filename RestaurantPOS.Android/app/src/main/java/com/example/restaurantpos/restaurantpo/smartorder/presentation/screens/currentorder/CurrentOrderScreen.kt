@@ -1,10 +1,15 @@
 package com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.currentorder
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -48,8 +53,11 @@ fun CurrentOrderScreen(
     }
 
     LaunchedEffect(uiState.successMessage, uiState.error) {
-        uiState.successMessage?.let {
-            // Navigate back immediately without showing snackbar to avoid delay
+        uiState.successMessage?.let { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
             viewModel.clearMessages()
             onNavigateBack()
         }
@@ -246,10 +254,11 @@ fun CurrentOrderScreen(
     if (showPaymentDialog) {
         PaymentDialog(
             totalAmount = uiState.order?.totalAmount ?: 0.0,
+            paymentSettings = uiState.paymentSettings,
             currencyFormatter = currencyFormatter,
             onDismiss = { showPaymentDialog = false },
-            onConfirm = { receivedAmount ->
-                viewModel.processPayment(receivedAmount)
+            onConfirm = { receivedAmount, paymentMethod ->
+                viewModel.processPayment(receivedAmount, paymentMethod)
                 showPaymentDialog = false
             }
         )
@@ -476,61 +485,280 @@ fun OrderItemCard(
 @Composable
 fun PaymentDialog(
     totalAmount: Double,
+    paymentSettings: com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.PaymentSettingsDto?,
     currencyFormatter: NumberFormat,
     onDismiss: () -> Unit,
-    onConfirm: (Double) -> Unit
+    onConfirm: (Double, String) -> Unit
 ) {
     var receivedAmount by remember { mutableStateOf(totalAmount.toString()) }
+    var selectedPaymentMethod by remember { mutableStateOf("Cash") } // "Cash" or "Transfer"
+    
     val receivedDouble = receivedAmount.toDoubleOrNull() ?: 0.0
     val change = (receivedDouble - totalAmount).coerceAtLeast(0.0)
 
-    AlertDialog(
+    // Bank Info
+    val bankId = paymentSettings?.bankBin ?: "MB"
+    val accountNo = paymentSettings?.accountNumber ?: "0000000000"
+    val accountName = paymentSettings?.accountName ?: "RESTAURANT"
+    
+    // VietQR URL
+    // Format: https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-<TEMPLATE>.png?amount=<AMOUNT>&addInfo=<CONTENT>
+    val qrUrl = "https://img.vietqr.io/image/$bankId-$accountNo-compact2.png?amount=${totalAmount.toInt()}&addInfo=Thanh%20toan%20don%20hang"
+
+    androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismiss,
-        title = { Text("Thanh toán tiền mặt", fontWeight = FontWeight.Bold) },
-        text = {
-            Column {
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .verticalScroll(androidx.compose.foundation.rememberScrollState())
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Thanh toán",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Rounded.Close, contentDescription = "Đóng")
+                    }
+                }
+                
+                Divider(modifier = Modifier.padding(vertical = 12.dp))
+
+                // Total Amount
                 Text(
-                    "Tổng tiền: ${currencyFormatter.format(totalAmount)}",
-                    style = MaterialTheme.typography.titleMedium,
+                    "Tổng tiền cần thu:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                Text(
+                    currencyFormatter.format(totalAmount),
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.height(16.dp))
                 
-                OutlinedTextField(
-                    value = receivedAmount,
-                    onValueChange = { receivedAmount = it.filter { char -> char.isDigit() || char == '.' } },
-                    label = { Text("Tiền khách đưa") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Spacer(modifier = Modifier.height(20.dp))
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                // Payment Method
+                Text("Phương thức thanh toán:", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
                 
-                if (receivedDouble >= totalAmount) {
-                    Text(
-                        "Tiền thừa: ${currencyFormatter.format(change)}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    // Cash Option
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { selectedPaymentMethod = "Cash" }
+                            .border(
+                                width = if (selectedPaymentMethod == "Cash") 2.dp else 1.dp,
+                                color = if (selectedPaymentMethod == "Cash") MaterialTheme.colorScheme.primary else Color.LightGray,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        colors = CardDefaults.cardColors(containerColor = if (selectedPaymentMethod == "Cash") MaterialTheme.colorScheme.primaryContainer else Color.White)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Rounded.Money, 
+                                contentDescription = null,
+                                tint = if (selectedPaymentMethod == "Cash") MaterialTheme.colorScheme.primary else Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("Tiền mặt", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    // Transfer Option
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { selectedPaymentMethod = "Transfer" }
+                            .border(
+                                width = if (selectedPaymentMethod == "Transfer") 2.dp else 1.dp,
+                                color = if (selectedPaymentMethod == "Transfer") MaterialTheme.colorScheme.primary else Color.LightGray,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                         colors = CardDefaults.cardColors(containerColor = if (selectedPaymentMethod == "Transfer") MaterialTheme.colorScheme.primaryContainer else Color.White)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Rounded.QrCode, 
+                                contentDescription = null,
+                                tint = if (selectedPaymentMethod == "Transfer") MaterialTheme.colorScheme.primary else Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("Chuyển khoản", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
+
+                if (selectedPaymentMethod == "Transfer") {
+                    // QR Code Section
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Quét mã VietQR:", fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f) // Square
+                                .background(Color.White, RoundedCornerShape(12.dp))
+                                .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            coil.compose.AsyncImage(
+                                model = qrUrl,
+                                contentDescription = "VietQR",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        // Bank Account Info
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Text("Ngân hàng:", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                                    Text(paymentSettings?.bankName ?: bankId, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodySmall)
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Text("Số tài khoản:", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                                    Text(accountNo, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodySmall)
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Text("Chủ tài khoản:", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                                    Text(accountName, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                        
+                        // Auto-fill full amount for Transfer
+                        LaunchedEffect(selectedPaymentMethod) {
+                            receivedAmount = totalAmount.toString()
+                        }
+                    }
+                } else {
+                    // Cash Input Section
+                    OutlinedTextField(
+                        value = receivedAmount,
+                        onValueChange = { receivedAmount = it.filter { char -> char.isDigit() || char == '.' } },
+                        label = { Text("Tiền khách đưa") },
+                        singleLine = true,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        textStyle = MaterialTheme.typography.titleMedium
                     )
+                    
+                    // Quick input buttons
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val suggestions = listOf(totalAmount, 50000.0, 100000.0, 200000.0, 500000.0)
+                        suggestions.filter { it >= totalAmount }.forEach { amount ->
+                             SuggestionChip(
+                                onClick = { receivedAmount = amount.toInt().toString() },
+                                label = { Text(currencyFormatter.format(amount)) }
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    if (receivedDouble >= totalAmount) {
+                         Card(
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                             Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Tiền thừa trả khách:", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
+                                Text(
+                                    currencyFormatter.format(change),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF2E7D32)
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                // Action Buttons
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    TextButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Hủy bỏ", color = Color.Gray)
+                    }
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    Button(
+                        onClick = { onConfirm(receivedDouble, selectedPaymentMethod) },
+                        enabled = receivedDouble >= totalAmount,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedPaymentMethod == "Transfer") Color(0xFF0068FF) else MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(if (selectedPaymentMethod == "Transfer") "Đã nhận tiền" else "Hoàn thành")
+                    }
                 }
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(receivedDouble) },
-                enabled = receivedDouble >= totalAmount
-            ) {
-                Text("Xác nhận")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Hủy")
-            }
         }
-    )
+    }
 }
 
 @Composable

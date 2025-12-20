@@ -45,4 +45,10 @@ object DatabaseModule {
     fun provideOrderDao(database: AppDatabase): com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.OrderDao {
         return database.orderDao()
     }
+
+    @Provides
+    @Singleton
+    fun providePaymentDao(database: AppDatabase): com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.PaymentDao {
+        return database.paymentDao()
+    }
 }

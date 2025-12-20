@@ -12,4 +12,6 @@ interface OrdersRepository {
     suspend fun updateItemQuantity(orderId: Int, itemId: Int, quantity: Int): Result<Order>
     suspend fun removeItemFromOrder(orderId: Int, itemId: Int): Result<Order>
     suspend fun updateOrderStatus(orderId: Int, status: String): Result<Order>
+    suspend fun getPaymentSettings(): Result<com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.PaymentSettingsDto>
+    fun getPaymentHistory(): kotlinx.coroutines.flow.Flow<List<com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.PaymentEntity>>
 }

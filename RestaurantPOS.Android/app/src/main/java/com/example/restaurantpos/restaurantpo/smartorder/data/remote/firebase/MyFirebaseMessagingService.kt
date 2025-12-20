@@ -67,7 +67,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val channelId = "OrderUpdates"
         val defaultSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_restaurant_logo)
+            .setSmallIcon(R.drawable.restaurant)
             .setContentTitle(title ?: "Restaurant POS")
             .setContentText(messageBody)
             .setAutoCancel(true)

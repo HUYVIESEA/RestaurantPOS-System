@@ -48,4 +48,7 @@ interface OrdersApi {
         @Path("id") id: Int,
         @Body request: com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.UpdateOrderStatusRequest
     ): OrderDto
+
+    @GET("api/PaymentSettings")
+    suspend fun getPaymentSettings(): com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.PaymentSettingsDto
 }

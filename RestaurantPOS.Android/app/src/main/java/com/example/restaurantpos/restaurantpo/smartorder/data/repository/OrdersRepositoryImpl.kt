@@ -19,7 +19,8 @@ import javax.inject.Inject
 
 class OrdersRepositoryImpl @Inject constructor(
     private val api: OrdersApi,
-    private val dao: OrderDao
+    private val dao: OrderDao,
+    private val paymentDao: com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.PaymentDao
 ) : OrdersRepository {
     
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
@@ -216,6 +217,21 @@ class OrdersRepositoryImpl @Inject constructor(
             val dto = api.completeOrder(orderId, request)
             val order = mapDtoToDomain(dto)
             
+            // Save Payment History
+            try {
+                paymentDao.insertPayment(
+                    com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.PaymentEntity(
+                        orderId = orderId,
+                        amount = receivedAmount,
+                        paymentMethod = paymentMethod,
+                        timestamp = System.currentTimeMillis(),
+                        isSynced = true
+                    )
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            
             // Update DB
             try {
                 val orderEntity = order.toEntity(isSynced = true)
@@ -291,7 +307,21 @@ class OrdersRepositoryImpl @Inject constructor(
             Result.success(order)
         } catch (e: Exception) {
             e.printStackTrace()
-             Result.failure(Exception("Failed to update order status: ${e.message}"))
+            Result.failure(Exception("Failed to update order status: ${e.message}"))
         }
+    }
+
+    override suspend fun getPaymentSettings(): Result<com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.PaymentSettingsDto> {
+        return try {
+            val dto = api.getPaymentSettings()
+            Result.success(dto)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(Exception("Failed to load payment settings: ${e.message}"))
+        }
+    }
+
+    override fun getPaymentHistory(): kotlinx.coroutines.flow.Flow<List<com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.PaymentEntity>> {
+        return paymentDao.getAllPayments()
     }
 }

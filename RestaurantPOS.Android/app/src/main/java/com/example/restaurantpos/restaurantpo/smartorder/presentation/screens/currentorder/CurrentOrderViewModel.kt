@@ -13,6 +13,7 @@ import javax.inject.Inject
 
 data class CurrentOrderUiState(
     val order: Order? = null,
+    val paymentSettings: com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.PaymentSettingsDto? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
     val successMessage: String? = null
@@ -29,6 +30,15 @@ class CurrentOrderViewModel @Inject constructor(
 
     init {
         listenToSignalREvents()
+        loadPaymentSettings()
+    }
+
+    private fun loadPaymentSettings() {
+        viewModelScope.launch {
+            ordersRepository.getPaymentSettings().onSuccess { settings ->
+                _uiState.value = _uiState.value.copy(paymentSettings = settings)
+            }
+        }
     }
 
     private fun listenToSignalREvents() {
@@ -99,7 +109,7 @@ class CurrentOrderViewModel @Inject constructor(
         }
     }
 
-    fun processPayment(receivedAmount: Double) {
+    fun processPayment(receivedAmount: Double, paymentMethod: String) {
         val order = _uiState.value.order ?: return
 
         if (receivedAmount < order.totalAmount) {
@@ -112,7 +122,7 @@ class CurrentOrderViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
-            ordersRepository.completeOrder(order.id, receivedAmount, "Cash").onSuccess { completedOrder ->
+            ordersRepository.completeOrder(order.id, receivedAmount, paymentMethod).onSuccess { completedOrder ->
                 val change = receivedAmount - order.totalAmount
                 _uiState.value = _uiState.value.copy(
                     successMessage = "Thanh toán thành công! Tiền thừa: ${String.format("%,.0f", change)}đ",

@@ -125,9 +125,10 @@ object AppModule {
     @Singleton
     fun provideOrdersRepository(
         api: com.example.restaurantpos.restaurantpo.smartorder.data.remote.api.OrdersApi,
-        dao: com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.OrderDao
+        dao: com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.OrderDao,
+        paymentDao: com.example.restaurantpos.restaurantpo.smartorder.data.local.dao.PaymentDao
     ): com.example.restaurantpos.restaurantpo.smartorder.domain.repository.OrdersRepository {
-        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.OrdersRepositoryImpl(api, dao)
+        return com.example.restaurantpos.restaurantpo.smartorder.data.repository.OrdersRepositoryImpl(api, dao, paymentDao)
     }
 
     @Provides
