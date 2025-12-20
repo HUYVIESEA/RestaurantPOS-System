@@ -77,6 +77,26 @@
 
                     <DataGridTextColumn Binding="{Binding Unit}" Header="ĐVT" Width="80"/>
 
+                    <DataGridTemplateColumn Header="Tồn kho" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding StockQuantity}" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding StockQuantity, Converter={StaticResource LessThanConverter}, ConverterParameter=10}" Value="True">
+                                                    <Setter Property="Foreground" Value="Red"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridCheckBoxColumn Binding="{Binding IsAvailable}" Header="Đang bán" Width="80" IsReadOnly="True" ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"/>
+
                     <DataGridTemplateColumn Header="Thao tác" Width="120">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

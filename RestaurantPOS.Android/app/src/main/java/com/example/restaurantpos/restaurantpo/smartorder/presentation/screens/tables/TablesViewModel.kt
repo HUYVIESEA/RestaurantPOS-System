@@ -2,6 +2,7 @@ package com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.t
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.restaurantpos.restaurantpo.smartorder.domain.model.Order
 import com.example.restaurantpos.restaurantpo.smartorder.domain.model.Table
 import com.example.restaurantpos.restaurantpo.smartorder.domain.usecase.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,32 +13,55 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TablesUiState(
-    val tables: List<Table> = emptyList(),
-    val selectedFloor: String = "Tầng 1",
-    val floors: List<String> = listOf(
-        "Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4", "Tầng 5", 
-        "Tầng trệt", "Tầng lửng", "Sân thượng", 
-        "Khu VIP", "Khu gia đình", "Khu ngoài trời"
-    ),
-    val selectedStatus: String = "Tất cả", // NEW: Status filter
+    val allTables: List<Table> = emptyList(),
+    val selectedFloor: String = "Tất cả",
+    val selectedStatus: String = "Tất cả",
     val selectedTables: Set<Int> = emptySet(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val successMessage: String? = null
+    val successMessage: String? = null,
+    
+    // Take Away Support
+    val takeAwayTable: Table? = null,
+    val showTakeAwayDialog: Boolean = false,
+    val takeAwayOrders: List<Order> = emptyList(),
+    val isLoadingTakeAway: Boolean = false
 ) {
-    // Computed property for filtered tables
+    val floors: List<String>
+        get() = listOf("Tất cả") + allTables.map { it.floor }.distinct().sorted()
+
     val filteredTables: List<Table>
-        get() = when (selectedStatus) {
-            "Trống" -> tables.filter { it.isAvailable }
-            "Đang dùng" -> tables.filter { !it.isAvailable }
-            else -> tables // "Tất cả"
+        get() = allTables.filter { table ->
+            (selectedFloor == "Tất cả" || table.floor == selectedFloor) &&
+            (when (selectedStatus) {
+                "Trống" -> table.isAvailable
+                "Đang dùng" -> !table.isAvailable
+                else -> true
+            })
+
+        }.sortedWith { t1, t2 ->
+            // Prioritize Take Away table
+            val isTakeAway1 = t1.id == takeAwayTable?.id
+            val isTakeAway2 = t2.id == takeAwayTable?.id
+            
+            when {
+                isTakeAway1 && !isTakeAway2 -> -1
+                !isTakeAway1 && isTakeAway2 -> 1
+                else -> t1.tableNumber.compareTo(t2.tableNumber)
+            }
         }
+    
+    // Legacy support for StatsRow using current view or all?
+    // Usually admin wants to see stats for the CURRENT view (filtered by floor) or ALL?
+    // The screenshot shows stats. Usually it's helpful to see stats for the selected floor.
+    val tables: List<Table> get() = filteredTables // Alias for compatibility
 }
 
 @HiltViewModel
 class TablesViewModel @Inject constructor(
     private val getTablesUseCase: GetTablesUseCase,
-    private val getTablesByFloorUseCase: GetTablesByFloorUseCase,
+    private val getOrdersByTableUseCase: GetOrdersByTableUseCase,
+    // getTablesByFloorUseCase removed as we do client-side filtering
     private val returnTableUseCase: ReturnTableUseCase,
     private val mergeTablesUseCase: MergeTablesUseCase,
     private val splitTablesUseCase: SplitTablesUseCase,
@@ -60,7 +84,6 @@ class TablesViewModel @Inject constructor(
                     is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.OrderUpdated,
                     is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.OrderCompleted,
                     is com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent.TableUpdated -> {
-                        // Reload tables when any order/table event occurs
                         loadTables()
                     }
                 }
@@ -72,15 +95,21 @@ class TablesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
-            val result = if (_uiState.value.selectedFloor == "Tất cả") {
-                getTablesUseCase()
-            } else {
-                getTablesByFloorUseCase(_uiState.value.selectedFloor)
-            }
-            
-            result.onSuccess { tables ->
+            // Always fetch ALL tables to support dynamic floors filtering
+            getTablesUseCase().onSuccess { tables ->
+                // Identify Take Away Table
+                val takeAway = tables.find { 
+                    it.tableNumber.equals("Mang về", ignoreCase = true) || 
+                    it.tableNumber.equals("Mang ve", ignoreCase = true) ||
+                    it.tableNumber.equals("Take Away", ignoreCase = true)
+                }
+                
+                // Do NOT remove TakeAway from grid display, user wants it in grid
+                // val displayTables = if (takeAway != null) tables.minus(takeAway) else tables
+
                 _uiState.value = _uiState.value.copy(
-                    tables = tables,
+                    allTables = tables, // Use full list
+                    takeAwayTable = takeAway,
                     isLoading = false
                 )
             }.onFailure { error ->
@@ -94,7 +123,6 @@ class TablesViewModel @Inject constructor(
 
     fun selectFloor(floor: String) {
         _uiState.value = _uiState.value.copy(selectedFloor = floor)
-        loadTables()
     }
     
     fun selectStatus(status: String) {
@@ -177,6 +205,41 @@ class TablesViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun openTakeAway() {
+        val table = _uiState.value.takeAwayTable
+        if (table == null) {
+            _uiState.value = _uiState.value.copy(error = "Không tìm thấy bàn 'Mang về' trong hệ thống")
+            return
+        }
+        
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoadingTakeAway = true, 
+                showTakeAwayDialog = true, 
+                error = null
+            )
+            
+            getOrdersByTableUseCase(table.id).onSuccess { orders ->
+                 // Filter active orders
+                 val activeOrders = orders.filter { it.status != "Completed" && it.status != "Cancelled" }
+                 
+                 _uiState.value = _uiState.value.copy(
+                     takeAwayOrders = activeOrders,
+                     isLoadingTakeAway = false
+                 )
+            }.onFailure {
+                 _uiState.value = _uiState.value.copy(
+                     isLoadingTakeAway = false,
+                     error = "Lỗi tải đơn mang về: ${it.message}"
+                 )
+            }
+        }
+    }
+
+    fun closeTakeAwayDialog() {
+        _uiState.value = _uiState.value.copy(showTakeAwayDialog = false)
     }
 
     fun clearMessages() {

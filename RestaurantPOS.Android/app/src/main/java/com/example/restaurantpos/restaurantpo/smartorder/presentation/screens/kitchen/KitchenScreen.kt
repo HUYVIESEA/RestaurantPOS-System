@@ -88,7 +88,8 @@ fun KitchenScreen(
                                 order = order,
                                 isPending = selectedTab == 0,
                                 onAction = { 
-                                    // TODO: Implement status update action
+                                    val newStatus = if (selectedTab == 0) "Processing" else "Completed" // Or "Served"
+                                    viewModel.updateOrderStatus(order.id, newStatus)
                                 }
                             )
                         }
@@ -142,11 +143,29 @@ fun KitchenOrderCard(
             Divider(modifier = Modifier.padding(vertical = 12.dp))
             
             // Items
-            // Note: Order model needs to have items list. Assuming it does or we fetch it.
-            // Currently Order model in previous steps might not have items populated in the list view.
-            // We might need to fetch details or ensure items are included.
-            // For now, placeholder text
-            Text("Chi tiết đơn hàng...", style = MaterialTheme.typography.bodyMedium)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                order.items.forEach { item ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "${item.quantity}x ${item.productName}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    if (!item.note.isNullOrEmpty()) {
+                        Text(
+                            text = "Ghi chú: ${item.note}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
+                }
+            }
             
             Spacer(modifier = Modifier.height(16.dp))
             

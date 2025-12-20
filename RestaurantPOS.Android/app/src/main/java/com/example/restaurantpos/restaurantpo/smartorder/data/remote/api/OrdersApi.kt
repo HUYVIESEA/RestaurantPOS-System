@@ -42,4 +42,10 @@ interface OrdersApi {
         @Path("orderId") orderId: Int,
         @Path("itemId") itemId: Int
     ): OrderDto
+
+    @PUT("api/Orders/{id}/Status")
+    suspend fun updateOrderStatus(
+        @Path("id") id: Int,
+        @Body request: com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.UpdateOrderStatusRequest
+    ): OrderDto
 }

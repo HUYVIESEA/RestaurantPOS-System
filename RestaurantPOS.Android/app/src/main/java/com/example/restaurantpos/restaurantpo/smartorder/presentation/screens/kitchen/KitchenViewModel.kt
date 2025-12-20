@@ -76,10 +76,16 @@ class KitchenViewModel @Inject constructor(
 
     fun updateOrderStatus(orderId: Int, newStatus: String) {
         viewModelScope.launch {
-            // TODO: Implement API call to update status
-            // For now, we just reload to simulate (assuming backend updates via other means or we add updateStatus to repo)
-            // ordersRepository.updateOrderStatus(orderId, newStatus)
-            loadOrders()
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            ordersRepository.updateOrderStatus(orderId, newStatus).onSuccess {
+                // Success - reload orders to refresh lists
+                loadOrders()
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    error = "Update failed: ${error.message}",
+                    isLoading = false
+                )
+            }
         }
     }
 }

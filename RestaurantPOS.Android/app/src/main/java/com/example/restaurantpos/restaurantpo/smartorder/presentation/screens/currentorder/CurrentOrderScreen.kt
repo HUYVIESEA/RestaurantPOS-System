@@ -26,6 +26,7 @@ import java.util.*
 @Composable
 fun CurrentOrderScreen(
     tableId: Int,
+    orderId: Int? = null,
     onNavigateBack: () -> Unit,
     onAddMoreItems: (Int, Int) -> Unit, // tableId, orderId
     viewModel: CurrentOrderViewModel = hiltViewModel()
@@ -42,8 +43,8 @@ fun CurrentOrderScreen(
     var showConfirmDialog by remember { mutableStateOf(false) } // Confirm decrease
     var showEditDialog by remember { mutableStateOf(false) } // Input specific quantity
 
-    LaunchedEffect(true) {
-        viewModel.loadCurrentOrder(tableId)
+    LaunchedEffect(tableId, orderId) {
+        viewModel.loadCurrentOrder(tableId, orderId)
     }
 
     LaunchedEffect(uiState.successMessage, uiState.error) {

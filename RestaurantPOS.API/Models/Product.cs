@@ -23,6 +23,8 @@ namespace RestaurantPOS.API.Models
 
    public string? ImageUrl { get; set; }
 
+        public int StockQuantity { get; set; }
+
         public bool IsAvailable { get; set; } = true;
 
      public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

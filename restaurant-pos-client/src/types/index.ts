@@ -12,7 +12,7 @@ export interface Product {
   // Optional extensions for variants and stock
   variants?: ProductVariant[];
   modifiers?: ProductModifier[];
-  stockQty?: number; // current stock (optional)
+  stockQuantity: number;
 }
 
 export interface Category {

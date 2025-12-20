@@ -52,6 +52,27 @@ class SignalRService @Inject constructor(
                 }
             )
             .build()
+            
+        // Handle reconnection
+        hubConnection?.onClosed { error ->
+             Log.e(TAG, "SignalR connection closed", error)
+             // Simple Manual Reconnect Strategy
+             CoroutineScope(Dispatchers.IO).launch {
+                 var retryCount = 0
+                 while (retryCount < 5 && hubConnection?.connectionState == HubConnectionState.DISCONNECTED) {
+                     try {
+                         kotlinx.coroutines.delay(5000) // Wait 5 seconds
+                         Log.d(TAG, "Attempting to reconnect (Attempt ${retryCount + 1})...")
+                         hubConnection?.start()?.blockingAwait()
+                         Log.d(TAG, "Reconnected successfully")
+                         return@launch
+                     } catch (e: Exception) {
+                         Log.e(TAG, "Reconnect failed", e)
+                         retryCount++
+                     }
+                 }
+             }
+        }
 
         // Register event handlers
         hubConnection?.on("OrderCreated", { orderId: Int ->

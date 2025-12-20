@@ -120,7 +120,10 @@ fun MenuScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(uiState.filteredProducts) { product ->
+                    items(
+                        items = uiState.filteredProducts,
+                        key = { it.id }
+                    ) { product ->
                         ProductItemCard(
                             product = product,
                             currencyFormatter = currencyFormatter,
@@ -153,8 +156,8 @@ fun MenuScreen(
         AddEditProductDialog(
             categories = uiState.distinctCategories,
             onDismiss = { showAddDialog = false },
-            onConfirm = { name, desc, price, catId, catName ->
-                viewModel.addProduct(name, desc, price, catId, catName)
+            onConfirm = { name, desc, price, catId, catName, stock, available ->
+                viewModel.addProduct(name, desc, price, catId, catName, stock, available)
                 showAddDialog = false
             }
         )
@@ -165,13 +168,15 @@ fun MenuScreen(
             product = productToEdit,
             categories = uiState.distinctCategories,
             onDismiss = { productToEdit = null },
-            onConfirm = { name, desc, price, catId, catName ->
+            onConfirm = { name, desc, price, catId, catName, stock, available ->
                 viewModel.updateProduct(productToEdit!!.copy(
                     name = name,
                     description = desc,
                     price = price,
                     categoryId = catId,
-                    categoryName = catName
+                    categoryName = catName,
+                    stockQuantity = stock,
+                    isAvailable = available
                 ))
                 productToEdit = null
             }
@@ -254,6 +259,24 @@ fun ProductDetailDialog(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(
+                        text = "Tồn kho: ${product.stockQuantity}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = if (product.isAvailable) "Còn hàng" else "Hết hàng",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (product.isAvailable) Color(0xFF4CAF50) else Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 
                 Surface(
                     color = MaterialTheme.colorScheme.secondaryContainer,
@@ -293,11 +316,13 @@ fun AddEditProductDialog(
     product: Product? = null,
     categories: List<Pair<Int, String>>,
     onDismiss: () -> Unit,
-    onConfirm: (String, String, Double, Int, String) -> Unit
+    onConfirm: (String, String, Double, Int, String, Int, Boolean) -> Unit
 ) {
     var name by remember { mutableStateOf(product?.name ?: "") }
     var description by remember { mutableStateOf(product?.description ?: "") }
     var priceStr by remember { mutableStateOf(product?.price?.toString() ?: "") }
+    var stockStr by remember { mutableStateOf(product?.stockQuantity?.toString() ?: "0") }
+    var isAvailable by remember { mutableStateOf(product?.isAvailable ?: true) }
     
     // Default to first category if available, or 0/""
     var categoryId by remember { mutableStateOf(product?.categoryId ?: if (categories.isNotEmpty()) categories[0].first else 0) }
@@ -328,6 +353,22 @@ fun AddEditProductDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                OutlinedTextField(
+                    value = stockStr, 
+                    onValueChange = { stockStr = it }, 
+                    label = { Text("Tồn kho") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = isAvailable,
+                        onCheckedChange = { isAvailable = it }
+                    )
+                    Text("Đang kinh doanh")
+                }
                 
                 // Category Dropdown
                 Box(modifier = Modifier.fillMaxWidth()) {
@@ -364,8 +405,9 @@ fun AddEditProductDialog(
         confirmButton = {
             Button(onClick = {
                 val price = priceStr.toDoubleOrNull() ?: 0.0
+                val stock = stockStr.toIntOrNull() ?: 0
                 if (name.isNotBlank() && price > 0) {
-                    onConfirm(name, description, price, categoryId, categoryName)
+                    onConfirm(name, description, price, categoryId, categoryName, stock, isAvailable)
                 }
             }) {
                 Text(if (product == null) "Thêm" else "Lưu")
@@ -402,7 +444,10 @@ fun ProductItemCard(
             ) {
                 if (product.imageUrl != null) {
                     AsyncImage(
-                        model = product.imageUrl,
+                        model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                            .data(product.imageUrl)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = product.name,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
@@ -431,12 +476,25 @@ fun ProductItemCard(
                     maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = currencyFormatter.format(product.price),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                   modifier = Modifier.fillMaxWidth(),
+                   horizontalArrangement = Arrangement.SpaceBetween,
+                   verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = currencyFormatter.format(product.price),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (product.stockQuantity < 10) {
+                        Text(
+                            text = "SL: ${product.stockQuantity}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Red
+                        )
+                    }
+                }
             }
         }
     }

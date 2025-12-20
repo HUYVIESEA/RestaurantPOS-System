@@ -19,6 +19,7 @@ const ProductForm: React.FC = () => {
     categoryId: 0,
     imageUrl: '',
     isAvailable: true,
+    stockQuantity: 0,
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,6 +54,7 @@ const ProductForm: React.FC = () => {
         categoryId: product.categoryId,
         imageUrl: product.imageUrl || '',
         isAvailable: product.isAvailable,
+        stockQuantity: product.stockQuantity || 0,
       });
     } catch (err) {
       setError('Không thể tải thông tin thực đơn');
@@ -64,10 +66,18 @@ const ProductForm: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    // ✅ Validate price
+  /* ✅ Validate price and stock */
     const priceValue = Number(formData.price);
+    const stockValue = Number(formData.stockQuantity);
+    
     if (isNaN(priceValue) || priceValue < 0) {
       setError('Giá thực đơn không hợp lệ');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(stockValue) || stockValue < 0) {
+      setError('Số lượng tồn kho không hợp lệ');
       setLoading(false);
       return;
     }
@@ -76,6 +86,7 @@ const ProductForm: React.FC = () => {
       const productData: Partial<Product> = {
         ...formData,
         price: priceValue, // ✅ Convert to number
+        stockQuantity: stockValue,
         id: isEditMode ? Number(id) : 0,
       };
 
@@ -105,6 +116,9 @@ const ProductForm: React.FC = () => {
       // ✅ Use price utility for clean input
       const cleanedPrice = cleanPriceInput(value);
       setFormData(prev => ({ ...prev, [name]: cleanedPrice }));
+    } else if (name === 'stockQuantity') {
+        const val = parseInt(value) || 0;
+        setFormData(prev => ({ ...prev, [name]: val }));
     } else if (name === 'categoryId') {
       setFormData(prev => ({ ...prev, [name]: Number(value) }));
     } else {
@@ -184,6 +198,19 @@ const ProductForm: React.FC = () => {
               ))}
             </select>
           </div>
+        </div>
+
+        <div className="form-group">
+            <label htmlFor="stockQuantity">Số lượng tồn kho</label>
+            <input
+              type="number"
+              id="stockQuantity"
+              name="stockQuantity"
+              value={formData.stockQuantity}
+              onChange={handleChange}
+              min="0"
+              placeholder="0"
+            />
         </div>
 
         <div className="form-group">

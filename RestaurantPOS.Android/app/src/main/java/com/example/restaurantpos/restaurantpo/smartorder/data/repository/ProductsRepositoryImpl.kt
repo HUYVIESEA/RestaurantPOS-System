@@ -10,9 +10,23 @@ import javax.inject.Inject
 
 class ProductsRepositoryImpl @Inject constructor(
     private val api: ProductsApi,
-    private val dao: ProductDao
+    private val dao: ProductDao,
+    private val settingsManager: com.example.restaurantpos.restaurantpo.smartorder.data.local.SettingsManager
 ) : ProductsRepository {
     
+    // Helper to normalize Image URL
+    private fun getFullImageUrl(relativePath: String?): String? {
+        if (relativePath.isNullOrEmpty()) return null
+        if (relativePath.startsWith("http")) return relativePath
+        
+        var baseUrl = settingsManager.getBaseUrl()
+        if (!baseUrl.endsWith("/")) baseUrl += "/"
+        
+        // Remove leading slash if present
+        val cleanPath = if (relativePath.startsWith("/")) relativePath.substring(1) else relativePath
+        return "$baseUrl$cleanPath"
+    }
+
     override suspend fun getProducts(): Result<List<Product>> {
         return try {
             // Try to fetch from API
@@ -25,7 +39,8 @@ class ProductsRepositoryImpl @Inject constructor(
                     price = dto.price,
                     categoryId = dto.categoryId,
                     categoryName = dto.categoryName,
-                    imageUrl = dto.imageUrl,
+                    imageUrl = getFullImageUrl(dto.imageUrl),
+                    stockQuantity = dto.stockQuantity,
                     isAvailable = dto.isAvailable
                 )
             }
@@ -66,7 +81,8 @@ class ProductsRepositoryImpl @Inject constructor(
                 price = dto.price,
                 categoryId = dto.categoryId,
                 categoryName = dto.categoryName,
-                imageUrl = dto.imageUrl,
+                imageUrl = getFullImageUrl(dto.imageUrl),
+                stockQuantity = dto.stockQuantity,
                 isAvailable = dto.isAvailable
             )
             Result.success(product)
@@ -98,7 +114,8 @@ class ProductsRepositoryImpl @Inject constructor(
                     price = dto.price,
                     categoryId = dto.categoryId,
                     categoryName = dto.categoryName,
-                    imageUrl = dto.imageUrl,
+                    imageUrl = getFullImageUrl(dto.imageUrl),
+                    stockQuantity = dto.stockQuantity,
                     isAvailable = dto.isAvailable
                 )
             }
@@ -130,7 +147,8 @@ class ProductsRepositoryImpl @Inject constructor(
                 price = product.price,
                 categoryId = product.categoryId,
                 categoryName = product.categoryName,
-                imageUrl = product.imageUrl,
+                imageUrl = product.imageUrl, // We send back the full or relative URL? Usually better to not touch it if it's already full
+                stockQuantity = product.stockQuantity,
                 isAvailable = product.isAvailable
             )
             val responseDto = api.createProduct(dto)
@@ -141,7 +159,8 @@ class ProductsRepositoryImpl @Inject constructor(
                 price = responseDto.price,
                 categoryId = responseDto.categoryId,
                 categoryName = responseDto.categoryName,
-                imageUrl = responseDto.imageUrl,
+                imageUrl = getFullImageUrl(responseDto.imageUrl),
+                stockQuantity = responseDto.stockQuantity,
                 isAvailable = responseDto.isAvailable
             )
             dao.insertProduct(newProduct.toEntity())
@@ -161,6 +180,7 @@ class ProductsRepositoryImpl @Inject constructor(
                 categoryId = product.categoryId,
                 categoryName = product.categoryName,
                 imageUrl = product.imageUrl,
+                stockQuantity = product.stockQuantity,
                 isAvailable = product.isAvailable
             )
             api.updateProduct(product.id, dto)

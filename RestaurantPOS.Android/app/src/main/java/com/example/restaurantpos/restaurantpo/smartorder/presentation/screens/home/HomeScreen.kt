@@ -38,6 +38,8 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    val currencyFormatter = remember { java.text.NumberFormat.getCurrencyInstance(java.util.Locale("vi", "VN")) }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -110,17 +112,18 @@ fun HomeScreen(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
+                NavigationDrawerItem(
+                    label = { Text(if (uiState.userRole == "Admin" || uiState.userRole == "Manager") "Quản lý Món" else "Thực đơn") },
+                    selected = false,
+                    onClick = { 
+                        scope.launch { drawerState.close() }
+                        onNavigateToMenu()
+                    },
+                    icon = { Icon(Icons.Rounded.RestaurantMenu, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
                 if (uiState.userRole == "Admin" || uiState.userRole == "Manager") {
-                    NavigationDrawerItem(
-                        label = { Text("Quản lý Món") },
-                        selected = false,
-                        onClick = { 
-                            scope.launch { drawerState.close() }
-                            onNavigateToMenu()
-                        },
-                        icon = { Icon(Icons.Rounded.RestaurantMenu, null) },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    )
                     NavigationDrawerItem(
                         label = { Text("Báo cáo") },
                         selected = false,
@@ -184,7 +187,12 @@ fun HomeScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = Color.White
-                    )
+                    ),
+                    actions = {
+                        IconButton(onClick = { viewModel.loadStats() }) {
+                            Icon(Icons.Rounded.Refresh, "Refresh", tint = Color.White)
+                        }
+                    }
                 )
             }
         ) { padding ->
@@ -208,14 +216,15 @@ fun HomeScreen(
                 ) {
                     SummaryCard(
                         title = "Doanh thu",
-                        value = "15.500.000đ",
+                        value = if (uiState.isLoadingStats) "..." else currencyFormatter.format(uiState.totalRevenue),
                         icon = Icons.Rounded.AttachMoney,
                         color = Color(0xFF4CAF50),
                         modifier = Modifier.weight(1f)
                     )
+                    
                     SummaryCard(
                         title = "Đơn hàng",
-                        value = "42",
+                        value = if (uiState.isLoadingStats) "..." else uiState.totalOrders.toString(),
                         icon = Icons.Rounded.ReceiptLong,
                         color = Color(0xFF2196F3),
                         modifier = Modifier

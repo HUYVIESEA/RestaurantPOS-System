@@ -36,3 +36,7 @@ data class CompleteOrderRequest(
     @SerializedName("receivedAmount") val receivedAmount: Double,
     @SerializedName("paymentMethod") val paymentMethod: String = "Cash"
 )
+
+data class UpdateOrderStatusRequest(
+    @SerializedName("status") val status: String
+)

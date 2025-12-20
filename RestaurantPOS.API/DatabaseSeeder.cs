@@ -153,7 +153,8 @@ namespace RestaurantPOS.API
                     Price = 35000, 
                     CategoryId = category.Id, 
                     ImageUrl = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product 
                 { 
@@ -162,7 +163,8 @@ namespace RestaurantPOS.API
                     Price = 55000, 
                     CategoryId = category.Id, 
                     ImageUrl = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product 
                 { 
@@ -171,7 +173,8 @@ namespace RestaurantPOS.API
                     Price = 75000, 
                     CategoryId = category.Id, 
                     ImageUrl = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 
                 // Side Dishes (Toppings)
@@ -182,7 +185,8 @@ namespace RestaurantPOS.API
                     Price = 15000, 
                     CategoryId = category.Id, 
                     ImageUrl = "https://example.com/chacom.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product 
                 { 
@@ -191,7 +195,8 @@ namespace RestaurantPOS.API
                     Price = 15000, 
                     CategoryId = category.Id, 
                     ImageUrl = "https://example.com/nemran.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product 
                 { 
@@ -200,7 +205,8 @@ namespace RestaurantPOS.API
                     Price = 20000, 
                     CategoryId = category.Id, 
                     ImageUrl = "https://example.com/doisun.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product 
                 { 
@@ -209,7 +215,8 @@ namespace RestaurantPOS.API
                     Price = 25000, 
                     CategoryId = category.Id, 
                     ImageUrl = "https://example.com/thitchangio.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 }
             };
 
@@ -224,6 +231,7 @@ namespace RestaurantPOS.API
                 else
                 {
                     existing.ImageUrl = p.ImageUrl;
+                    existing.StockQuantity = p.StockQuantity;
                     _context.Products.Update(existing);
                     Console.WriteLine($"🔄 Updated product '{p.Name}' image");
                 }
@@ -270,7 +278,8 @@ namespace RestaurantPOS.API
                     Price = 5000,
                     CategoryId = category.Id,
                     ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -279,7 +288,8 @@ namespace RestaurantPOS.API
                     Price = 15000,
                     CategoryId = category.Id,
                     ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -288,7 +298,8 @@ namespace RestaurantPOS.API
                     Price = 15000,
                     CategoryId = category.Id,
                     ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -297,7 +308,8 @@ namespace RestaurantPOS.API
                     Price = 15000,
                     CategoryId = category.Id,
                     ImageUrl = "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -306,7 +318,8 @@ namespace RestaurantPOS.API
                     Price = 15000,
                     CategoryId = category.Id,
                     ImageUrl = "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
 
                 // Soft Drinks
@@ -317,7 +330,8 @@ namespace RestaurantPOS.API
                     Price = 20000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/coca.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -326,7 +340,8 @@ namespace RestaurantPOS.API
                     Price = 20000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/pepsi.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -335,7 +350,8 @@ namespace RestaurantPOS.API
                     Price = 10000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/nuocsuoi.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
 
                 // Beer
@@ -346,7 +362,8 @@ namespace RestaurantPOS.API
                     Price = 25000,
                     CategoryId = category.Id,
                     ImageUrl = "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -355,7 +372,8 @@ namespace RestaurantPOS.API
                     Price = 25000,
                     CategoryId = category.Id,
                     ImageUrl = "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&q=80&w=800",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 }
             };
 
@@ -370,6 +388,7 @@ namespace RestaurantPOS.API
                 else
                 {
                     existing.ImageUrl = p.ImageUrl;
+                    existing.StockQuantity = p.StockQuantity;
                     _context.Products.Update(existing);
                     Console.WriteLine($"🔄 Updated drink '{p.Name}' image");
                 }
@@ -415,7 +434,8 @@ namespace RestaurantPOS.API
                     Price = 65000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/bachinuong.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -424,7 +444,8 @@ namespace RestaurantPOS.API
                     Price = 75000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/namnuong.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -433,7 +454,8 @@ namespace RestaurantPOS.API
                     Price = 70000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/dainuong.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -442,7 +464,8 @@ namespace RestaurantPOS.API
                     Price = 80000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/bocuonnam.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -451,7 +474,8 @@ namespace RestaurantPOS.API
                     Price = 15000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/changanuong.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -460,7 +484,8 @@ namespace RestaurantPOS.API
                     Price = 25000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/canhganuong.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -469,7 +494,8 @@ namespace RestaurantPOS.API
                     Price = 70000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/suonsunnuong.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 }
             };
 
@@ -484,6 +510,7 @@ namespace RestaurantPOS.API
                 else
                 {
                     existing.ImageUrl = p.ImageUrl;
+                    existing.StockQuantity = p.StockQuantity;
                     _context.Products.Update(existing);
                     Console.WriteLine($"🔄 Updated grilled dish '{p.Name}' image");
                 }
@@ -529,7 +556,8 @@ namespace RestaurantPOS.API
                     Price = 10000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/duachuot.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -538,7 +566,8 @@ namespace RestaurantPOS.API
                     Price = 5000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/rausong.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -547,7 +576,8 @@ namespace RestaurantPOS.API
                     Price = 10000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/bunla.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -556,7 +586,8 @@ namespace RestaurantPOS.API
                     Price = 10000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/banhmi.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -565,7 +596,8 @@ namespace RestaurantPOS.API
                     Price = 30000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/khoaitaychien.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -574,7 +606,8 @@ namespace RestaurantPOS.API
                     Price = 30000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/ngochien.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -583,7 +616,8 @@ namespace RestaurantPOS.API
                     Price = 30000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/khoailangken.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 },
                 new Product
                 {
@@ -592,7 +626,8 @@ namespace RestaurantPOS.API
                     Price = 10000,
                     CategoryId = category.Id,
                     ImageUrl = "https://example.com/kimchi.jpg",
-                    IsAvailable = true
+                    IsAvailable = true,
+                    StockQuantity = 100
                 }
             };
 
@@ -607,6 +642,7 @@ namespace RestaurantPOS.API
                 else
                 {
                     existing.ImageUrl = p.ImageUrl;
+                    existing.StockQuantity = p.StockQuantity;
                     _context.Products.Update(existing);
                     Console.WriteLine($"🔄 Updated side dish '{p.Name}' image");
                 }

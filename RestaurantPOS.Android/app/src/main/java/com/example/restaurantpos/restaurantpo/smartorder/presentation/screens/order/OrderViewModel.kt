@@ -58,6 +58,7 @@ data class OrderUiState(
 class OrderViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
     private val createOrderUseCase: com.example.restaurantpos.restaurantpo.smartorder.domain.usecase.CreateOrderUseCase,
+    private val signalRService: com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalRService,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -71,9 +72,17 @@ class OrderViewModel @Inject constructor(
 
     init {
         loadProducts()
+        subscribeToRealtimeUpdates()
     }
     
-    // ... existing methods ...
+    private fun subscribeToRealtimeUpdates() {
+        viewModelScope.launch {
+            signalRService.events.collect {
+                // Refresh products on any update (Order created/completed implies stock change)
+                loadProducts()
+            }
+        }
+    }
 
     fun submitOrder() {
         val currentCart = _uiState.value.cartItems
@@ -100,7 +109,11 @@ class OrderViewModel @Inject constructor(
     
     fun loadProducts() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            // Keep loading state silent if we already have data (refreshing in background)
+            val isFirstLoad = _uiState.value.products.isEmpty()
+            if (isFirstLoad) {
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            }
             
             getProductsUseCase().onSuccess { products ->
                 val categories = listOf("Tất cả") + products.mapNotNull { it.categoryName }.distinct()
@@ -110,10 +123,12 @@ class OrderViewModel @Inject constructor(
                     isLoading = false
                 )
             }.onFailure { error ->
-                _uiState.value = _uiState.value.copy(
-                    error = error.message,
-                    isLoading = false
-                )
+                if (isFirstLoad) {
+                    _uiState.value = _uiState.value.copy(
+                        error = error.message,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -130,6 +145,13 @@ class OrderViewModel @Inject constructor(
         val currentCart = _uiState.value.cartItems
         val existingItemIndex = currentCart.indexOfFirst { it.product.id == product.id }
         
+        // Stock check
+        val currentQty = if (existingItemIndex != -1) currentCart[existingItemIndex].quantity else 0
+        if (currentQty >= product.stockQuantity) {
+            viewModelScope.launch { _uiEvent.send(OrderUiEvent.ShowSnackbar("Đã đạt giới hạn tồn kho")) }
+            return
+        }
+
         val newCart = if (existingItemIndex != -1) {
             // Create new list with updated quantity
             currentCart.mapIndexed { index, item ->
@@ -153,7 +175,15 @@ class OrderViewModel @Inject constructor(
         
         if (itemIndex != -1) {
             val item = currentCart[itemIndex]
+            val product = _uiState.value.products.find { it.id == productId } ?: return
+            
             val newQuantity = item.quantity + delta
+            
+            // Stock Constraint
+            if (delta > 0 && newQuantity > product.stockQuantity) {
+                viewModelScope.launch { _uiEvent.send(OrderUiEvent.ShowSnackbar("Đã đạt giới hạn tồn kho")) }
+                return
+            }
             
             val newCart = if (newQuantity > 0) {
                 // Update quantity
@@ -175,14 +205,24 @@ class OrderViewModel @Inject constructor(
     
     fun setQuantity(productId: Int, quantity: Int) {
         val currentCart = _uiState.value.cartItems
+        val product = _uiState.value.products.find { it.id == productId } ?: return
+        
+        // Cap quantity at stock
+        val finalQuantity = if (quantity > product.stockQuantity) {
+            viewModelScope.launch { _uiEvent.send(OrderUiEvent.ShowSnackbar("Số lượng điều chỉnh về mức tồn kho tối đa: ${product.stockQuantity}")) }
+            product.stockQuantity
+        } else {
+            quantity
+        }
+
         val itemIndex = currentCart.indexOfFirst { it.product.id == productId }
         
         if (itemIndex != -1) {
-            val newCart = if (quantity > 0) {
+            val newCart = if (finalQuantity > 0) {
                 // Update quantity
                 currentCart.mapIndexed { index, cartItem ->
                     if (index == itemIndex) {
-                        cartItem.copy(quantity = quantity)
+                        cartItem.copy(quantity = finalQuantity)
                     } else {
                         cartItem
                     }
@@ -193,15 +233,9 @@ class OrderViewModel @Inject constructor(
             }
             
             _uiState.value = _uiState.value.copy(cartItems = newCart)
-        } else if (quantity > 0) {
-            // Item not in cart, but trying to set positive quantity -> Add it?
-            // Usually setQuantity is called on existing items, but if we allow clicking on product list item quantity...
-            // Let's find the product in products list
-            val product = _uiState.value.products.find { it.id == productId }
-            if (product != null) {
-                val newCart = currentCart + CartItem(product, quantity)
-                _uiState.value = _uiState.value.copy(cartItems = newCart)
-            }
+        } else if (finalQuantity > 0) {
+            val newCart = currentCart + CartItem(product, finalQuantity)
+            _uiState.value = _uiState.value.copy(cartItems = newCart)
         }
     }
     

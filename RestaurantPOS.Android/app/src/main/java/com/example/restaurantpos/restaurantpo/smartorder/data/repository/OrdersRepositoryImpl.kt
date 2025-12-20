@@ -273,4 +273,25 @@ class OrdersRepositoryImpl @Inject constructor(
             Result.failure(Exception("Failed to remove item: ${e.message}"))
         }
     }
+    override suspend fun updateOrderStatus(orderId: Int, status: String): Result<Order> {
+        return try {
+            val request = com.example.restaurantpos.restaurantpo.smartorder.data.remote.dto.UpdateOrderStatusRequest(status = status)
+            val dto = api.updateOrderStatus(orderId, request)
+            val order = mapDtoToDomain(dto)
+            
+            // Update DB
+            try {
+                val orderEntity = order.toEntity(isSynced = true)
+                val itemEntities = order.items.map { it.toEntity(0) }
+                dao.updateOrderWithItems(orderEntity, itemEntities)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            
+            Result.success(order)
+        } catch (e: Exception) {
+            e.printStackTrace()
+             Result.failure(Exception("Failed to update order status: ${e.message}"))
+        }
+    }
 }

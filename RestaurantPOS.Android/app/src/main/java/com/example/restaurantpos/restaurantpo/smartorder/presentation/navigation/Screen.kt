@@ -9,8 +9,10 @@ sealed class Screen(val route: String) {
             if (orderId != null) "order/$tableId?orderId=$orderId" 
             else "order/$tableId"
     }
-    object CurrentOrder : Screen("current_order/{tableId}") {
-        fun createRoute(tableId: Int) = "current_order/$tableId"
+    object CurrentOrder : Screen("current_order/{tableId}?orderId={orderId}") {
+        fun createRoute(tableId: Int, orderId: Int? = null) = 
+            if (orderId != null) "current_order/$tableId?orderId=$orderId" 
+            else "current_order/$tableId"
     }
     object OrderHistory : Screen("order_history")
     object Settings : Screen("settings")
@@ -18,4 +20,5 @@ sealed class Screen(val route: String) {
     object Kitchen : Screen("kitchen")
     object UserManagement : Screen("user_management")
     object Reports : Screen("reports")
+    object ScanQr : Screen("scan_qr")
 }

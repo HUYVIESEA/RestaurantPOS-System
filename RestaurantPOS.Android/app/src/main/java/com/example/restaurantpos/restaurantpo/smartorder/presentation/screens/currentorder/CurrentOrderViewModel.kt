@@ -60,25 +60,30 @@ class CurrentOrderViewModel @Inject constructor(
         }
     }
 
-    fun loadCurrentOrder(tableId: Int) {
+    fun loadCurrentOrder(tableId: Int, orderId: Int? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             ordersRepository.getOrdersByTable(tableId).onSuccess { orders ->
                 android.util.Log.d("CurrentOrderVM", "Found ${orders.size} orders for table $tableId")
-                orders.forEach { order ->
-                    android.util.Log.d("CurrentOrderVM", "Order #${order.id}: status=${order.status}, items=${order.items.size}")
+                
+                var currentOrder: Order? = null
+                
+                if (orderId != null) {
+                    // Try to find specific order
+                    currentOrder = orders.find { it.id == orderId }
                 }
-                
-                // Get the most recent pending order
-                var currentOrder = orders
-                    .filter { it.status.equals("Pending", ignoreCase = true) }
-                    .maxByOrNull { it.orderDate }
-                
-                // Fallback: If no pending order, get the most recent order
-                if (currentOrder == null && orders.isNotEmpty()) {
-                    currentOrder = orders.maxByOrNull { it.orderDate }
-                    android.util.Log.d("CurrentOrderVM", "No pending order, using most recent: #${currentOrder?.id}")
+
+                if (currentOrder == null) {
+                    // Fallback to existing logic: most recent pending
+                    currentOrder = orders
+                        .filter { it.status.equals("Pending", ignoreCase = true) }
+                        .maxByOrNull { it.orderDate }
+                    
+                    // Fallback: If no pending order, get the most recent order
+                    if (currentOrder == null && orders.isNotEmpty()) {
+                        currentOrder = orders.maxByOrNull { it.orderDate }
+                    }
                 }
 
                 _uiState.value = _uiState.value.copy(
@@ -86,7 +91,6 @@ class CurrentOrderViewModel @Inject constructor(
                     isLoading = false
                 )
             }.onFailure { error ->
-                android.util.Log.e("CurrentOrderVM", "Error loading orders", error)
                 _uiState.value = _uiState.value.copy(
                     error = "Lỗi: ${error.message}",
                     isLoading = false

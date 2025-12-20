@@ -37,6 +37,23 @@ fun NavGraph(
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
+                },
+                onNavigateToScanQr = {
+                    navController.navigate(Screen.ScanQr.route)
+                }
+            )
+        }
+
+        composable(Screen.ScanQr.route) {
+            val viewModel: com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.auth.ScanQrViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+            val context = androidx.compose.ui.platform.LocalContext.current
+            
+            com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.auth.ScanQrScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onQrCodeDetected = { url ->
+                    viewModel.saveBaseUrl(url)
+                    android.widget.Toast.makeText(context, "Đã cập nhật máy chủ. Vui lòng khởi động lại ứng dụng.", android.widget.Toast.LENGTH_LONG).show()
+                    navController.popBackStack()
                 }
             )
         }
@@ -82,6 +99,9 @@ fun NavGraph(
                         navController.navigate(Screen.CurrentOrder.createRoute(tableId))
                     }
                 },
+                onTakeAwayOrderClick = { tableId, orderId ->
+                    navController.navigate(Screen.CurrentOrder.createRoute(tableId, orderId))
+                },
                 onNavigateBack = {
                     navController.popBackStack()
                 }
@@ -110,14 +130,24 @@ fun NavGraph(
         
         composable(
             route = Screen.CurrentOrder.route,
-            arguments = listOf(navArgument("tableId") { type = NavType.IntType })
+            arguments = listOf(
+                navArgument("tableId") { type = NavType.IntType },
+                navArgument("orderId") { 
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
         ) { backStackEntry ->
             val tableId = backStackEntry.arguments?.getInt("tableId") ?: 0
+            val orderIdArg = backStackEntry.arguments?.getInt("orderId") ?: -1
+            val orderId = if (orderIdArg == -1) null else orderIdArg
+            
             com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.currentorder.CurrentOrderScreen(
                 tableId = tableId,
+                orderId = orderId,
                 onNavigateBack = { navController.popBackStack() },
-                onAddMoreItems = { tId, orderId ->
-                    navController.navigate(Screen.Order.createRoute(tId, orderId))
+                onAddMoreItems = { tId, oId ->
+                    navController.navigate(Screen.Order.createRoute(tId, oId))
                 }
             )
         }

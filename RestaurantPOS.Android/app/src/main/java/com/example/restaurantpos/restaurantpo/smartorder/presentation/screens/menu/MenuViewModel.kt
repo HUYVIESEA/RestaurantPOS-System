@@ -100,7 +100,7 @@ class MenuViewModel @Inject constructor(
 
         _uiState.value = state.copy(filteredProducts = result)
     }
-    fun addProduct(name: String, description: String, price: Double, categoryId: Int, categoryName: String) {
+    fun addProduct(name: String, description: String, price: Double, categoryId: Int, categoryName: String, stockQuantity: Int, isAvailable: Boolean) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             val product = Product(
@@ -111,7 +111,8 @@ class MenuViewModel @Inject constructor(
                 categoryId = categoryId,
                 categoryName = categoryName,
                 imageUrl = null, // TODO: Image upload
-                isAvailable = true
+                isAvailable = isAvailable,
+                stockQuantity = stockQuantity
             )
             productsRepository.addProduct(product).onSuccess {
                 loadProducts()

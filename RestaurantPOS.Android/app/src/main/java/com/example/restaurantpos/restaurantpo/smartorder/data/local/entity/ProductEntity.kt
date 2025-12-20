@@ -14,6 +14,7 @@ data class ProductEntity(
     val categoryId: Int,
     val categoryName: String?,
     val imageUrl: String?,
+    val stockQuantity: Int,
     val isAvailable: Boolean
 ) {
     fun toDomain(): Product {
@@ -25,6 +26,7 @@ data class ProductEntity(
             categoryId = categoryId,
             categoryName = categoryName,
             imageUrl = imageUrl,
+            stockQuantity = stockQuantity,
             isAvailable = isAvailable
         )
     }
@@ -39,6 +41,7 @@ fun Product.toEntity(): ProductEntity {
         categoryId = categoryId,
         categoryName = categoryName,
         imageUrl = imageUrl,
+        stockQuantity = stockQuantity,
         isAvailable = isAvailable
     )
 }

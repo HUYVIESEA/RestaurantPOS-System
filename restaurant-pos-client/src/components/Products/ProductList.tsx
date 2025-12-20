@@ -212,16 +212,33 @@ onClick={() => handleCategoryFilter(category.id)}
       </div>
 
   <div className="product-content">
-         <div className="product-header">
-      <h3 className="product-name">{product.name}</h3>
-           <span className={`availability-badge ${product.isAvailable ? 'available' : 'unavailable'}`}>
-   {product.isAvailable ? (
-  <><i className="fas fa-check-circle"></i> Còn hàng</>
-  ) : (
-   <><i className="fas fa-times-circle"></i> Hết hàng</>
-        )}
-  </span>
-      </div>
+          <div className="product-header">
+            <h3 className="product-name">{product.name}</h3>
+            <div className="status-badges">
+              <span className={`availability-badge ${product.isAvailable ? 'available' : 'unavailable'}`}>
+                {product.isAvailable ? (
+                  <><i className="fas fa-check-circle"></i> Còn hàng</>
+                ) : (
+                  <><i className="fas fa-times-circle"></i> Hết hàng</>
+                )}
+              </span>
+              {(product.stockQuantity !== undefined && product.stockQuantity < 10 && product.stockQuantity > 0) && (
+                 <span className="stock-badge low-stock">
+                    <i className="fas fa-exclamation-triangle"></i> Sắp hết: {product.stockQuantity}
+                 </span>
+              )}
+               {(product.stockQuantity !== undefined && product.stockQuantity === 0) && (
+                 <span className="stock-badge out-stock">
+                    <i className="fas fa-ban"></i> Hết kho
+                 </span>
+              )}
+               {(product.stockQuantity !== undefined && product.stockQuantity >= 10) && (
+                 <span className="stock-badge in-stock">
+                    <i className="fas fa-cubes"></i> SL: {product.stockQuantity}
+                 </span>
+              )}
+            </div>
+          </div>
 
      {product.description && (
       <p className="product-description">{product.description}</p>

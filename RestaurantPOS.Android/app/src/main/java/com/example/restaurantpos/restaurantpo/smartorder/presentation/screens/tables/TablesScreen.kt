@@ -23,13 +23,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.restaurantpos.restaurantpo.smartorder.domain.model.Table
-import java.text.SimpleDateFormat
+import com.example.restaurantpos.restaurantpo.smartorder.domain.model.Order
+import java.text.SimpleDateFormat // Existing import
 import java.util.*
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TablesScreen(
     onTableClick: (Int, Boolean) -> Unit,
+    onTakeAwayOrderClick: (Int, Int) -> Unit, // tableId, orderId
     onNavigateBack: () -> Unit,
     viewModel: TablesViewModel = hiltViewModel()
 ) {
@@ -76,6 +80,10 @@ fun TablesScreen(
                             TextButton(onClick = { viewModel.mergeTables() }) {
                                 Text("Ghép bàn", color = Color.White, fontWeight = FontWeight.Bold)
                             }
+                        }
+                         // Add Take Away Button here
+                        IconButton(onClick = { viewModel.openTakeAway() }) {
+                            Icon(Icons.Rounded.ShoppingBag, "Mang về", tint = Color.White)
                         }
                     }
                     IconButton(onClick = { viewModel.loadTables() }) {
@@ -133,7 +141,9 @@ fun TablesScreen(
                             table = table,
                             isSelected = uiState.selectedTables.contains(table.id),
                             onTableClick = {
-                                if (uiState.selectedTables.isNotEmpty()) {
+                                if (uiState.takeAwayTable != null && table.id == uiState.takeAwayTable!!.id) {
+                                    viewModel.openTakeAway()
+                                } else if (uiState.selectedTables.isNotEmpty()) {
                                     viewModel.toggleTableSelection(table.id)
                                 } else {
                                     onTableClick(table.id, table.isAvailable)
@@ -153,7 +163,118 @@ fun TablesScreen(
                 }
             }
         }
+        }
+
+    
+    // Take Away Dialog
+    if (uiState.showTakeAwayDialog) {
+        TakeAwayDialog(
+            orders = uiState.takeAwayOrders,
+            isLoading = uiState.isLoadingTakeAway,
+            onDismiss = { viewModel.closeTakeAwayDialog() },
+            onNewOrder = {
+                viewModel.closeTakeAwayDialog()
+                uiState.takeAwayTable?.let { table ->
+                    // Navigate to Order screen with tableId. 
+                    // Note: OrderViewModel creates new order for table.
+                    // If multiple orders exist, we assume OrderScreen handles NEW order creation.
+                    // But wait, OrderScreen takes tableId and checks for existing order logic?
+                    // Actually OrderScreen is designed to CREATE order if we start adding items. 
+                    // It doesn't auto-load existing unless programmed to.
+                    // Wait, standard OrderScreen might load existing items if cart is empty?
+                    // Let's assume OrderScreen is for NEW/Edit. 
+                    // Ideally for TakeAway New Order, we want a clean state.
+                    // We might need to ensure OrderViewModel clears cart if table is "Mang về".
+                    // But let's navigate first.
+                    // We use `Screen.Order.createRoute(table.id)` which is standard for "Adding items to table".
+                    
+                    // IMPORTANT: Standard tables: 1 table = 1 order. 
+                    // TakeAway: 1 table = N orders.
+                    // If we navigate to OrderScreen(tableId), OrderViewModel will fetch products. It treats it as "Adding to cart".
+                    // Then submit -> Creates Order. This works for New Order.
+                     onTableClick(table.id, true) // Treat as available for New Order
+                }
+            },
+            onSelectOrder = { order ->
+                viewModel.closeTakeAwayDialog()
+                uiState.takeAwayTable?.let { table ->
+                    onTakeAwayOrderClick(table.id, order.id)
+                }
+            }
+        )
     }
+}
+
+@Composable
+fun TakeAwayDialog(
+    orders: List<Order>,
+    isLoading: Boolean,
+    onDismiss: () -> Unit,
+    onNewOrder: () -> Unit,
+    onSelectOrder: (Order) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Đơn hàng Mang về") },
+        text = {
+            if (isLoading) {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (orders.isEmpty()) {
+                Text("Chưa có đơn hàng nào đang phục vụ.")
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(1),
+                    modifier = Modifier.heightIn(max = 400.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(orders) { order ->
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            onClick = { onSelectOrder(order) }
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text("Đơn #${order.id}", fontWeight = FontWeight.Bold)
+                                    Text(
+                                        SimpleDateFormat("HH:mm", Locale.getDefault()).format(order.orderDate),
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                                Text(
+                                    java.text.NumberFormat.getCurrencyInstance(Locale("vi", "VN")).format(order.totalAmount),
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onNewOrder) {
+                Icon(Icons.Rounded.Add, null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("Đơn mới")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Đóng")
+            }
+        }
+    )
 }
 
 @Composable

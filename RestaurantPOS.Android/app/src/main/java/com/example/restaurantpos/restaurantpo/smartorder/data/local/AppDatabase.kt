@@ -12,7 +12,7 @@ import com.example.restaurantpos.restaurantpo.smartorder.data.local.entity.Table
 
 @Database(
     entities = [ProductEntity::class, TableEntity::class, OrderEntity::class, OrderItemEntity::class],
-    version = 2, // Increment version
+    version = 3, // Increment version
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

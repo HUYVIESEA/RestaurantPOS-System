@@ -19,6 +19,9 @@ class SmartOrderApp : Application(), Configuration.Provider {
     lateinit var signalRService: SignalRService
 
     @Inject
+    lateinit var settingsManager: com.example.restaurantpos.restaurantpo.smartorder.data.local.SettingsManager
+
+    @Inject
     lateinit var workerFactory: androidx.hilt.work.HiltWorkerFactory
     
     override val workManagerConfiguration: Configuration
@@ -29,15 +32,15 @@ class SmartOrderApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         
-        // Initialize SignalR connection
-        // TODO: Get base URL from config or BuildConfig
-        // Alternative URLs for testing:
-        // - Production: http://192.168.0.101:5000
-        // - Client: http://172.16.13.163:5000
-        // - Emulator: http://10.0.2.2:5000
-        val clientURL = "http://192.168.0.101:5000"
+        // Initialize SignalR connection with dynamic URL
+        val baseUrl = settingsManager.getBaseUrl()
         try {
-            signalRService.connect(clientURL)
+             // Ensure URL does not end with slash for SignalRService (it appends /restaurantHub)
+             // Actually currently SignalRService appends. 
+             // baseUrl from SettingsManager might or might not have slash.
+             // Clean it up.
+             val cleanUrl = baseUrl.removeSuffix("/")
+            signalRService.connect(cleanUrl)
         } catch (e: Exception) {
             e.printStackTrace()
         }

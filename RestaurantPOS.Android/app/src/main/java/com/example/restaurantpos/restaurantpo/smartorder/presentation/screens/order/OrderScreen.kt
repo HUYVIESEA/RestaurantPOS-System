@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -330,12 +331,19 @@ fun ProductListItem(
     onRemoveClick: () -> Unit,
     onQuantityClick: () -> Unit
 ) {
+    val isOutOfStock = product.stockQuantity <= 0
+    val canOrder = product.isAvailable && !isOutOfStock
+    val isLowStock = product.isAvailable && product.stockQuantity < 10 && !isOutOfStock
+    val maxReached = quantity >= product.stockQuantity
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onAddClick),
+            .clickable(enabled = canOrder) { if (canOrder) onAddClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(
+            containerColor = if (canOrder) Color.White else Color(0xFFF5F5F5)
+        )
     ) {
         Row(
             modifier = Modifier
@@ -359,7 +367,9 @@ fun ProductListItem(
                             .build(),
                         contentDescription = product.name,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .alpha(if (!canOrder) 0.5f else 1f)
                     )
                 } else {
                     Icon(
@@ -368,6 +378,22 @@ fun ProductListItem(
                         modifier = Modifier.size(24.dp),
                         tint = Color.Gray
                     )
+                }
+                
+                if (!canOrder) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Rounded.Block, 
+                            contentDescription = "Unavailable", 
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
 
@@ -379,52 +405,92 @@ fun ProductListItem(
                     text = product.name,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = if (canOrder) Color.Black else Color.Gray
                 )
                 Text(
                     text = currencyFormatter.format(product.price),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = if (canOrder) MaterialTheme.colorScheme.primary else Color.Gray,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyMedium
                 )
+                
+                // Stock Status Labels
+                if (!product.isAvailable) {
+                     Text(
+                        text = "Ngừng kinh doanh",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Red
+                    )
+                } else if (isOutOfStock) {
+                    Text(
+                        text = "Hết hàng",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Red
+                    )
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Tồn: ${product.stockQuantity}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray
+                        )
+                        if (isLowStock) {
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "(Sắp hết)",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color(0xFFFF9800), // Orange
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
             }
 
             // Quantity Controls
-            if (quantity > 0) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(
-                        onClick = onRemoveClick,
-                        modifier = Modifier.size(32.dp).background(Color(0xFFEEEEEE), CircleShape)
-                    ) {
-                        Icon(Icons.Rounded.Remove, null, modifier = Modifier.size(16.dp))
+            if (canOrder) {
+                if (quantity > 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            onClick = onRemoveClick,
+                            modifier = Modifier.size(32.dp).background(Color(0xFFEEEEEE), CircleShape)
+                        ) {
+                            Icon(Icons.Rounded.Remove, null, modifier = Modifier.size(16.dp))
+                        }
+                        
+                        Surface(
+                            onClick = onQuantityClick,
+                            shape = RoundedCornerShape(4.dp),
+                            color = Color.Transparent
+                        ) {
+                            Text(
+                                text = quantity.toString(),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                fontWeight = FontWeight.Bold,
+                                textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                                color = if (maxReached) Color.Red else Color.Unspecified
+                            )
+                        }
+                        
+                        IconButton(
+                            onClick = { if (!maxReached) onAddClick() },
+                            modifier = Modifier.size(32.dp).background(
+                                if (maxReached) Color.Gray else MaterialTheme.colorScheme.primary, 
+                                CircleShape
+                            ),
+                            enabled = !maxReached
+                        ) {
+                            Icon(Icons.Rounded.Add, null, modifier = Modifier.size(16.dp), tint = Color.White)
+                        }
                     }
-                    
-                    Surface(
-                        onClick = onQuantityClick,
-                        shape = RoundedCornerShape(4.dp),
-                        color = Color.Transparent
-                    ) {
-                        Text(
-                            text = quantity.toString(),
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                            fontWeight = FontWeight.Bold,
-                            textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
-                        )
-                    }
-                    
+                } else {
                     IconButton(
                         onClick = onAddClick,
-                        modifier = Modifier.size(32.dp).background(MaterialTheme.colorScheme.primary, CircleShape)
+                        modifier = Modifier.size(32.dp).background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
                     ) {
-                        Icon(Icons.Rounded.Add, null, modifier = Modifier.size(16.dp), tint = Color.White)
+                        Icon(Icons.Rounded.Add, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                     }
-                }
-            } else {
-                IconButton(
-                    onClick = onAddClick,
-                    modifier = Modifier.size(32.dp).background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
-                ) {
-                    Icon(Icons.Rounded.Add, null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }

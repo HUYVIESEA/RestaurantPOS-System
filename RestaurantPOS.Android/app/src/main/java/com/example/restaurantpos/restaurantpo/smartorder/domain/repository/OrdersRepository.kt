@@ -11,4 +11,5 @@ interface OrdersRepository {
     suspend fun completeOrder(orderId: Int, receivedAmount: Double, paymentMethod: String = "Cash"): Result<Order>
     suspend fun updateItemQuantity(orderId: Int, itemId: Int, quantity: Int): Result<Order>
     suspend fun removeItemFromOrder(orderId: Int, itemId: Int): Result<Order>
+    suspend fun updateOrderStatus(orderId: Int, status: String): Result<Order>
 }

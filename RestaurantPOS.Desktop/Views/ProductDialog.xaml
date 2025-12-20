@@ -40,6 +40,13 @@
 
             <TextBox materialDesign:HintAssist.Hint="Đơn vị tính" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                      Text="{Binding Product.Unit}" Margin="0,0,0,10"/>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBox materialDesign:HintAssist.Hint="Tồn kho" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding Product.StockQuantity}" Width="150" Margin="0,0,20,10"/>
+                         
+                <CheckBox Content="Đang kinh doanh" IsChecked="{Binding Product.IsAvailable}" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            </StackPanel>
             
             <ComboBox materialDesign:HintAssist.Hint="Danh mục" Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                       ItemsSource="{Binding Categories}" DisplayMemberPath="Name" SelectedValuePath="Id"

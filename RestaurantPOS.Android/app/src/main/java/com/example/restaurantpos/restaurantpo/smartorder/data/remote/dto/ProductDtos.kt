@@ -10,5 +10,6 @@ data class ProductDto(
     @SerializedName("categoryId") val categoryId: Int,
     @SerializedName("categoryName") val categoryName: String?,
     @SerializedName("imageUrl") val imageUrl: String?,
+    @SerializedName("stockQuantity") val stockQuantity: Int = 0,
     @SerializedName("isAvailable") val isAvailable: Boolean
 )
