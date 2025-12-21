@@ -15,7 +15,9 @@ sealed class Screen(val route: String) {
             else "current_order/$tableId"
     }
     object OrderHistory : Screen("order_history")
-    object Settings : Screen("settings")
+    object Settings : Screen("settings/{userRole}") {
+        fun createRoute(userRole: String) = "settings/$userRole"
+    }
     object Menu : Screen("menu")
     object Kitchen : Screen("kitchen")
     object UserManagement : Screen("user_management")

@@ -15,6 +15,8 @@ class SettingsManager @Inject constructor(
     companion object {
         private const val KEY_BASE_URL = "base_url"
         private const val DEFAULT_BASE_URL = "http://192.168.0.101:5000" // Default fallback
+        private const val KEY_PRINTER_IP = "printer_ip"
+        private const val KEY_PRINTER_PORT = "printer_port"
     }
 
     fun getBaseUrl(): String {
@@ -23,5 +25,21 @@ class SettingsManager @Inject constructor(
 
     fun saveBaseUrl(url: String) {
         prefs.edit().putString(KEY_BASE_URL, url).apply()
+    }
+
+    fun getPrinterIp(): String? {
+        return prefs.getString(KEY_PRINTER_IP, null)
+    }
+
+    fun getPrinterPort(): Int? {
+        val port = prefs.getInt(KEY_PRINTER_PORT, -1)
+        return if (port != -1) port else null
+    }
+
+    fun savePrinterSettings(ip: String, port: Int) {
+        prefs.edit()
+            .putString(KEY_PRINTER_IP, ip)
+            .putInt(KEY_PRINTER_PORT, port)
+            .apply()
     }
 }

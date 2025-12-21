@@ -28,7 +28,7 @@ fun HomeScreen(
     onNavigateToOrderHistory: () -> Unit,
     onNavigateToMenu: () -> Unit,
     onNavigateToKitchen: () -> Unit,
-    onNavigateToSettings: () -> Unit,
+    onNavigateToSettings: (String) -> Unit,
     onNavigateToUserManagement: () -> Unit,
     onNavigateToReports: () -> Unit,
     onLogout: () -> Unit,
@@ -123,7 +123,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                if (uiState.userRole == "Admin" || uiState.userRole == "Manager") {
+                if (uiState.userRole == "Admin" || uiState.userRole == "Manager" || uiState.userRole == "Staff") {
                     NavigationDrawerItem(
                         label = { Text("Báo cáo") },
                         selected = false,
@@ -147,17 +147,18 @@ fun HomeScreen(
                         icon = { Icon(Icons.Rounded.People, null) },
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
-                    NavigationDrawerItem(
-                        label = { Text("Cài đặt") },
-                        selected = false,
-                        onClick = { 
-                            scope.launch { drawerState.close() }
-                            onNavigateToSettings()
-                        },
-                        icon = { Icon(Icons.Rounded.Settings, null) },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    )
                 }
+                
+                NavigationDrawerItem(
+                    label = { Text("Cài đặt") },
+                    selected = false,
+                    onClick = { 
+                        scope.launch { drawerState.close() }
+                        onNavigateToSettings(uiState.userRole)
+                    },
+                    icon = { Icon(Icons.Rounded.Settings, null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
                 
                 Spacer(modifier = Modifier.weight(1f))
                 Divider()

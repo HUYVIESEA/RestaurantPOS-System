@@ -72,8 +72,8 @@ fun NavGraph(
                 onNavigateToMenu = {
                     navController.navigate(Screen.Menu.route)
                 },
-                onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
+                onNavigateToSettings = { role ->
+                    navController.navigate(Screen.Settings.createRoute(role))
                 },
                 onNavigateToUserManagement = {
                     navController.navigate(Screen.UserManagement.route)
@@ -163,8 +163,13 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Settings.route) {
+        composable(
+            route = Screen.Settings.route,
+            arguments = listOf(navArgument("userRole") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userRole = backStackEntry.arguments?.getString("userRole") ?: "Staff"
             com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.settings.SettingsScreen(
+                userRole = userRole,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
