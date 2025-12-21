@@ -154,6 +154,94 @@ namespace RestaurantPOS.Desktop.ViewModels
                 }
                 catch { /* Ignore preload errors */ }
             });
+
+            _ = InitializeSignalR();
+        }
+
+        private async Task InitializeSignalR()
+        {
+            var signalR = SignalRService.Instance;
+            
+            signalR.OrderCreated += OnOrderEvent;
+            signalR.OrderUpdated += OnOrderEvent;
+            signalR.OrderCompleted += OnOrderEvent;
+            signalR.TableUpdated += OnTableUpdated;
+            
+            await signalR.ConnectAsync();
+        }
+
+        private void OnOrderEvent(int orderId)
+        {
+             Application.Current.Dispatcher.Invoke(() =>
+             {
+                 _ = LoadTablesAsync(); 
+                 
+                 if (CurrentOrder != null && CurrentOrder.Id == orderId)
+                 {
+                      _ = ReloadCurrentOrder();
+                 }
+                 else if (CurrentOrder != null && SelectedTable != null)
+                 {
+                     // Check if this order events belongs to current table? 
+                     // Since we only get ID, we can't be sure unless we fetch.
+                     // Safest is to reload current table if we suspect activity.
+                     // But simpler: just reload table list. If user is inside a table, maybe check if that table status changed?
+                     // Let's just reload table list for now.
+                 }
+                 
+                 if (IsDashboardView) _ = DashboardVM.LoadDashboardData();
+             });
+        }
+        
+        private void OnTableUpdated(int tableId)
+        {
+             Application.Current.Dispatcher.Invoke(() =>
+             {
+                 _ = LoadTablesAsync();
+                 if (SelectedTable != null && SelectedTable.Id == tableId)
+                 {
+                     // Refresh current order just in case
+                     _ = ReloadCurrentOrder();
+                 }
+             });
+        }
+
+        private async Task ReloadCurrentOrder()
+        {
+             if (SelectedTable == null) return;
+             try 
+             {
+                 var orders = await _orderService.GetOrdersByTableAsync(SelectedTable.Id);
+                 var activeOrder = orders.FirstOrDefault(o => o.Status != "Completed" && o.Status != "Cancelled");
+                 
+                 CurrentOrder = activeOrder;
+                 CartItems.Clear();
+
+                 if (activeOrder != null)
+                 {
+                     foreach (var item in activeOrder.OrderItems)
+                     {
+                         var product = _allProducts.FirstOrDefault(p => p.Id == item.ProductId) ?? item.Product;
+                         if (product != null)
+                         {
+                             var cartItem = new CartItem(product, item.Quantity, false, item.Id) { Note = item.Note ?? "" };
+                             CartItems.Add(cartItem);
+                         }
+                     }
+                      
+                     if (SelectedTable.IsAvailable) 
+                     {
+                         SelectedTable.IsAvailable = false;
+                     }
+                 }
+                 else
+                 {
+                      if (!SelectedTable.IsAvailable) SelectedTable.IsAvailable = true;
+                 }
+                 OnPropertyChanged(nameof(TotalAmount));
+                 UpdateCustomerDisplay();
+             }
+             catch {}
         }
 
         // ...

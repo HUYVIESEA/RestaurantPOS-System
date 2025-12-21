@@ -364,7 +364,9 @@ namespace RestaurantPOS.Desktop.ViewModels
                     Category = product.Category,
                     ImageUrl = product.ImageUrl,
                     Unit = product.Unit,
-                    Description = product.Description
+                    Description = product.Description,
+                    StockQuantity = product.StockQuantity,
+                    IsAvailable = product.IsAvailable
                 };
 
                 var editCategories = new ObservableCollection<Category>(Categories.Where(c => c.Id != 0));
