@@ -29,14 +29,18 @@ class SignalRService @Inject constructor(
     private val tokenManager: TokenManager
 ) {
     private var hubConnection: HubConnection? = null
-    private val _events = MutableSharedFlow<SignalREvent>(replay = 0)
+
+    val connectionId: String?
+        get() = hubConnection?.connectionId
+
+    private val _events = MutableSharedFlow<SignalREvent>(replay = 0, extraBufferCapacity = 64)
     val events: SharedFlow<SignalREvent> = _events.asSharedFlow()
 
     private val TAG = "SignalRService"
 
     fun connect(baseUrl: String) {
         if (hubConnection?.connectionState == HubConnectionState.CONNECTED) {
-            Log.d(TAG, "Already connected")
+            Log.d(TAG, "Already connected. ID: ${hubConnection?.connectionId}")
             return
         }
 
@@ -44,7 +48,6 @@ class SignalRService @Inject constructor(
 
         hubConnection = HubConnectionBuilder.create(hubUrl)
             .withAccessTokenProvider(
-                // SignalR requires RxJava Single<String>
                 Single.fromCallable {
                     runBlocking {
                         tokenManager.token.first() ?: ""
@@ -64,7 +67,7 @@ class SignalRService @Inject constructor(
                          kotlinx.coroutines.delay(5000) // Wait 5 seconds
                          Log.d(TAG, "Attempting to reconnect (Attempt ${retryCount + 1})...")
                          hubConnection?.start()?.blockingAwait()
-                         Log.d(TAG, "Reconnected successfully")
+                         Log.d(TAG, "Reconnected successfully. ID: ${hubConnection?.connectionId}")
                          return@launch
                      } catch (e: Exception) {
                          Log.e(TAG, "Reconnect failed", e)
@@ -76,29 +79,29 @@ class SignalRService @Inject constructor(
 
         // Register event handlers
         hubConnection?.on("OrderCreated", { orderId: Int ->
-            Log.d(TAG, "OrderCreated: $orderId")
+            Log.d(TAG, "Received OrderCreated: $orderId")
             _events.tryEmit(SignalREvent.OrderCreated(orderId))
         }, Int::class.javaObjectType)
 
         hubConnection?.on("OrderUpdated", { orderId: Int ->
-            Log.d(TAG, "OrderUpdated: $orderId")
+            Log.d(TAG, "Received OrderUpdated: $orderId")
             _events.tryEmit(SignalREvent.OrderUpdated(orderId))
         }, Int::class.javaObjectType)
 
         hubConnection?.on("OrderCompleted", { orderId: Int ->
-            Log.d(TAG, "OrderCompleted: $orderId")
+            Log.d(TAG, "Received OrderCompleted: $orderId")
             _events.tryEmit(SignalREvent.OrderCompleted(orderId))
         }, Int::class.javaObjectType)
 
         hubConnection?.on("TableUpdated", { tableId: Int ->
-            Log.d(TAG, "TableUpdated: $tableId")
+            Log.d(TAG, "Received TableUpdated: $tableId")
             _events.tryEmit(SignalREvent.TableUpdated(tableId))
         }, Int::class.javaObjectType)
 
         // Start connection
         try {
             hubConnection?.start()?.blockingAwait()
-            Log.d(TAG, "SignalR connected to $hubUrl")
+            Log.d(TAG, "SignalR connected to $hubUrl. ID: ${hubConnection?.connectionId}")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to connect to SignalR: ${e.message}", e)
         }

@@ -3,6 +3,7 @@ package com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.k
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalRService
+import com.example.restaurantpos.restaurantpo.smartorder.data.remote.SignalREvent
 import com.example.restaurantpos.restaurantpo.smartorder.domain.model.Order
 import com.example.restaurantpos.restaurantpo.smartorder.domain.repository.OrdersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,11 +68,65 @@ class KitchenViewModel @Inject constructor(
     private fun listenToSignalREvents() {
         viewModelScope.launch {
             signalRService.events.collect { event ->
-                // Reload on any order update for now
-                // Optimization: Check if event relates to kitchen (Created, StatusChanged)
-                loadOrders()
+                when (event) {
+                    is SignalREvent.OrderCreated -> fetchAndUpsertOrder(event.orderId)
+                    is SignalREvent.OrderUpdated -> fetchAndUpsertOrder(event.orderId)
+                    is SignalREvent.OrderCompleted -> removeOrder(event.orderId)
+                    else -> {
+                        // Optional: Reload all if unsure
+                        // loadOrders() 
+                    }
+                }
             }
         }
+    }
+
+    private fun fetchAndUpsertOrder(orderId: Int) {
+        viewModelScope.launch {
+            ordersRepository.getOrder(orderId).onSuccess { order ->
+                // Check if relevant to Kitchen (Pending or Processing)
+                if (order.status == "Pending" || order.status == "Processing") {
+                    updateLocalOrderList(order)
+                } else {
+                    // If it became Completed or Cancelled, remove it from Kitchen view
+                    removeOrder(orderId)
+                }
+            }.onFailure {
+                // If fetch failed, might be deleted or network error
+                // Ideally log it
+            }
+        }
+    }
+
+    private fun updateLocalOrderList(newOrder: Order) {
+        val currentPending = _uiState.value.pendingOrders.toMutableList()
+        val currentProcessing = _uiState.value.processingOrders.toMutableList()
+
+        // Remove potential existing instance to update it
+        currentPending.removeAll { it.id == newOrder.id }
+        currentProcessing.removeAll { it.id == newOrder.id }
+
+        // Add to appropriate list
+        if (newOrder.status == "Pending") {
+            currentPending.add(newOrder)
+        } else if (newOrder.status == "Processing") {
+            currentProcessing.add(newOrder)
+        }
+
+        _uiState.value = _uiState.value.copy(
+            pendingOrders = currentPending.sortedBy { it.id }, // FIFO based on ID
+            processingOrders = currentProcessing.sortedBy { it.id }
+        )
+    }
+
+    private fun removeOrder(orderId: Int) {
+        val currentPending = _uiState.value.pendingOrders.filter { it.id != orderId }
+        val currentProcessing = _uiState.value.processingOrders.filter { it.id != orderId }
+
+        _uiState.value = _uiState.value.copy(
+            pendingOrders = currentPending,
+            processingOrders = currentProcessing
+        )
     }
 
     fun updateOrderStatus(orderId: Int, newStatus: String) {
