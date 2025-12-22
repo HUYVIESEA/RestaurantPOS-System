@@ -13,6 +13,9 @@ using RestaurantPOS.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Fix DateTime issues with Postgres
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 
 // Add services to the container.
 builder.Services.AddControllers()

@@ -3,6 +3,14 @@ import axios from 'axios';
 // Auto-detect API URL based on current hostname
 // If accessing via LAN (not localhost), use the same hostname for API
 const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    
+    // If accessing via LAN (not localhost), use the current IP for API
+    if (!isLocalhost) {
+        return `${window.location.protocol}//${hostname}:5000/api`;
+    }
+
     return (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/api';
 };
 
@@ -33,6 +41,20 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', {
+      message: error.message,
+      code: error.code,
+      config: {
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+        method: error.config?.method
+      },
+      response: {
+        status: error.response?.status,
+        data: error.response?.data
+      }
+    });
+
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'; // ✅ ADD React
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../../services/productService';
-import { orderService } from '../../services/orderService';
+import reportService from '../../services/reportService'; // e
 import { categoryService } from '../../services/categoryService';
 import { tableService } from '../../services/tableService';
 import { formatCurrency } from '../../utils/priceUtils'; // ✅ ADD
@@ -37,32 +37,23 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [products, orders, categories, tables] = await Promise.all([
+      const today = new Date().toISOString().split('T')[0];
+      
+      const [products, categories, tables, summary, statistics] = await Promise.all([
         productService.getAll(),
-        orderService.getAll(),
         categoryService.getAll(),
         tableService.getAll(),
+        reportService.getSalesSummary(),
+        reportService.getOrderStatistics(today, today) // Get stats for today
       ]);
-
-      // Calculate today's revenue
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const todayOrders = orders.filter(order => {
-        const orderDate = new Date(order.orderDate);
-        return orderDate >= today && order.status === 'Completed';
-      });
-
-      const todayRevenue = todayOrders.reduce((sum, order) => sum + order.totalAmount, 0);
-      const pendingOrders = orders.filter(order => order.status === 'Pending').length;
 
       setStats({
         totalProducts: products.length,
-        totalOrders: orders.length,
+        totalOrders: summary.todayOrders,
         totalCategories: categories.length,
         availableTables: tables.filter(t => t.isAvailable).length,
-        todayRevenue,
-        pendingOrders,
+        todayRevenue: summary.todayRevenue,
+        pendingOrders: statistics.pendingOrders,
       });
       setError(null);
     } catch (err) {

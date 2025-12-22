@@ -194,3 +194,11 @@ export interface ExportRequest {
   endDate: string;
   format: 'PDF' | 'Excel' | 'CSV';
 }
+
+export interface PagedResult<T> {
+  items: T[];
+  totalItems: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}

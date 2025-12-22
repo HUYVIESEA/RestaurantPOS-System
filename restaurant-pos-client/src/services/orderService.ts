@@ -1,10 +1,17 @@
 import apiClient from './api';
-import { Order, OrderItem } from '../types';
+import { Order, OrderItem, PagedResult } from '../types';
 
 export const orderService = {
   getAll: async (): Promise<Order[]> => {
-    const response = await apiClient.get<Order[]>('/Orders');
-    return response.data;
+    // Analytics needs ALL orders to calculate revenue, growth, etc.
+    // The backend endpoint is paged, so we request a large page size.
+    const response = await apiClient.get<PagedResult<Order>>('/Orders?page=1&pageSize=10000');
+    // Normalize response: check if it's paged
+    if (response.data && 'items' in response.data) {
+       return response.data.items;
+    }
+    // Fallback if backend changes to return array directly
+    return response.data as unknown as Order[];
   },
 
   getById: async (id: number): Promise<Order> => {

@@ -9,11 +9,16 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Green.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
             <utils:LessThanConverter x:Key="LessThanConverter"/>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <utils:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+            <utils:BooleanToContentConverter x:Key="BooleanToContentConverter"/>
+            <utils:SubstringConverter x:Key="SubstringConverter"/>
+            <utils:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

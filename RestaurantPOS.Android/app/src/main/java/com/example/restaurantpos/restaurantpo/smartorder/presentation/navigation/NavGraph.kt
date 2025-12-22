@@ -170,7 +170,12 @@ fun NavGraph(
             val userRole = backStackEntry.arguments?.getString("userRole") ?: "Staff"
             com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.settings.SettingsScreen(
                 userRole = userRole,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             )
         }
 

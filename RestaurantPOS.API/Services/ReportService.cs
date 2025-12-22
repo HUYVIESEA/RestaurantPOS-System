@@ -122,6 +122,9 @@ namespace RestaurantPOS.API.Services
 
         public async Task<List<ProductReportDto>> GetProductPerformanceAsync(DateTime startDate, DateTime endDate)
         {
+            if (startDate.Kind != DateTimeKind.Utc) startDate = startDate.ToUniversalTime();
+            if (endDate.Kind != DateTimeKind.Utc) endDate = endDate.ToUniversalTime();
+
             var productStats = await _context.OrderItems
                 .Include(oi => oi.Order)
                 .Include(oi => oi.Product)
@@ -148,6 +151,9 @@ namespace RestaurantPOS.API.Services
 
         public async Task<ProductReportDto> GetProductReportByIdAsync(int productId, DateTime startDate, DateTime endDate)
         {
+            if (startDate.Kind != DateTimeKind.Utc) startDate = startDate.ToUniversalTime();
+            if (endDate.Kind != DateTimeKind.Utc) endDate = endDate.ToUniversalTime();
+
             var product = await _context.Products
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == productId);
@@ -186,25 +192,26 @@ namespace RestaurantPOS.API.Services
         // Order Statistics
         public async Task<OrderStatisticsDto> GetOrderStatisticsAsync(DateTime startDate, DateTime endDate)
         {
-            var stats = await _context.Orders
-                .AsNoTracking()
-                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
-                .GroupBy(o => 1) // Fake group to aggregate all
-                .Select(g => new
-                {
-                    TotalOrders = g.Count(),
-                    CompletedOrders = g.Count(o => o.Status == "Completed"),
-                    PendingOrders = g.Count(o => o.Status == "Pending"),
-                    CancelledOrders = g.Count(o => o.Status == "Cancelled"),
-                    TotalRevenue = g.Sum(o => o.Status == "Completed" ? o.TotalAmount : 0)
-                })
-                .FirstOrDefaultAsync();
+            // Ensure UTC
+            if (startDate.Kind != DateTimeKind.Utc) startDate = startDate.ToUniversalTime();
+            if (endDate.Kind != DateTimeKind.Utc) endDate = endDate.ToUniversalTime();
 
-            int totalOrders = stats?.TotalOrders ?? 0;
-            int completedOrders = stats?.CompletedOrders ?? 0;
-            int pendingOrders = stats?.PendingOrders ?? 0;
-            int cancelledOrders = stats?.CancelledOrders ?? 0;
-            decimal totalRevenue = stats?.TotalRevenue ?? 0;
+            var query = _context.Orders
+                .AsNoTracking()
+                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate);
+
+            var totalOrders = await query.CountAsync();
+            var completedOrders = await query.CountAsync(o => o.Status == "Completed");
+            var pendingOrders = await query.CountAsync(o => o.Status == "Pending");
+            var cancelledOrders = await query.CountAsync(o => o.Status == "Cancelled");
+            
+            // Note: Fetch amounts to memory to avoid EF Core translation issues with DefaultIfEmpty on Postgres
+            var completedOrderAmounts = await query
+                .Where(o => o.Status == "Completed")
+                .Select(o => o.TotalAmount)
+                .ToListAsync();
+
+            var totalRevenue = completedOrderAmounts.Sum();
 
             return new OrderStatisticsDto
             {
@@ -221,6 +228,7 @@ namespace RestaurantPOS.API.Services
 
         public async Task<List<HourlyReportDto>> GetHourlyOrdersAsync(DateTime date)
         {
+            if (date.Kind != DateTimeKind.Utc) date = date.ToUniversalTime();
             var startOfDay = date.Date;
             var endOfDay = date.Date.AddDays(1);
 
@@ -241,6 +249,7 @@ namespace RestaurantPOS.API.Services
 
         public async Task<List<WeeklyReportDto>> GetWeeklyOrdersAsync(DateTime startDate)
         {
+            if (startDate.Kind != DateTimeKind.Utc) startDate = startDate.ToUniversalTime();
             var endDate = startDate.AddDays(7);
 
             var weeklyData = await _context.Orders
@@ -260,6 +269,9 @@ namespace RestaurantPOS.API.Services
         // Table Reports
         public async Task<List<TablePerformanceDto>> GetTablePerformanceAsync(DateTime startDate, DateTime endDate)
         {
+            if (startDate.Kind != DateTimeKind.Utc) startDate = startDate.ToUniversalTime();
+            if (endDate.Kind != DateTimeKind.Utc) endDate = endDate.ToUniversalTime();
+
             var tableStats = await _context.Orders
                 .Include(o => o.Table)
                 .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate && o.Status == "Completed")
@@ -354,9 +366,12 @@ namespace RestaurantPOS.API.Services
         // Helper Methods
         private async Task<decimal> GetRevenueForPeriodAsync(DateTime startDate, DateTime endDate)
         {
-            return await _context.Orders
+            var amounts = await _context.Orders
                 .Where(o => o.OrderDate >= startDate && o.OrderDate < endDate && o.Status == "Completed")
-                .SumAsync(o => o.TotalAmount);
+                .Select(o => o.TotalAmount)
+                .ToListAsync();
+                
+            return amounts.Sum();
         }
 
         private async Task<int> GetOrderCountForPeriodAsync(DateTime startDate, DateTime endDate)

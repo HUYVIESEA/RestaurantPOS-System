@@ -2,8 +2,12 @@ package com.example.restaurantpos.restaurantpo.smartorder.presentation.screens.s
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ExitToApp
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Print
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.*
@@ -20,10 +24,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun SettingsScreen(
     userRole: String = "Staff",
     onNavigateBack: () -> Unit,
+    onLogout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(true) {
+        viewModel.logoutEvent.collect {
+            onLogout()
+        }
+    }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
@@ -52,7 +63,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Admin only: Server Config
@@ -129,23 +141,29 @@ fun SettingsScreen(
                 }
             }
             
-            // Staff & Kitchen & Others: Info
-            if (!userRole.equals("Admin", ignoreCase = true) && !userRole.equals("Manager", ignoreCase = true)) {
-                 Text(
-                    "Thông tin ứng dụng",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Card(
-                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Phiên bản: 1.0.0", style = MaterialTheme.typography.bodyMedium)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("Vai trò: $userRole", style = MaterialTheme.typography.bodyMedium)
+            // App Info (Visible to All)
+             Text(
+                "Thông tin tài khoản",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Card(
+                 modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                         Icon(Icons.Rounded.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                         Spacer(modifier = Modifier.width(8.dp))
+                         Column {
+                             Text(uiState.username.ifEmpty { "Người dùng" }, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                             Text(uiState.userRole.ifEmpty { userRole }, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                         }
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Phiên bản ứng dụng: 1.0.0", style = MaterialTheme.typography.bodySmall)
                 }
             }
 
@@ -161,12 +179,19 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Lưu thay đổi")
                 }
-                
-                Text(
-                    "Lưu ý: Hầu hết cài đặt sẽ có hiệu lực ngay lập tức.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            }
+            
+            Spacer(modifier = Modifier.weight(1f)) // Push logout to bottom if space available
+
+            Button(
+                onClick = { viewModel.logout() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                Icon(Icons.Rounded.ExitToApp, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Đăng xuất")
             }
         }
     }
