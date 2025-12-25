@@ -202,3 +202,16 @@ export interface PagedResult<T> {
   pageSize: number;
   totalPages: number;
 }
+
+export interface Supplier {
+  id: number;
+  name: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  contactPerson?: string;
+  notes?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}

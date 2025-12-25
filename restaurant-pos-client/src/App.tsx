@@ -28,7 +28,9 @@ import UserList from './components/Users/UserList';
 import UserForm from './components/Users/UserForm';
 import UserProfile from './components/Users/UserProfile';
 import ChangePassword from './components/Users/ChangePassword';
-import PaymentResult from './components/Payment/PaymentResult'; // ✅ ADD
+import PaymentResult from './components/Payment/PaymentResult';
+import SupplierList from './components/Suppliers/SupplierList';
+
 
 
 function AppContent() {
@@ -87,6 +89,9 @@ function AppContent() {
               
               {/* Payment */}
               <Route path="/payment-result" element={<PrivateRoute><PaymentResult /></PrivateRoute>} />
+
+              {/* Suppliers */}
+              <Route path="/suppliers" element={<PrivateRoute><SupplierList /></PrivateRoute>} />
 
 
               <Route path="*" element={<Navigate to="/" replace />} />

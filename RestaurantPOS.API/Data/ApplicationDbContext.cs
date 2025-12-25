@@ -26,6 +26,7 @@ namespace RestaurantPOS.API.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PaymentSettings> PaymentSettings { get; set; }
         public DbSet<PosDevice> PosDevices { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

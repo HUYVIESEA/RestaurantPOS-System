@@ -22,10 +22,11 @@ const Navbar: React.FC = () => {
     { path: '/', label: 'Dashboard', icon: 'fa-chart-line', permission: true }, // Always visible
   { path: '/tables', label: 'Bàn', icon: 'fa-utensils', permission: true }, // Always visible
     { path: '/orders', label: 'Đơn hàng', icon: 'fa-receipt', permission: true }, // Always visible
-    { path: '/inventory', label: 'Kho hàng', icon: 'fa-warehouse', permission: permissions.products.canEdit }, // ✅ New Inventory
-    { path: '/kitchen', label: 'Bếp', icon: 'fa-fire', permission: true }, // ✅ NEW Kitchen
+    { path: '/inventory', label: 'Kho hàng', icon: 'fa-warehouse', permission: permissions.products.canEdit },
+    { path: '/kitchen', label: 'Bếp', icon: 'fa-fire', permission: true },
     { path: '/products', label: 'Thực đơn', icon: 'fa-box', permission: true }, // Always visible
     { path: '/categories', label: 'Danh mục', icon: 'fa-folder', permission: true }, // Always visible
+    { path: '/suppliers', label: 'Nhà cung cấp', icon: 'fa-truck', permission: permissions.products.canEdit }, // Admin, Manager
     { path: '/statistics', label: 'Thống kê', icon: 'fa-chart-bar', permission: permissions.canAccessAnalytics || permissions.reports.canView }, // Admin, Manager
     { path: '/users', label: 'Người dùng', icon: 'fa-users', permission: permissions.users.canView }, // Admin only
   ];
