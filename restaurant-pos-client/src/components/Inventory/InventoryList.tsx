@@ -6,6 +6,7 @@ import { Product, Category } from '../../types';
 import { useToast } from '../../contexts/ToastContext';
 import { formatCurrency } from '../../utils/priceUtils';
 import { SkeletonGrid } from '../Common/Skeleton';
+import CustomSelect from '../Common/CustomSelect'; 
 import './InventoryList.css';
 
 const InventoryList: React.FC = () => {
@@ -96,6 +97,22 @@ const InventoryList: React.FC = () => {
   const lowStockCount = products.filter(p => (p.stockQuantity || 0) < 10 && (p.stockQuantity || 0) > 0).length;
   const outStockCount = products.filter(p => (p.stockQuantity || 0) <= 0).length;
 
+  // Custom Select Options
+  const statusOptions = [
+      { value: 'all', label: 'Tất cả trạng thái', icon: 'fas fa-list' },
+      { value: 'low', label: 'Sắp hết hàng (<10)', icon: 'fas fa-exclamation-triangle' },
+      { value: 'out', label: 'Đã hết hàng', icon: 'fas fa-times-circle' }
+  ];
+
+  const categoryOptions = [
+      { value: 0, label: 'Tất cả danh mục', icon: 'fas fa-tags' }, 
+      ...categories.map(c => ({ value: c.id, label: c.name, icon: 'fas fa-utensils' }))
+  ];
+
+  const handleCategoryChange = (val: number) => {
+      setSelectedCategory(val === 0 ? null : val);
+  };
+
   if (loading) return <div className="inventory-container"><SkeletonGrid items={5} columns={1} /></div>;
 
   return (
@@ -138,26 +155,19 @@ const InventoryList: React.FC = () => {
         </div>
         
         <div className="filters">
-            <select 
-                value={filterStatus} 
-                onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="status-select"
-            >
-                <option value="all">Tất cả trạng thái</option>
-                <option value="low">⚠️ Sắp hết hàng (&lt;10)</option>
-                <option value="out">⛔ Đã hết hàng</option>
-            </select>
+            <CustomSelect 
+                options={statusOptions}
+                value={filterStatus}
+                onChange={(val) => setFilterStatus(val)}
+                placeholder="Trạng thái"
+            />
 
-            <select 
-                value={selectedCategory || ''} 
-                onChange={(e) => setSelectedCategory(e.target.value ? Number(e.target.value) : null)}
-                className="category-select"
-            >
-                <option value="">Tất cả danh mục</option>
-                {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-            </select>
+            <CustomSelect 
+                options={categoryOptions}
+                value={selectedCategory || 0}
+                onChange={(val) => handleCategoryChange(Number(val))}
+                placeholder="Danh mục"
+            />
         </div>
       </div>
 
@@ -253,7 +263,6 @@ const InventoryList: React.FC = () => {
         )}
       </div>
 
-
       {editingProduct && (
         <div className="quantity-modal-overlay" onClick={() => setEditingProduct(null)}>
             <div className="quantity-modal" onClick={e => e.stopPropagation()}>
@@ -284,5 +293,4 @@ const InventoryList: React.FC = () => {
     </div>
   );
 };
-
 export default InventoryList;

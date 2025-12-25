@@ -175,18 +175,26 @@
 .search-box input {
     width: 100%;
     padding: 0.85rem 1rem 0.85rem 3rem;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-light, #e2e8f0);
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #334155;
     background: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-box input:hover {
+    border-color: #94a3b8;
+    background-color: #f8fafc;
 }
 
 .search-box input:focus {
     outline: none;
     border-color: #0060C0;
-    box-shadow: 0 0 0 3px rgba(0, 96, 192, 0.1);
+    box-shadow: 0 0 0 4px rgba(0, 96, 192, 0.1);
+    background-color: white;
 }
 
 .filters {
@@ -196,25 +204,38 @@
 
 .filters select {
     appearance: none;
-    padding: 0.85rem 2.5rem 0.85rem 1.25rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 0.85rem 2.75rem 0.85rem 1.25rem; /* More space for arrow */
     border: 1px solid var(--border-light);
     border-radius: 12px;
     font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-weight: 500;
+    color: #334155; /* Slate 700 */
     background-color: white;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-    transition: all 0.2s;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Premium Chevron Arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
-    background-size: 1em;
+    background-size: 1.25rem;
+    min-width: 200px; /* Consistent width */
 }
 
 .filters select:hover {
+    border-color: #94a3b8;
+    background-color: #f8fafc;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.filters select:focus {
+    outline: none;
     border-color: #0060C0;
-    color: var(--text-primary);
+    box-shadow: 0 0 0 4px rgba(0, 96, 192, 0.1); /* Brand focus ring */
+    transform: translateY(-1px);
 }
 
 /* ============ TABLE ============ */

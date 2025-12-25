@@ -7,6 +7,9 @@ import { categoryService } from '../../services/categoryService';
 import { Order, OrderItem, Product, Table, Category } from '../../types';
 import Toast from '../Common/Toast';
 import './OrderForm.css';
+import { useVoiceRecognition } from '../../hooks/useVoiceRecognition'; // ✅ Hook
+import { parseVoiceOrder } from '../../utils/voiceOrderParser'; // ✅ Parser
+import { useTextToSpeech } from '../../hooks/useTextToSpeech'; // ✅ TTS Hook
 
 interface CartItem {
   product: Product;
@@ -39,9 +42,77 @@ const OrderForm: React.FC = () => {
   const [showToast, setShowToast] = useState(false); // ✅ Toast state
   const [toastMessage, setToastMessage] = useState('');
 
+  // ✅ Voice Recognition Setup
+  const { isListening, transcript, finalTranscript, start, stop, supported } = useVoiceRecognition();
+  const { speak } = useTextToSpeech(); // ✅ Init TTS
+  
+  // Feature: Random Persona ("Bếp ơi", "Em ơi", "Bạn ơi")
+  const personas = ["Bếp ơi", "Em ơi", "Bạn ơi"];
+  
+  const getRandomPersona = () => personas[Math.floor(Math.random() * personas.length)];
+  const [activePersona, setActivePersona] = useState("Bếp ơi");
+
   useEffect(() => {
     fetchData();
+    // Do not randomize on mount to avoid talking immediately without interaction
   }, []);
+
+  const handleStartListening = () => {
+      try {
+        console.log("Starting voice recognition...");
+        const newPersona = getRandomPersona();
+        setActivePersona(newPersona);
+        
+        // 🗣️ Speak Greeting
+        speak(`${newPersona} đây, mời gọi món`);
+        
+        start();
+      } catch (e) {
+        alert("Không thể khởi động micro. Vui lòng kiểm tra quyền truy cập.");
+        console.error(e);
+      }
+  };
+
+  const toggleListening = () => {
+      if (isListening) {
+          stop();
+      } else {
+          handleStartListening();
+      }
+  };
+
+  // ✅ Process Voice Results
+  useEffect(() => {
+      if (finalTranscript) {
+          console.log("Processing voice:", finalTranscript);
+          const parsedItems = parseVoiceOrder(finalTranscript, products);
+          
+          if (parsedItems.length > 0) {
+              let addedCount = 0;
+              let newCart = [...cart];
+              let spokenItems: string[] = [];
+
+              parsedItems.forEach(({ product, quantity }) => {
+                   const existingIndex = newCart.findIndex(i => i.product.id === product.id);
+                   if (existingIndex > -1) {
+                       newCart[existingIndex].quantity += quantity;
+                   } else {
+                       newCart.push({ product, quantity: quantity, notes: '' });
+                   }
+                   addedCount++;
+                   spokenItems.push(`${quantity} ${product.name}`);
+              });
+
+              setCart(newCart);
+              const message = `Đã thêm ${spokenItems.join(', ')}`;
+              setToastMessage(`🎤 ${message}`);
+              setShowToast(true);
+              
+              // 🗣️ Speak Confirmation
+              speak(`Đã thêm ${spokenItems.length} món. ${activePersona} nghe rõ!`);
+          }
+      }
+  }, [finalTranscript, products, activePersona, speak]);
 
   // ✅ Sync selectedTable with URL param
   useEffect(() => {
@@ -57,13 +128,12 @@ const fetchData = async () => {
     try {
       const [tablesData, productsData, categoriesData] = await Promise.all([
         tableService.getAll(),
-productService.getAll(),
+        productService.getAll(),
         categoryService.getAll(),
       ]);
       
       // ✅ Handle Takeaway Logic
       if (isTakeaway) {
-        // Find a table specifically for takeaway if not already selected
         if (!selectedTable) {
            const takeawayTable = tablesData.find(t => 
              t.tableNumber.toLowerCase().includes('mang') || 
@@ -73,7 +143,7 @@ productService.getAll(),
         }
       }
 
-      setTables(tablesData); // ✅ Load ALL tables so we can show occupied ones too
+      setTables(tablesData);
       setProducts(productsData.filter(p => p.isAvailable));
       setCategories(categoriesData);
     } catch (err) {
@@ -82,7 +152,6 @@ productService.getAll(),
   };
 
   const addToCart = (product: Product) => {
-    // Check stock
     const existing = cart.find(item => item.product.id === product.id);
     const currentQty = existing ? existing.quantity : 0;
     const isUnlimited = product.stockQuantity !== undefined && product.stockQuantity < 0;
@@ -108,7 +177,6 @@ productService.getAll(),
     if (quantity <= 0) {
       setCart(cart.filter(item => item.product.id !== productId));
     } else {
-      // Check stock limit
       const item = cart.find(i => i.product.id === productId);
       if (item) {
           const isUnlimited = item.product.stockQuantity !== undefined && item.product.stockQuantity < 0;
@@ -136,11 +204,8 @@ productService.getAll(),
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
- setError(null);
+    setError(null);
 
-    // ✅ Table is mandatory ONLY if NOT takeaway, or if we enforce it
-    // If backend requires tableId, we must have selectedTable.
-    // If it's takeaway map to a virtual table or null if backend allows.
     if (!selectedTable && !isTakeaway) {
       setError('Vui lòng chọn bàn');
       setLoading(false);
@@ -156,35 +221,32 @@ productService.getAll(),
   try {
       const orderData: Partial<Order> = {
         tableId: selectedTable || undefined,
-customerName: customerName.trim() || undefined,
+        customerName: customerName.trim() || undefined,
         notes: notes.trim() || undefined,
- status: 'Pending',
+        status: 'Pending',
         orderItems: cart.map(item => ({
-  id: 0,
-   orderId: 0,
-    productId: item.product.id,
-        quantity: item.quantity,
-          unitPrice: item.product.price,
-       notes: item.notes || undefined,
+            id: 0,
+            orderId: 0,
+            productId: item.product.id,
+            quantity: item.quantity,
+            unitPrice: item.product.price,
+            notes: item.notes || undefined,
         })) as OrderItem[],
       };
 
       await orderService.create(orderData as Omit<Order, 'id' | 'orderDate' | 'totalAmount'>);
       
-      // Mark table as occupied
       if (selectedTable) {
         await tableService.updateAvailability(selectedTable, false);
       }
       
-      // ✅ Show toast notification
       const selectedTableData = tables.find(t => t.id === selectedTable);
       setToastMessage(`✅ Đã tạo đơn cho ${selectedTableData?.tableNumber}! Tổng: ${calculateTotal().toLocaleString('vi-VN')} đ`);
- setShowToast(true);
+      setShowToast(true);
       
-      // ✅ Redirect to Tables after short delay
       setTimeout(() => {
-     navigate('/tables');
-   }, 1500);
+        navigate('/tables');
+      }, 1500);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Đã xảy ra lỗi');
     } finally {
@@ -200,18 +262,48 @@ customerName: customerName.trim() || undefined,
     <div className="order-form-container">
       {/* ✅ Toast Notification */}
       {showToast && (
-   <Toast 
+        <Toast 
           message={toastMessage}
           type="success"
-    onClose={() => setShowToast(false)}
+          onClose={() => setShowToast(false)}
         />
+      )}
+
+      {/* ✅ Voice Listening Overlay */}
+      {supported && isListening && (
+          <div className="voice-overlay" onClick={stop}>
+              <div className="voice-content">
+                  <div className="voice-waves">
+                      <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <h3>{activePersona} đang nghe...</h3>
+                  <p className="voice-transcript">{transcript || `Hãy nói: '${activePersona}, cho 2 bún đậu...'`}</p>
+                  <button className="btn-stop-listening text-red-500 font-bold mt-4" onClick={(e) => { e.stopPropagation(); stop(); }}>
+                      🛑 Dừng lại
+                  </button>
+              </div>
+          </div>
       )}
 
       <div className="form-header">
         <h2>{isTakeaway ? '🥡 Đơn Mang Về' : '🛒 Tạo đơn hàng mới'}</h2>
-        <button onClick={() => navigate('/tables')} className="btn-back">
-          ← Quay lại
-    </button>
+        
+        <div className="header-actions" style={{display:'flex', gap:'10px'}}>
+             {supported && (
+                 <button 
+                    type="button" 
+                    className={`btn-voice ${isListening ? 'listening' : ''}`}
+                    onClick={toggleListening}
+                    title={`Gọi ${activePersona} hỗ trợ`}
+                 >
+                     <i className={`fas fa-microphone${isListening ? '-slash' : ''}`}></i>
+                     {isListening ? ` ${activePersona} đang nghe` : ` Gọi ${activePersona}`}
+                 </button>
+             )}
+            <button onClick={() => navigate('/tables')} className="btn-back">
+            ← Quay lại
+            </button>
+        </div>
       </div>
 
       {error && <div className="error-message">{error}</div>}
