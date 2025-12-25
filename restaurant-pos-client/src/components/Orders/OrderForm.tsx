@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { productService } from '../../services/productService';
 import { tableService } from '../../services/tableService';
@@ -17,9 +17,12 @@ interface CartItem {
 const OrderForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
-  // Get preselected table from location state
-  const preselectedTableId = location.state?.tableId;
+  // Get preselected table from location state OR URL params (for takeaway)
+  const urlTableId = searchParams.get('tableId');
+  const isTakeaway = searchParams.get('takeaway') === 'true'; // ✅ Detect takeaway mode
+  const preselectedTableId = location.state?.tableId || (urlTableId ? parseInt(urlTableId) : null);
 
   const [selectedTable, setSelectedTable] = useState<number | null>(preselectedTableId || null);
   const [customerName, setCustomerName] = useState('');
@@ -40,6 +43,16 @@ const OrderForm: React.FC = () => {
     fetchData();
   }, []);
 
+  // ✅ Sync selectedTable with URL param
+  useEffect(() => {
+    if (urlTableId) {
+      const tableId = parseInt(urlTableId);
+      if (!isNaN(tableId)) {
+        setSelectedTable(tableId);
+      }
+    }
+  }, [urlTableId]);
+
 const fetchData = async () => {
     try {
       const [tablesData, productsData, categoriesData] = await Promise.all([
@@ -47,34 +60,68 @@ const fetchData = async () => {
 productService.getAll(),
         categoryService.getAll(),
       ]);
-      setTables(tablesData.filter(t => t.isAvailable));
+      
+      // ✅ Handle Takeaway Logic
+      if (isTakeaway) {
+        // Find a table specifically for takeaway if not already selected
+        if (!selectedTable) {
+           const takeawayTable = tablesData.find(t => 
+             t.tableNumber.toLowerCase().includes('mang') || 
+             t.tableNumber.toLowerCase() === 'takeaway'
+           );
+           if (takeawayTable) setSelectedTable(takeawayTable.id);
+        }
+      }
+
+      setTables(tablesData); // ✅ Load ALL tables so we can show occupied ones too
       setProducts(productsData.filter(p => p.isAvailable));
-    setCategories(categoriesData);
+      setCategories(categoriesData);
     } catch (err) {
       setError('Không thể tải dữ liệu');
     }
   };
 
   const addToCart = (product: Product) => {
+    // Check stock
     const existing = cart.find(item => item.product.id === product.id);
-if (existing) {
+    const currentQty = existing ? existing.quantity : 0;
+    const isUnlimited = product.stockQuantity !== undefined && product.stockQuantity < 0;
+    
+    if (!isUnlimited && product.stockQuantity !== undefined && (currentQty + 1) > product.stockQuantity) {
+       setError(`Sản phẩm "${product.name}" chỉ còn ${product.stockQuantity} món`);
+       return;
+    }
+
+    if (existing) {
       setCart(cart.map(item =>
-  item.product.id === product.id
-        ? { ...item, quantity: item.quantity + 1 }
+        item.product.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
           : item
       ));
-  } else {
+    } else {
       setCart([...cart, { product, quantity: 1, notes: '' }]);
     }
+    setError(null);
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
     if (quantity <= 0) {
       setCart(cart.filter(item => item.product.id !== productId));
- } else {
+    } else {
+      // Check stock limit
+      const item = cart.find(i => i.product.id === productId);
+      if (item) {
+          const isUnlimited = item.product.stockQuantity !== undefined && item.product.stockQuantity < 0;
+          if (!isUnlimited && item.product.stockQuantity !== undefined && quantity > item.product.stockQuantity) {
+              setError(`Không đủ số lượng trong kho`);
+              return;
+          }
+      }
+
       setCart(cart.map(item =>
         item.product.id === productId ? { ...item, quantity } : item
       ));
+      setError(null);
     }
   };
 
@@ -91,10 +138,13 @@ if (existing) {
     setLoading(true);
  setError(null);
 
-    if (!selectedTable) {
+    // ✅ Table is mandatory ONLY if NOT takeaway, or if we enforce it
+    // If backend requires tableId, we must have selectedTable.
+    // If it's takeaway map to a virtual table or null if backend allows.
+    if (!selectedTable && !isTakeaway) {
       setError('Vui lòng chọn bàn');
-    setLoading(false);
-   return;
+      setLoading(false);
+      return;
     }
 
     if (cart.length === 0) {
@@ -105,7 +155,7 @@ if (existing) {
 
   try {
       const orderData: Partial<Order> = {
-        tableId: selectedTable,
+        tableId: selectedTable || undefined,
 customerName: customerName.trim() || undefined,
         notes: notes.trim() || undefined,
  status: 'Pending',
@@ -122,7 +172,9 @@ customerName: customerName.trim() || undefined,
       await orderService.create(orderData as Omit<Order, 'id' | 'orderDate' | 'totalAmount'>);
       
       // Mark table as occupied
-      await tableService.updateAvailability(selectedTable, false);
+      if (selectedTable) {
+        await tableService.updateAvailability(selectedTable, false);
+      }
       
       // ✅ Show toast notification
       const selectedTableData = tables.find(t => t.id === selectedTable);
@@ -156,8 +208,8 @@ customerName: customerName.trim() || undefined,
       )}
 
       <div className="form-header">
-<h2>🛒 Tạo đơn hàng mới</h2>
-     <button onClick={() => navigate('/tables')} className="btn-back">
+        <h2>{isTakeaway ? '🥡 Đơn Mang Về' : '🛒 Tạo đơn hàng mới'}</h2>
+        <button onClick={() => navigate('/tables')} className="btn-back">
           ← Quay lại
     </button>
       </div>
@@ -190,39 +242,67 @@ customerName: customerName.trim() || undefined,
 
           {/* Products Grid */}
        <div className="products-grid">
-            {filteredProducts.map(product => (
-       <div key={product.id} className="product-item" onClick={() => addToCart(product)}>
-                {product.imageUrl && (
-    <img src={product.imageUrl} alt={product.name} />
-)}
-    <div className="product-info">
-              <h4>{product.name}</h4>
-         <p className="product-price">{product.price.toLocaleString('vi-VN')} đ</p>
-     </div>
-      <button className="btn-add">+</button>
-       </div>
-         ))}
+            {filteredProducts.map(product => {
+                 const isUnlimited = product.stockQuantity !== undefined && product.stockQuantity < 0;
+                 const isOutOfStock = !isUnlimited && product.stockQuantity !== undefined && product.stockQuantity <= 0;
+                 return (
+                    <div 
+                        key={product.id} 
+                        className={`product-item ${isOutOfStock ? 'out-of-stock' : ''}`} 
+                        onClick={() => !isOutOfStock && addToCart(product)}
+                    >
+                        {product.imageUrl && (
+                            <img src={product.imageUrl} alt={product.name} />
+                        )}
+                        <div className="product-info">
+                            <h4>{product.name}</h4>
+                            <p className="product-price">{product.price.toLocaleString('vi-VN')} đ</p>
+                            <div className="stock-info">
+                                {isUnlimited ? (
+                                    <span className="badge-stock unlimited">∞ Vô hạn</span>
+                                ) : isOutOfStock ? (
+                                    <span className="badge-stock out">Hết hàng</span>
+                                ) : (
+                                    <span className="badge-stock">Còn: {product.stockQuantity}</span>
+                                )}
+                            </div>
+                        </div>
+                        <button className="btn-add" disabled={isOutOfStock}>+</button>
+                    </div>
+                 );
+            })}
           </div>
         </div>
 
      {/* Right: Cart & Order Info */}
     <div className="cart-section">
           <form onSubmit={handleSubmit}>
-            {/* Table Selection */}
-     <div className="form-group">
-       <label>Bàn *</label>
-              <select
-   value={selectedTable || ''}
-           onChange={(e) => setSelectedTable(Number(e.target.value))}
-       required
-        >
-  <option value="">Chọn bàn</option>
-            {tables.map(table => (
-   <option key={table.id} value={table.id}>
-       {table.tableNumber} - {table.floor} ({table.capacity} người)
-         </option>
-   ))}
-       </select>
+            {/* Table Selection - Hidden/Readonly for Takeaway if needed */}
+            <div className="form-group">
+                <label>Bàn {!isTakeaway && '*'}</label>
+                {isTakeaway ? (
+                    <div className="takeaway-badge">
+                        <i className="fas fa-shopping-bag"></i> 
+                        {selectedTable ? ' Đã chọn bàn Mang Về' : ' Mang về (Không cần bàn)'}
+                    </div>
+                ) : (
+                    <select
+                        value={selectedTable || ''}
+                        onChange={(e) => setSelectedTable(Number(e.target.value))}
+                        required
+                    >
+                        <option value="">Chọn bàn</option>
+                        {tables.map(table => (
+                            <option 
+                                key={table.id} 
+                                value={table.id}
+                                disabled={!table.isAvailable && table.id !== selectedTable}
+                            >
+                                {table.tableNumber} - {table.floor} ({table.capacity} người) {!table.isAvailable ? '(Đang phục vụ)' : ''}
+                            </option>
+                        ))}
+                    </select>
+                )}
             </div>
 
             {/* Customer Name */}
@@ -299,12 +379,12 @@ type="text"
 
        {/* Submit */}
             <button
-  type="submit"
-   className="btn-submit"
-      disabled={loading || cart.length === 0 || !selectedTable}
-      >
-        {loading ? 'Đang tạo...' : '✓ Tạo đơn hàng'}
-         </button>
+              type="submit"
+              className="btn-submit"
+              disabled={loading || cart.length === 0 || (!selectedTable && !isTakeaway)}
+            >
+              {loading ? 'Đang tạo...' : isTakeaway ? '🥡 Tạo đơn Mang Về' : '✓ Tạo đơn hàng'}
+            </button>
   </form>
    </div>
       </div>

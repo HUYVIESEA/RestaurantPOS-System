@@ -34,6 +34,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
+          <img src="/restaurant.png" alt="Smart Order POS" style={{height: '64px', marginBottom: '1rem'}} />
           <h1>Smart Order POS</h1>
         <h2>Đăng nhập</h2>
        <p>Nhập thông tin để truy cập hệ thống</p>

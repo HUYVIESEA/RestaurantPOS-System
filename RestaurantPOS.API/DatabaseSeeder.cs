@@ -26,6 +26,7 @@ namespace RestaurantPOS.API
             Console.WriteLine("========================================");
 
             await SeedUsersAsync();
+            await SeedPaymentSettingsAsync(); // ✅ Add this
             await SeedBunDauDataAsync();
             await SeedDrinksDataAsync();
             await SeedGrilledDishesDataAsync();
@@ -37,6 +38,38 @@ namespace RestaurantPOS.API
             Console.WriteLine("========================================");
             Console.WriteLine("Database Seeding Completed");
             Console.WriteLine("========================================");
+        }
+
+        /// <summary>
+        /// Seed default payment settings (VietQR)
+        /// </summary>
+        private async Task SeedPaymentSettingsAsync()
+        {
+            Console.WriteLine("\n--- Seeding Payment Settings ---");
+            if (!await _context.PaymentSettings.AnyAsync(s => s.IsActive))
+            {
+                // Get Admin user id
+                var admin = await _context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
+                var adminId = admin?.Id ?? 1;
+
+                var settings = new PaymentSettings
+                {
+                    BankName = "MBBank",
+                    BankBin = "970422", 
+                    AccountNumber = "0000123456789",
+                    AccountName = "NHA HANG DEMO",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedByUserId = adminId
+                };
+                _context.PaymentSettings.Add(settings);
+                await _context.SaveChangesAsync();
+                Console.WriteLine("✅ Added default payment settings (MBBank - Demo)");
+            }
+            else
+            {
+                Console.WriteLine("⏭️  Active payment settings already exist");
+            }
         }
 
         /// <summary>

@@ -1,11 +1,10 @@
 /* ========================================
-   DASHBOARD - MODERN DESIGN WITH DARK MODE
+   DASHBOARD - RESPONSIVE DESIGN
    ======================================== */
 
 .dashboard-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--spacing-xl);
+  /* NO max-width - inherit from main-content */
+  padding: 1.5rem 2rem; /* Add horizontal padding for content */
   background: var(--bg-primary);
   min-height: 100vh;
   transition: background 0.3s ease;
@@ -16,45 +15,82 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-2xl);
-  padding-bottom: var(--spacing-lg);
-  border-bottom: 2px solid var(--border-light);
-  transition: border-color 0.3s ease;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #0060C0 0%, #0078D4 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 96, 192, 0.2);
 }
 
 .header-left h2 {
-  margin: 0 0 var(--spacing-xs) 0;
-  color: var(--primary);
-  font-size: var(--font-3xl);
+  margin: 0 0 0.5rem 0;
+  color: white !important;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  transition: color 0.3s ease;
+  gap: 0.75rem;
+  font-weight: 700;
+}
+
+.header-left h2 i {
+  color: white !important;
 }
 
 .subtitle {
   margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--font-base);
-  transition: color 0.3s ease;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.95rem;
 }
 
-/* ============ STATS GRID ============ */
+.dashboard-header .btn {
+  background: white;
+  color: #0060C0;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard-header .btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============ STATS GRID - AUTO RESPONSIVE ============ */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-xl);
-  margin-bottom: var(--spacing-2xl);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Auto-fit based on screen */
+  gap: 1.5rem; /* 24px - 8px grid */
+  margin-bottom: 2rem; /* 32px */
+}
+
+/* Enhanced responsive breakpoints */
+@media (min-width: 1400px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr); /* Force 3 columns on large screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 1rem; /* 16px */
+  }
 }
 
 .stat-card {
   position: relative;
-  background: var(--bg-secondary);
-  padding: var(--spacing-xl);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-light);
-  transition: all var(--transition-base);
+  background: white;
+  padding: 1.5rem; /* 24px - 8px grid */
+  border-radius: 16px; /* Larger, modern */
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.06); /* Layered shadows for depth */
+  border: 2px solid transparent;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother easing */
   overflow: hidden;
 }
 
@@ -65,69 +101,94 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+  background: #0060C0;
+  transition: width 0.3s ease;
+}
+
+.stat-card:hover::before {
+  width: 8px; /* Expand on hover */
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--primary);
+  transform: translateY(-6px); /* More lift */
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.08),
+    0 16px 40px rgba(0, 0, 0, 0.12); /* Deeper shadows */
+  border-color: rgba(0, 96, 192, 0.2); /* Subtle border glow */
 }
 
-/* Stat Card Colors */
-.stat-card.products::before { background: linear-gradient(to bottom, #17a2b8, #117a8b); }
-.stat-card.orders::before { background: linear-gradient(to bottom, #ffc107, #e0a800); }
-.stat-card.categories::before { background: linear-gradient(to bottom, #28a745, #1e7e34); }
-.stat-card.tables::before { background: linear-gradient(to bottom, #6f42c1, #5a32a3); }
-.stat-card.revenue::before { background: linear-gradient(to bottom, #28a745, #1e7e34); }
-.stat-card.pending::before { background: linear-gradient(to bottom, #dc3545, #c82333); }
+/* Stat Card Colors - Enhanced gradients */
+.stat-card.products::before { background: linear-gradient(180deg, #0060C0, #004080); }
+.stat-card.orders::before { background: linear-gradient(180deg, #FF6F00, #E65100); }
+.stat-card.categories::before { background: linear-gradient(180deg, #4CAF50, #388E3C); }
+.stat-card.tables::before { background: linear-gradient(180deg, #9C27B0, #7B1FA2); }
+.stat-card.revenue::before { background: linear-gradient(180deg, #2E7D32, #1B5E20); }
+.stat-card.pending::before { background: linear-gradient(180deg, #F44336, #D32F2F); }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-  border-radius: var(--radius-lg);
+  width: 64px; /* Slightly larger */
+  height: 64px;
+  background: linear-gradient(135deg, #0060C0 0%, #0078D4 100%);
+  border-radius: 16px; /* Match card radius */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
-  margin-bottom: var(--spacing-md);
-  box-shadow: var(--shadow-primary);
-  color: var(--white);
-  transition: all 0.3s ease;
+  font-size: 1.75rem; /* Larger icon */
+  margin-bottom: 1rem; /* 16px spacing */
+  box-shadow: 
+    0 4px 12px rgba(0, 96, 192, 0.25),
+    0 8px 24px rgba(0, 96, 192, 0.15); /* Layered icon shadow */
+  color: white;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.stat-card.products .stat-icon { background: linear-gradient(135deg, #17a2b8, #117a8b); }
-.stat-card.orders .stat-icon { background: linear-gradient(135deg, #ffc107, #e0a800); }
+.stat-card:hover .stat-icon {
+  transform: scale(1.08) rotate(-5deg); /* More dynamic */
+  box-shadow: 
+    0 6px 16px rgba(0, 96, 192, 0.3),
+    0 12px 32px rgba(0, 96, 192, 0.2);
+}
+
+.stat-card.products .stat-icon { background: linear-gradient(135deg, #0060C0, #0078D4); }
+.stat-card.orders .stat-icon { background: linear-gradient(135deg, #FF6F00, #FF8F00); }
 .stat-card.categories .stat-icon { background: linear-gradient(135deg, #28a745, #1e7e34); }
 .stat-card.tables .stat-icon { background: linear-gradient(135deg, #6f42c1, #5a32a3); }
 .stat-card.revenue .stat-icon { background: linear-gradient(135deg, #28a745, #1e7e34); }
 .stat-card.pending .stat-icon { background: linear-gradient(135deg, #dc3545, #c82333); }
 
 .stat-content h3 {
-  margin: 0 0 var(--spacing-xs) 0;
-  font-size: var(--font-sm);
+  margin: 0 0 0.5rem 0; /* 8px */
+  font-size: 0.8rem; /* Slightly larger */
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: var(--font-semibold);
+  letter-spacing: 1px; /* More spacing */
+  font-weight: 700; /* Bolder */
   transition: color 0.3s ease;
 }
 
 .stat-number {
-  margin: 0;
-  font-size: var(--font-4xl);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
+  margin: 0.5rem 0; /* 8px */
+  font-size: 2.5rem; /* Larger! */
+  font-weight: 800; /* Extra bold */
+  color: #0060C0;
   line-height: 1;
-  transition: color 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-feature-settings: 'tnum'; /* Tabular numbers */
+  letter-spacing: -0.02em; /* Tighter for large numbers */
+}
+
+.stat-card:hover .stat-number {
+  transform: scale(1.05);
+  color: #004A99; /* Darker on hover */
 }
 
 .stat-label {
-  margin: var(--spacing-xs) 0 0 0;
-  font-size: var(--font-sm);
+  margin: 0.5rem 0 0 0; /* 8px top */
+  font-size: 0.9rem; /* Slightly larger */
   color: var(--text-tertiary);
+  font-weight: 500;
   transition: color 0.3s ease;
+  line-height: 1.4;
 }
 
 .stat-trend {
@@ -258,10 +319,10 @@
   transition: color 0.3s ease;
 }
 
-/* Button Color Variants */
+/* Button Color Variants - KiotViet Theme */
 .action-btn.primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  border-color: var(--primary);
+  background: linear-gradient(135deg, #0060C0 0%, #0078D4 100%);
+  border-color: #0060C0;
 }
 
 .action-btn.primary .action-title,
@@ -270,13 +331,13 @@
 }
 
 .action-btn.primary:hover {
-  box-shadow: 0 8px 24px rgba(0, 123, 255, 0.4);
-  border-color: var(--primary-light);
+  box-shadow: 0 8px 24px rgba(0, 96, 192, 0.4);
+  border-color: #0078D4;
 }
 
 .action-btn.secondary {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  border-color: #3498db;
+  background: linear-gradient(135deg, #FF6F00 0%, #FF8F00 100%);
+  border-color: #FF6F00;
 }
 
 .action-btn.secondary .action-title,
@@ -285,13 +346,13 @@
 }
 
 .action-btn.secondary:hover {
-  box-shadow: 0 8px 24px rgba(52, 152, 219, 0.4);
-  border-color: #5dade2;
+  box-shadow: 0 8px 24px rgba(255, 111, 0, 0.4);
+  border-color: #FFA726;
 }
 
 .action-btn.success {
-  background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
-  border-color: #27ae60;
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+  border-color: #4CAF50;
 }
 
 .action-btn.success .action-title,
@@ -300,13 +361,13 @@
 }
 
 .action-btn.success:hover {
-  box-shadow: 0 8px 24px rgba(39, 174, 96, 0.4);
-  border-color: #58d68d;
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+  border-color: #66BB6A;
 }
 
 .action-btn.info {
-  background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
-  border-color: #e67e22;
+  background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+  border-color: #9C27B0;
 }
 
 .action-btn.info .action-title,
@@ -315,8 +376,8 @@
 }
 
 .action-btn.info:hover {
-  box-shadow: 0 8px 24px rgba(230, 126, 34, 0.4);
-  border-color: #f39c12;
+  box-shadow: 0 8px 24px rgba(156, 39, 176, 0.4);
+  border-color: #BA68C8;
 }
 
 /* ============ SYSTEM INFO ============ */
@@ -375,11 +436,20 @@
 }
 
 [data-theme="dark"] .dashboard-header {
-  border-bottom-color: var(--border-dark);
+  background: linear-gradient(135deg, #0060C0 0%, #0078D4 100%);
+  box-shadow: 0 4px 12px rgba(0, 96, 192, 0.3);
 }
 
 [data-theme="dark"] .header-left h2 {
-  color: var(--primary-light);
+  color: white !important;
+}
+
+[data-theme="dark"] .header-left h2 i {
+  color: white !important;
+}
+
+[data-theme="dark"] .subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 [data-theme="dark"] .stat-card {

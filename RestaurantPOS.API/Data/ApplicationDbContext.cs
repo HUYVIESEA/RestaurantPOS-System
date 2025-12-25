@@ -81,6 +81,17 @@ namespace RestaurantPOS.API.Data
             });
       }
 
+        // ✅ SPECIAL: "Mang về" (Takeaway) table - Container for all takeaway orders
+        // Use Id=100 to avoid conflicts with existing tables
+        tables.Add(new Table
+        {
+            Id = 100,
+            TableNumber = "Mang về",
+            Capacity = 999, // Not a physical table
+            IsAvailable = true, // Always available
+            Floor = "Mang về"
+        });
+
     modelBuilder.Entity<Table>().HasData(tables);
 
     // Configure User entity

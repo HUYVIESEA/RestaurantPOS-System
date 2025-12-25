@@ -53,8 +53,10 @@ _context.Products.Add(product);
             existingProduct.Description = product.Description;
           existingProduct.Price = product.Price;
             existingProduct.CategoryId = product.CategoryId;
-   existingProduct.ImageUrl = product.ImageUrl;
-     existingProduct.IsAvailable = product.IsAvailable;
+            existingProduct.ImageUrl = product.ImageUrl;
+            existingProduct.IsAvailable = product.IsAvailable;
+            existingProduct.StockQuantity = product.StockQuantity; // ✅ Fix: Update stock quantity
+
      existingProduct.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

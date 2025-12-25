@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { userService, CreateUserRequest, UpdateUserRequest } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
+import Loading from '../Common/Loading';
 import './UserForm.css';
 
 const UserForm: React.FC = () => {
@@ -142,9 +143,9 @@ const UserForm: React.FC = () => {
     }
   };
 
-  if (loading && isEditMode) {
-    return <div className="loading">Đang tải...</div>;
-  }
+  // if (loading && isEditMode) {
+  //   return <Loading message="Đang tải thông tin người dùng..." fullScreen={true} />;
+  // }
 
   return (
     <div className="user-form-container">

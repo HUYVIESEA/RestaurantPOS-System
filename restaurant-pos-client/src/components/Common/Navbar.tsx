@@ -22,6 +22,8 @@ const Navbar: React.FC = () => {
     { path: '/', label: 'Dashboard', icon: 'fa-chart-line', permission: true }, // Always visible
   { path: '/tables', label: 'Bàn', icon: 'fa-utensils', permission: true }, // Always visible
     { path: '/orders', label: 'Đơn hàng', icon: 'fa-receipt', permission: true }, // Always visible
+    { path: '/inventory', label: 'Kho hàng', icon: 'fa-warehouse', permission: permissions.products.canEdit }, // ✅ New Inventory
+    { path: '/kitchen', label: 'Bếp', icon: 'fa-fire', permission: true }, // ✅ NEW Kitchen
     { path: '/products', label: 'Thực đơn', icon: 'fa-box', permission: true }, // Always visible
     { path: '/categories', label: 'Danh mục', icon: 'fa-folder', permission: true }, // Always visible
     { path: '/statistics', label: 'Thống kê', icon: 'fa-chart-bar', permission: permissions.canAccessAnalytics || permissions.reports.canView }, // Admin, Manager
@@ -36,7 +38,7 @@ const Navbar: React.FC = () => {
         {/* Logo */}
         <div className="navbar-brand">
           <Link to="/" className="brand-link">
-            <i className="fas fa-store brand-icon"></i>
+            <img src="/restaurant.png" alt="Logo" className="brand-logo" style={{height: '32px', width: 'auto', marginRight: '0.75rem'}} />
             <span className="brand-text">Smart Order</span>
           </Link>
         </div>

@@ -20,6 +20,8 @@ import CategoryList from './components/Categories/CategoryList';
 import CategoryForm from './components/Categories/CategoryForm';
 import TableList from './components/Tables/TableList';
 import TableForm from './components/Tables/TableForm';
+import InventoryList from './components/Inventory/InventoryList'; // ✅ ADD
+import KitchenView from './components/Kitchen/KitchenView'; // ✅ ADD
 import Dashboard from './components/Dashboard/Dashboard';
 import Statistics from './components/Reports/Statistics'; // ✅ ADD
 import UserList from './components/Users/UserList';
@@ -56,10 +58,16 @@ function AppContent() {
               <Route path="/orders/new" element={<PrivateRoute><OrderForm /></PrivateRoute>} /> {/* ✅ ADD */}
               <Route path="/orders/:id" element={<PrivateRoute><OrderDetail /></PrivateRoute>} /> {/* ✅ ADD */}
 
+              {/* Inventory */}
+              <Route path="/inventory" element={<PrivateRoute><InventoryList /></PrivateRoute>} />
+              
               {/* Tables */}
               <Route path="/tables" element={<PrivateRoute><TableList /></PrivateRoute>} />
               <Route path="/tables/new" element={<PrivateRoute><TableForm /></PrivateRoute>} />
               <Route path="/tables/edit/:id" element={<PrivateRoute><TableForm /></PrivateRoute>} />
+
+              {/* Kitchen */}
+              <Route path="/kitchen" element={<PrivateRoute><KitchenView /></PrivateRoute>} />
 
               {/* Users */} {/* ✅ ADD */}
               <Route path="/users" element={<PrivateRoute><UserList /></PrivateRoute>} />

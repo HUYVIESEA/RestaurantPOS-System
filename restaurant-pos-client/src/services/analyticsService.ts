@@ -83,7 +83,9 @@ export const analyticsService = {
       
       completedOrders.forEach(order => {
         order.orderItems?.forEach((item: any) => {
-          const existing = productSales.get(item.productId) || { name: item.productName || 'Unknown', quantity: 0, revenue: 0 };
+          // Fix: Access product name from nested product object, fallback to 'Unknown'
+          const productName = item.product?.name || 'Unknown';
+          const existing = productSales.get(item.productId) || { name: productName, quantity: 0, revenue: 0 };
           existing.quantity += item.quantity;
           existing.revenue += item.unitPrice * item.quantity;
           productSales.set(item.productId, existing);

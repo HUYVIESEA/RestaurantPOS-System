@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
+import { tableService } from '../../services/tableService';
 import { Order, OrderItem } from '../../types';
 import { useToast } from '../../contexts/ToastContext';
 import AddItemDialog from './AddItemDialog';
 import CancelItemDialog from './CancelItemDialog';
-import VnPayButton from '../Payment/VnPayButton';
+import VietQRView from '../Payment/VietQRView';
+import '../Payment/VietQRView.css';
 import './OrderDetail.css';
 
 const OrderDetail: React.FC = () => {
@@ -13,13 +15,14 @@ const OrderDetail: React.FC = () => {
   const navigate = useNavigate();
   const { showSuccess, showError, showWarning } = useToast();
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelingItem, setCancelingItem] = useState<OrderItem | null>(null);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -29,7 +32,6 @@ const OrderDetail: React.FC = () => {
 
   const fetchOrderDetail = async () => {
     try {
-      setLoading(true);
       const data = await orderService.getById(parseInt(id!));
       setOrder(data);
       setError(null);
@@ -37,7 +39,7 @@ const OrderDetail: React.FC = () => {
       setError('Không thể tải chi tiết đơn hàng.');
       console.error('Error fetching order:', err);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -82,42 +84,42 @@ const OrderDetail: React.FC = () => {
 
     const itemsToCancel = order?.orderItems?.filter(item => 
       selectedItems.has(item.id)
-) || [];
+    ) || [];
 
-const totalCancelled = itemsToCancel.reduce(
+    const totalCancelled = itemsToCancel.reduce(
       (sum, item) => sum + (item.unitPrice * item.quantity), 
     0
     );
 
- const confirmMessage = `Bạn có chắc muốn hủy ${selectedItems.size} món?\n` +
-   `Tổng tiền: ${totalCancelled.toLocaleString('vi-VN')} đ`;
+    const confirmMessage = `Bạn có chắc muốn hủy ${selectedItems.size} món?\n` +
+      `Tổng tiền: ${totalCancelled.toLocaleString('vi-VN')} đ`;
 
     if (!window.confirm(confirmMessage)) return;
 
     try {
       // TODO: Call API to cancel items
-    // For now, we'll delete them locally
+      // For now, we'll delete them locally
       const remainingItems = order?.orderItems?.filter(item => 
-    !selectedItems.has(item.id)
+        !selectedItems.has(item.id)
       ) || [];
 
-  if (remainingItems.length === 0) {
-     // If all items cancelled, cancel the order
-      await orderService.updateStatus(parseInt(id!), 'Cancelled');
-   showSuccess('Đã hủy tất cả món. Đơn hàng chuyển sang trạng thái "Đã hủy".'); // ✅ CHANGED
+      if (remainingItems.length === 0) {
+        // If all items cancelled, cancel the order
+        await orderService.updateStatus(parseInt(id!), 'Cancelled');
+        showSuccess('Đã hủy tất cả món. Đơn hàng chuyển sang trạng thái "Đã hủy".'); // ✅ CHANGED
         navigate('/orders');
       } else {
         // Update order with remaining items
-      setOrder({
-...order!,
+        setOrder({
+          ...order!,
           orderItems: remainingItems,
           totalAmount: order!.totalAmount - totalCancelled
-     });
-      setSelectedItems(new Set());
+        });
+        setSelectedItems(new Set());
         showSuccess(`Đã hủy ${selectedItems.size} món thành công!`); // ✅ CHANGED
       }
     } catch (err) {
-    setError('Không thể hủy món.');
+      setError('Không thể hủy món.');
       console.error('Error cancelling items:', err);
     }
   };
@@ -146,18 +148,18 @@ const totalCancelled = itemsToCancel.reduce(
 
   // ✅ NEW: Handle quantity change
   const handleQuantityChange = async (itemId: number, newQuantity: number) => {
- if (newQuantity < 1) {
- // If quantity = 0, remove item
+    if (newQuantity < 1) {
+      // If quantity = 0, remove item
       handleCancelSingleItem(itemId);
       return;
     }
 
     try {
-   await orderService.updateItemQuantity(parseInt(id!), itemId, newQuantity);
-   await fetchOrderDetail();
+      await orderService.updateItemQuantity(parseInt(id!), itemId, newQuantity);
+      await fetchOrderDetail();
     } catch (err) {
-   setError('Không thể cập nhật số lượng.');
-   console.error('Error:', err);
+      setError('Không thể cập nhật số lượng.');
+      console.error('Error:', err);
     }
   };
 
@@ -177,19 +179,19 @@ const totalCancelled = itemsToCancel.reduce(
       if (remainingQuantity === 0) {
         // Remove item completely
         await orderService.removeItem(parseInt(id!), cancelingItem.id);
-   } else {
+      } else {
         // Update quantity
         await orderService.updateItemQuantity(parseInt(id!), cancelingItem.id, remainingQuantity);
       }
 
-   // Close dialog and reload
+      // Close dialog and reload
       setShowCancelDialog(false);
-    setCancelingItem(null);
+      setCancelingItem(null);
       await fetchOrderDetail();
- 
-   const message = remainingQuantity === 0
+      
+      const message = remainingQuantity === 0
         ? `Đã xóa món "${cancelingItem.product?.name}"`
- : `Đã hủy ${cancelQuantity} phần. Còn lại ${remainingQuantity} phần`;
+        : `Đã hủy ${cancelQuantity} phần. Còn lại ${remainingQuantity} phần`;
       showSuccess(message);
 
     } catch (err) {
@@ -199,15 +201,21 @@ const totalCancelled = itemsToCancel.reduce(
     }
   };
 
-  // Handle cash payment
-  const handleCashPayment = async () => {
-    if (!window.confirm(`Xác nhận thanh toán tiền mặt?\n\nTổng tiền: ${order!.totalAmount.toLocaleString('vi-VN')} đ`)) {
-      return;
-    }
-
+  // Handle payment completion (Cash or QR confirmed)
+  const handlePaymentComplete = async () => {
     try {
       await orderService.updateStatus(order!.id, 'Completed');
-      showSuccess(`✅ Thanh toán thành công!\nBàn ${order!.table?.tableNumber} đã được trả tự động.`);
+      
+      // Release table
+      if (order!.tableId) {
+          try {
+              await tableService.updateAvailability(order!.tableId, true);
+          } catch (tableErr) {
+              console.error('Failed to release table:', tableErr);
+          }
+      }
+
+      showSuccess(`✅ Thanh toán thành công!\nBàn ${order!.table?.tableNumber} đã được trả.`);
       navigate('/tables');
     } catch (err) {
       console.error('Error completing payment:', err);
@@ -215,73 +223,82 @@ const totalCancelled = itemsToCancel.reduce(
     }
   };
 
-  if (loading) return <div className="loading">Đang tải...</div>;
+  const handleCashPayment = () => {
+    if (window.confirm(`Xác nhận thanh toán tiền mặt?\n\nTổng tiền: ${order!.totalAmount.toLocaleString('vi-VN')} đ`)) {
+        handlePaymentComplete();
+    }
+  };
+
+
   if (error) return <div className="error">{error}</div>;
   if (!order) return <div className="error">Không tìm thấy đơn hàng</div>;
 
   return (
     <div className="order-detail-container">
-   {/* ✅ Add Item Dialog */}
+      {/* ✅ Add Item Dialog */}
       {showAddDialog && (
         <AddItemDialog
           onAdd={handleAddItem}
-       onCancel={() => setShowAddDialog(false)}
-    />
-    )}
+          onCancel={() => setShowAddDialog(false)}
+        />
+      )}
 
       {/* ✅ NEW: Cancel Item Dialog */}
       {showCancelDialog && cancelingItem && (
-   <CancelItemDialog
-     item={cancelingItem}
+        <CancelItemDialog
+          item={cancelingItem}
           onConfirm={handleCancelConfirm}
           onCancel={() => {
-       setShowCancelDialog(false);
-   setCancelingItem(null);
- }}
-  />
+            setShowCancelDialog(false);
+            setCancelingItem(null);
+          }}
+        />
       )}
 
       {/* Payment Method Dialog */}
       {showPaymentDialog && (
-        <div className="modal-overlay" onClick={() => setShowPaymentDialog(false)}>
+        <div className="modal-overlay" onClick={() => { setShowPaymentDialog(false); setShowQR(false); }}>
           <div className="modal-content payment-dialog" onClick={(e) => e.stopPropagation()}>
-            <h3>Chọn phương thức thanh toán</h3>
-            <p className="payment-amount">Tổng tiền: <strong>{order.totalAmount.toLocaleString('vi-VN')} đ</strong></p>
+            <h3>{showQR ? 'Thanh toán VietQR' : 'Chọn hình thức thanh toán'}</h3>
             
-            <div className="payment-methods">
-              <button 
-                className="payment-method-btn cash"
-                onClick={() => {
-                  setShowPaymentDialog(false);
-                  handleCashPayment();
-                }}
-              >
-                <i className="fas fa-money-bill-wave"></i>
-                <span>Tiền mặt</span>
-              </button>
+            {!showQR ? (
+                <>
+                    <p className="payment-amount">Tổng tiền: <strong>{order.totalAmount.toLocaleString('vi-VN')} đ</strong></p>
+                    <div className="payment-methods">
+                        <button 
+                            className="payment-method-btn cash"
+                            onClick={handleCashPayment}
+                        >
+                            <i className="fas fa-money-bill-wave"></i>
+                            <span>Tiền mặt</span>
+                        </button>
 
-              <VnPayButton 
-                amount={order.totalAmount}
-                orderDescription={`Thanh toán đơn hàng #${order.id} - Bàn ${order.table?.tableNumber}`}
-                orderType="billpayment"
-                onSuccess={(url) => {
-                  // Redirect to VNPay payment page
-                  window.location.href = url;
-                }}
-                onError={(error) => {
-                  setShowPaymentDialog(false);
-                  showError(`Thanh toán VNPay thất bại: ${error}`);
-                }}
-              />
-            </div>
-
-            <button 
-              className="btn btn-secondary"
-              onClick={() => setShowPaymentDialog(false)}
-              style={{ marginTop: '1rem', width: '100%' }}
-            >
-              Hủy
-            </button>
+                        <button 
+                            className="payment-method-btn qr"
+                            onClick={() => setShowQR(true)}
+                            style={{ background: 'linear-gradient(135deg, #0060C0, #363795)', color: 'white', border: 'none' }}
+                        >
+                            <i className="fas fa-qrcode"></i>
+                            <span>Chuyển khoản QR</span>
+                        </button>
+                    </div>
+                
+                    <button 
+                        className="btn btn-secondary"
+                        onClick={() => setShowPaymentDialog(false)}
+                        style={{ marginTop: '1rem', width: '100%' }}
+                    >
+                        Hủy bỏ
+                    </button>
+                </>
+            ) : (
+                <VietQRView 
+                    amount={order.totalAmount}
+                    description={`Thanh toan don ${order.id}`}
+                    onSuccess={handlePaymentComplete}
+                    onCancel={() => setShowQR(false)}
+                />
+            )}
           </div>
         </div>
       )}

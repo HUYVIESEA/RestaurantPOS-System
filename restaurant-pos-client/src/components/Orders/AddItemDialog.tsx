@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { productService } from '../../services/productService';
 import { categoryService } from '../../services/categoryService';
 import { Product, Category } from '../../types';
+import Loading from '../Common/Loading';
 import './AddItemDialog.css';
 
 interface AddItemDialogProps {
@@ -62,15 +63,15 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
     onAdd(selectedProduct.id, quantity, notes);
   };
 
-  if (loading) {
-    return (
-      <div className="dialog-overlay">
-     <div className="dialog-container">
-          <div className="loading">Đang tải...</div>
-</div>
-      </div>
- );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="dialog-overlay">
+  //       <div className="dialog-container">
+  //         <Loading message="Đang tải danh sách món..." size="small" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="dialog-overlay">

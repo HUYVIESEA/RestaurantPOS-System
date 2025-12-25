@@ -4,9 +4,12 @@
 
 .activity-log {
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: 16px; /* Modern radius */
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 8px 24px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  border: 1px solid var(--border-light);
 }
 
 .activity-log-header {
@@ -28,20 +31,33 @@
 }
 
 .btn-refresh {
-  padding: var(--spacing-xs) var(--spacing-md);
-  background: var(--bg-primary);
+  padding: 0.5rem 1rem;
+  background: white;
   border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .btn-refresh:hover {
-  background: var(--bun-brown);
+  background: #0060C0;
   color: white;
-  border-color: var(--bun-brown);
+  border-color: #0060C0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 96, 192, 0.2);
+}
+
+.btn-refresh i {
+  transition: transform 0.5s ease;
+}
+
+.btn-refresh:hover i {
   transform: rotate(180deg);
 }
 
@@ -73,12 +89,13 @@
 }
 
 .activity-log-item {
-  padding: var(--spacing-lg);
+  padding: 1.25rem;
   border-bottom: 1px solid var(--border-light);
   display: flex;
-  gap: var(--spacing-md);
-  transition: all 0.3s ease;
+  gap: 1rem;
+  transition: all 0.2s ease;
   position: relative;
+  background: white;
 }
 
 .activity-log-item:last-child {
@@ -86,7 +103,9 @@
 }
 
 .activity-log-item:hover {
-  background: var(--bg-tertiary);
+  background: #F8FAFC;
+  transform: translateX(4px);
+  border-left: 4px solid #0060C0; /* Accent on hover */
 }
 
 /* Action Icon */

@@ -73,7 +73,7 @@ namespace RestaurantPOS.API.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("CustomerName")
                         .HasColumnType("text");
@@ -82,7 +82,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("OrderGroupId")
                         .HasColumnType("integer");
@@ -169,10 +169,10 @@ namespace RestaurantPOS.API.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsUsed")
                         .HasColumnType("boolean");
@@ -182,7 +182,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -219,7 +219,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -265,13 +265,13 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("UpdatedByUserId")
                         .HasColumnType("integer");
@@ -302,14 +302,14 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LastConnected")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("RequestTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -336,7 +336,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -361,7 +361,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -399,7 +399,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("OccupiedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("TableNumber")
                         .IsRequired()
@@ -860,6 +860,15 @@ namespace RestaurantPOS.API.Migrations
                             IsAvailable = true,
                             IsMerged = false,
                             TableNumber = "B50"
+                        },
+                        new
+                        {
+                            Id = 100,
+                            Capacity = 999,
+                            Floor = "Mang về",
+                            IsAvailable = true,
+                            IsMerged = false,
+                            TableNumber = "Mang về"
                         });
                 });
 
@@ -872,7 +881,7 @@ namespace RestaurantPOS.API.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -892,7 +901,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastLoginAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -926,11 +935,11 @@ namespace RestaurantPOS.API.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 19, 5, 7, 36, 999, DateTimeKind.Utc).AddTicks(4010),
+                            CreatedAt = new DateTime(2025, 12, 22, 19, 16, 28, 621, DateTimeKind.Utc).AddTicks(5136),
                             Email = "admin@restaurantpos.com",
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = "$2a$11$p.zCkOn5UgKfxzsearnQAeOuR18ZRLx8Dy8vnMK.U3dv22NinNR1C",
+                            PasswordHash = "$2a$11$boLE0gELkEjVT3sMAdOIK.wD7/gDZEi55J1m3uSXyUvzJHGObKGaW",
                             Role = "Admin",
                             Username = "admin"
                         });
@@ -952,7 +961,7 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");

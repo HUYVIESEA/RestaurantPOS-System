@@ -3,11 +3,41 @@
 @import './styles/mobile.css';
 
 /* Legacy Variables (will be migrated) */
+/* ============ GLOBAL THEME VARIABLES (KIOTVIET STYLE) ============ */
 :root {
+  /* BRAND COLORS */
+  --primary: #0060C0;       /* Vibrant KiotViet Blue */
+  --primary-dark: #004A99;
+  --primary-light: #4D96FF;
+  --primary-soft: #e3f2fd;
+
+  --secondary: #64748b;     /* Slate */
+  --bg-secondary: #f0f2f5;  /* Enterprise Gray Background */
+  --bg-primary: #ffffff;
+
+  /* STATUS COLORS */
+  --success: #2e7d32;       /* Green */
+  --success-dark: #1b5e20;
+  --info: #0288d1;          /* Blue */
+  --warning: #ed6c02;       /* Orange */
+  --danger: #d32f2f;        /* Red */
+  --white: #ffffff;
+
+  /* NAVBAR */
+  --navbar-bg: linear-gradient(90deg, #0060C0 0%, #004A99 100%);
+  --navbar-height: 56px;
+
+  /* LAYOUT */
+  --radius-md: 4px;
+  --font-primary: 'Inter', system-ui, sans-serif;
+
+  /* LEGACY MAPPINGS (Required for older components) */
+  --bun-brown: var(--primary);
+  --bun-brown-light: var(--primary-light);
+  --bun-yellow: var(--success); /* Map yellow to success/green for now as user requested/edited */
   --bun-bg: #fff9e6;
   --bun-card: #ffffff;
-  --bun-text: #3e2723;
-  --bun-accent: #a5d6a7;
+  --bun-text: #333333;
 }
 
 /* ============ BASE STYLES ============ */
@@ -79,14 +109,14 @@ p {
 }
 
 a {
-  color: var(--bun-green);
+  color: var(--primary);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 a:hover {
-color: var(--bun-green-dark);
-  text-decoration: underline;
+  color: var(--primary-dark);
+  text-decoration: none;
 }
 
 /* ============ BUTTONS (Global) ============ */
@@ -134,6 +164,40 @@ transform: translateY(-2px);
 .btn-lg {
   padding: 1rem 2rem;
   font-size: var(--font-lg);
+}
+
+/* KiotViet Brand Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--white);
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: var(--white);
+  border-color: var(--success);
+}
+.btn-success:hover:not(:disabled) {
+  background-color: var(--success-dark);
+  border-color: var(--success-dark);
+  color: var(--white);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: var(--white);
+  border-color: var(--danger);
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--danger-dark);
+  border-color: var(--danger-dark);
+  color: var(--white);
 }
 
 /* ============ CARDS (Global) ============ */

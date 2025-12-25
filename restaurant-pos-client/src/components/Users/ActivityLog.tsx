@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Loading from '../Common/Loading';
 import './ActivityLog.css';
 
 // ========================================
@@ -148,19 +149,16 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
     });
   };
 
-  if (loading) {
-    return (
-      <div className="activity-log">
-        <div className="activity-log-header">
-          <h3>📋 Nhật ký hoạt động</h3>
-        </div>
-        <div className="activity-log-loading">
-          <div className="spinner"></div>
-          <p>Đang tải...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="activity-log">
+  //       <div className="activity-log-header">
+  //         <h3>📋 Nhật ký hoạt động</h3>
+  //       </div>
+  //       <Loading message="Đang tải nhật ký..." size="small" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="activity-log">

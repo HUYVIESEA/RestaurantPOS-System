@@ -1,89 +1,103 @@
+/* ========================================
+   STATISTICS/REPORTS - KIOTVIET BLUE THEME
+   ======================================== */
+
 .statistics-container {
-  padding: var(--spacing-lg);
-  background-color: var(--bg-secondary);
-  min-height: calc(100vh - 64px);
+  /* NO max-width - inherit from main-content */
+  padding: 1.5rem 2rem;
+  background: var(--bg-primary);
+  min-height: 100vh;
 }
 
+/* ============ HEADER ============ */
 .statistics-header {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #0060C0 0%, #0078D4 100%);
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 12px rgba(0, 96, 192, 0.2),
+    0 8px 24px rgba(0, 96, 192, 0.15);
 }
 
 .statistics-header h1 {
-  font-size: var(--font-2xl);
-  color: var(--text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.75rem;
+  color: white !important;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 0.75rem;
 }
 
 .statistics-header h1 i {
-  color: var(--bun-yellow);
+  color: white !important;
 }
 
 .statistics-subtitle {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9) !important;
   margin: 0;
-  font-size: var(--font-sm);
+  font-size: 0.95rem;
 }
 
+/* ============ TABS ============ */
 .statistics-tabs {
   display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 1px;
+  gap: 0.5rem;
+  margin-bottom: 0;
+  background: var(--bg-secondary);
+  padding: 0.5rem;
+  border-radius: 12px 12px 0 0;
+  overflow-x: auto;
 }
 
 .tab-btn {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 0.75rem 1.5rem;
   border: none;
   background: none;
-  font-size: var(--font-base);
-  font-weight: var(--font-semibold);
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 0.5rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+  border-radius: 8px;
   position: relative;
-  transition: all var(--transition-base);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .tab-btn:hover {
-  color: var(--bun-yellow);
-  background-color: rgba(255, 215, 0, 0.05);
+  color: #0060C0;
+  background: var(--bg-tertiary);
 }
 
 .tab-btn.active {
-  color: var(--bun-yellow);
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-light);
-  border-bottom-color: var(--bg-primary);
-  margin-bottom: -1px;
+  color: white !important;
+  background: linear-gradient(135deg, #0060C0 0%, #0078D4 100%);
+  box-shadow: 0 2px 8px rgba(0, 96, 192, 0.3);
 }
 
-.tab-btn.active::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background-color: var(--bun-yellow);
-  border-radius: 3px 3px 0 0;
+.tab-btn i {
+  font-size: 1rem;
 }
 
+/* ============ CONTENT ============ */
 .statistics-content {
-  background-color: var(--bg-primary);
-  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+  background: white;
+  border-radius: 0 0 16px 16px; /* Matched radius */
   min-height: 500px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: 0;
+  overflow: hidden;
 }
 
 .tab-pane {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 2rem;
 }
 
 @keyframes fadeIn {
@@ -97,23 +111,65 @@
   }
 }
 
-/* Responsive */
+/* ============ DARK MODE ============ */
+[data-theme="dark"] .statistics-container {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .statistics-tabs {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .tab-btn:hover {
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .statistics-content {
+  background: var(--bg-secondary);
+  border-color: var(--border-medium);
+}
+
+/* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
+  .statistics-container {
+    padding: 1rem;
+  }
+
+  .statistics-header {
+    padding: 1.25rem;
+  }
+
+  .statistics-header h1 {
+    font-size: 1.5rem;
+  }
+
   .statistics-tabs {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    border-bottom: none;
+    flex-wrap: wrap;
+    border-radius: 12px;
   }
 
   .tab-btn {
-    width: 100%;
-    border-radius: var(--radius-md);
-    border: 1px solid transparent;
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+   font-size: 0.85rem;
   }
 
-  .tab-btn.active {
-    border-bottom-color: var(--border-light);
-    margin-bottom: 0;
-    background-color: var(--bg-primary);
+  .statistics-content {
+    border-radius: 12px;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-btn {
+    min-width: 100px;
+    font-size: 0.8rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .tab-btn i {
+    font-size: 0.9rem;
   }
 }

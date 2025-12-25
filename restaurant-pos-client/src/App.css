@@ -1,126 +1,38 @@
 .App {
   min-height: 100vh;
-  background-color: var(--bg-secondary);  /* ✅ Use theme variable */
+  display: flex; /* Added for sticky footer support if needed */
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-primary);
 }
 
 /* ✅ Dark mode specific */
 [data-theme="dark"] .App {
-  background-color: var(--bg-secondary);  /* Will be #2d2d2d in dark mode */
+  background-color: var(--bg-secondary);
 }
 
 main {
-  background-color: var(--bg-secondary);  /* ✅ Add */
-  min-height: calc(100vh - 70px);  /* Subtract navbar height */
+  background-color: var(--bg-secondary);
+  min-height: calc(100vh - 70px);
+  flex: 1; /* Push footer down */
 }
 
-.navbar {
-  background-color: var(--primary);
-  padding: 1rem 0;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.25);
-  border-bottom: 3px solid var(--accent);
-}
-
-.nav-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-}
-
-.nav-logo {
-  color: var(--accent);
-  font-size: 1.5rem;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.nav-menu {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 2rem;
-  flex: 1;
-}
-
-.nav-item {
-  margin: 0;
-}
-
-.nav-link {
-  color: var(--white);
-  text-decoration: none;
-  font-size: 1rem;
-  transition: color 0.3s, transform 0.2s;
-  white-space: nowrap;
-}
-
-.nav-link:hover {
-  color: var(--accent);
-  transform: translateY(-1px);
-}
-
-.nav-user {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.user-info {
-  color: var(--white);
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.btn-logout {
-  background-color: var(--secondary);
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s, transform 0.2s;
-  white-space: nowrap;
-}
-
-.btn-logout:hover {
-  background-color: var(--secondary-dark);
-  transform: translateY(-1px);
-}
+/* Legacy Navbar styles removed - handled by Navbar.css */
 
 .main-content {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  max-width: none; /* ← NO LIMIT - Full width */
+  margin: 0;
+  padding: 1.5rem 3%; /* ← Dynamic padding: 3% of viewport */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Take remaining space */
 }
 
+/* Minimum padding on smaller screens */
 @media (max-width: 1024px) {
-  .nav-container {
-    flex-wrap: wrap;
-  }
-  
-  .nav-menu {
-    order: 3;
-    width: 100%;
- justify-content: center;
-    margin-top: 1rem;
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .nav-menu {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .nav-user {
-    flex-direction: column;
-    gap: 0.5rem;
+  .main-content {
+    padding: 1.5rem 2rem; /* Fixed padding on tablets/mobile */
   }
 }

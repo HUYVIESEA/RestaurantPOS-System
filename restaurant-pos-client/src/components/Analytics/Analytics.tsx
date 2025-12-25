@@ -35,6 +35,37 @@ const Analytics: React.FC = () => {
     }
   };
 
+  const handleExportCSV = () => {
+    if (!data) return;
+
+    // Create CSV content for Revenue by Day
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Ngay,Doanh Thu\n";
+    data.revenueByDay.forEach(item => {
+      csvContent += `${item.day},${item.revenue}\n`;
+    });
+
+    csvContent += "\nTop San Pham\n";
+    csvContent += "Ten San Pham,So Luong,Doanh Thu\n";
+    data.topProducts.forEach(item => {
+      csvContent += `${item.name},${item.quantity},${item.revenue}\n`;
+    });
+
+    csvContent += "\nTong Quan\n";
+    csvContent += `Tong Doanh Thu (Tuan),${data.weekRevenue}\n`;
+    csvContent += `Don Hang Hoan Thanh,${data.completedOrders}\n`;
+    csvContent += `Gia Tri Trung Binh,${data.averageOrderValue}\n`;
+
+    // Download file
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `bao_cao_doanh_thu_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return (
       <div className="analytics-container">
@@ -77,6 +108,9 @@ const Analytics: React.FC = () => {
        30 ngày
      </button>
           </div>
+          <button className="btn btn-secondary" onClick={handleExportCSV} style={{ marginRight: '10px' }}>
+            <i className="fas fa-file-csv"></i> Xuất CSV
+          </button>
       <button className="btn btn-primary" onClick={fetchAnalytics}>
  <i className="fas fa-sync-alt"></i> Làm mới
           </button>

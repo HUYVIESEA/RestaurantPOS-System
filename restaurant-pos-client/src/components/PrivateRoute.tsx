@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Loading from './Common/Loading';
 
 interface PrivateRouteProps {
   children: React.ReactElement;
@@ -10,18 +11,9 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, requiredRole }) => {
   const { isAuthenticated, user, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div style={{ 
-    display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
- <div>Đang tải...</div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return <Loading message="Đang kiểm tra đăng nhập..." fullScreen={true} />;
+  // }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

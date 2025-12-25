@@ -68,7 +68,8 @@ phoneNumber: formData.phoneNumber || undefined,
     <div className="register-container">
       <div className="register-card">
         <div className="register-header">
-<h1>🍽️ Restaurant POS</h1>
+          <img src="/restaurant.png" alt="Smart Order POS" style={{height: '64px', marginBottom: '1rem'}} />
+          <h1>Smart Order POS</h1>
           <h2>Đăng ký</h2>
    <p>Tạo tài khoản mới để sử dụng hệ thống</p>
       </div>
