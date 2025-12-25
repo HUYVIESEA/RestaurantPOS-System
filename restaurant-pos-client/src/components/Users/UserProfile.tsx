@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userService, UpdateProfileRequest } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
-import { SkeletonProfile } from '../Common/Skeleton'; // ✅ ADD
+import { SkeletonProfile } from '../Common/Skeleton';
+import { USER_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
 import './UserProfile.css';
 
 const UserProfile: React.FC = () => {
@@ -41,7 +42,7 @@ const UserProfile: React.FC = () => {
       });
     } catch (err) {
       console.error('Error fetching profile:', err);
-      showError('Không thể tải thông tin hồ sơ');
+      showError(USER_MESSAGES.PROFILE_LOAD_ERROR);
     } finally {
   setLoading(false);
     }
@@ -68,7 +69,7 @@ const UserProfile: React.FC = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-  showError('Vui lòng kiểm tra lại thông tin');
+  showError(COMMON_MESSAGES.FORM_INVALID);
    return;
 }
 
@@ -82,12 +83,12 @@ const UserProfile: React.FC = () => {
 
       await userService.updateProfile(updateData);
   
-      showSuccess('Cập nhật hồ sơ thành công!');
+      showSuccess(USER_MESSAGES.PROFILE_UPDATE_SUCCESS);
       setIsEditing(false);
       await fetchProfile();
     } catch (err: any) {
    console.error('Error updating profile:', err);
-      const errorMessage = err.response?.data || 'Không thể cập nhật hồ sơ';
+      const errorMessage = err.response?.data || USER_MESSAGES.PROFILE_UPDATE_ERROR;
       showError(errorMessage);
   } finally {
    setSaving(false);

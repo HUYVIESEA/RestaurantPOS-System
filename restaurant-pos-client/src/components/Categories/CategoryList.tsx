@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { categoryService } from '../../services/categoryService';
 import { Category } from '../../types';
 import { usePermissions } from '../../hooks/usePermissions';
+import { useToast } from '../../contexts/ToastContext';
+import { CATEGORY_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
 import './CategoryList.css';
 
 const CategoryList: React.FC = () => {
   const navigate = useNavigate();
   const permissions = usePermissions();
+  const { showSuccess, showError } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -22,22 +24,22 @@ const CategoryList: React.FC = () => {
       setLoading(true);
       const data = await categoryService.getAll();
       setCategories(data);
-      setError(null);
     } catch (err) {
-      setError('Không thể tải danh mục.');
+      showError(CATEGORY_MESSAGES.LOAD_ERROR);
       console.error('Error fetching categories:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Bạn có chắc muốn xóa danh mục này?')) {
+  const handleDelete = async (id: number, name: string) => {
+    if (window.confirm(COMMON_MESSAGES.CONFIRM_DELETE('danh mục', name))) {
       try {
         await categoryService.delete(id);
         setCategories(categories.filter(c => c.id !== id));
+        showSuccess(CATEGORY_MESSAGES.DELETE_SUCCESS);
       } catch (err) {
-        setError('Không thể xóa danh mục.');
+        showError(CATEGORY_MESSAGES.DELETE_ERROR);
         console.error('Error deleting category:', err);
       }
     }
@@ -48,7 +50,7 @@ const CategoryList: React.FC = () => {
     (c.description && c.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  if (error) return <div className="error-message">{error}</div>;
+  if (loading) return <div className="category-list-container"><p>Đang tải...</p></div>;
 
   return (
     <div className="category-list-container">
@@ -121,7 +123,7 @@ const CategoryList: React.FC = () => {
               {permissions.categories.canDelete && (
                 <button 
                   className="btn-icon btn-delete"
-                  onClick={() => handleDelete(category.id)}
+                  onClick={() => handleDelete(category.id, category.name)}
                   title="Xóa danh mục"
                 >
                   <i className="fas fa-trash-alt"></i>

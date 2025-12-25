@@ -11,6 +11,7 @@ import {
   ResetPasswordDialog,
   ToggleStatusDialog
 } from './EmployeeDialogs';
+import { USER_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
 import './UserList.css';
 import './EmployeeStats.css';
 
@@ -52,9 +53,9 @@ const UserList: React.FC = () => {
       setUsers(data);
       setError(null);
     } catch (err) {
-      setError('Không thể tải danh sách người dùng.');
+      setError(USER_MESSAGES.LOAD_ERROR);
       console.error('Error fetching users:', err);
-      showError('Không thể tải danh sách người dùng');
+      showError(USER_MESSAGES.LOAD_ERROR);
     } finally {
       setLoading(false);
     }
@@ -72,10 +73,10 @@ const UserList: React.FC = () => {
     try {
       await userService.updateRole(roleChangeUser.id, newRole);
       await fetchUsers();
-      showSuccess(`Đã đổi vai trò thành ${newRole}`);
+      showSuccess(USER_MESSAGES.ROLE_CHANGE_SUCCESS(newRole));
     } catch (err) {
       console.error('Error changing role:', err);
-      showError('Không thể đổi vai trò');
+      showError(USER_MESSAGES.ROLE_CHANGE_ERROR);
     } finally {
       setShowRoleDialog(false);
       setRoleChangeUser(null);
@@ -96,10 +97,10 @@ const UserList: React.FC = () => {
       const result = await userService.resetPassword(passwordResetUser.id);
       setNewPassword(result.newPassword);
       setShowNewPassword(true);
-      showSuccess('Đã reset mật khẩu thành công');
+      showSuccess(USER_MESSAGES.PASSWORD_RESET_SUCCESS);
     } catch (err) {
       console.error('Error resetting password:', err);
-      showError('Không thể reset mật khẩu');
+      showError(USER_MESSAGES.PASSWORD_RESET_ERROR);
       setShowPasswordDialog(false);
       setPasswordResetUser(null);
     }
@@ -124,11 +125,11 @@ const UserList: React.FC = () => {
     try {
       await userService.updateStatus(statusChangeUser.id, !statusChangeUser.status);
       await fetchUsers();
-      const action = statusChangeUser.status ? 'vô hiệu hóa' : 'kích hoạt';
-      showSuccess(`Đã ${action} người dùng thành công`);
+      const successMsg = statusChangeUser.status ? USER_MESSAGES.STATUS_DEACTIVATE_SUCCESS : USER_MESSAGES.STATUS_ACTIVATE_SUCCESS;
+      showSuccess(successMsg);
     } catch (err: any) {
       console.error('Error toggling status:', err);
-      showError(err.response?.data || 'Không thể thay đổi trạng thái');
+      showError(err.response?.data || USER_MESSAGES.STATUS_CHANGE_ERROR);
     } finally {
       setShowStatusDialog(false);
       setStatusChangeUser(null);
@@ -147,10 +148,10 @@ const UserList: React.FC = () => {
     try {
       await userService.delete(userToDelete.id);
       await fetchUsers();
-      showSuccess('Đã xóa người dùng thành công');
+      showSuccess(USER_MESSAGES.DELETE_SUCCESS);
     } catch (err: any) {
       console.error('Error deleting user:', err);
-      showError(err.response?.data || 'Không thể xóa người dùng');
+      showError(err.response?.data || USER_MESSAGES.DELETE_ERROR);
     } finally {
       setShowConfirmDialog(false);
       setUserToDelete(null);
@@ -386,8 +387,8 @@ const UserList: React.FC = () => {
         {/* Dialogs */}
         <ConfirmDialog
           isOpen={showConfirmDialog}
-          title="Xác nhận xóa người dùng"
-          message={`Bạn có chắc chắn muốn xóa người dùng "${userToDelete?.name}"? Hành động này không thể hoàn tác.`}
+          title={USER_MESSAGES.CONFIRM_DELETE_TITLE}
+          message={COMMON_MESSAGES.CONFIRM_DELETE('nhân viên', userToDelete?.name)}
           confirmText="Xóa"
           cancelText="Hủy"
           type="danger"

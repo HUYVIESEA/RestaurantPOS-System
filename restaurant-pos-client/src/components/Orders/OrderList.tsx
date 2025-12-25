@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
-import { tableService } from '../../services/tableService'; // ✅ ADD
+import { tableService } from '../../services/tableService';
 import { Order } from '../../types';
 import { formatPrice } from '../../utils/priceUtils';
 import { useToast } from '../../contexts/ToastContext';
 import { useSignalR } from '../../contexts/SignalRContext';
 import ConfirmDialog from '../Common/ConfirmDialog';
-import VietQRView from '../Payment/VietQRView'; // ✅ ADD
-import '../Payment/VietQRView.css'; // ✅ ADD
+import CustomSelect from '../Common/CustomSelect';
+import VietQRView from '../Payment/VietQRView';
+import '../Payment/VietQRView.css';
 import './OrderList.css';
+
+// Status options for order dropdown - Workflow: Pending → Prepared → Completed
+const statusOptions = [
+  { value: 'Pending', label: 'Chờ chế biến', icon: 'fas fa-fire' },
+  { value: 'Prepared', label: 'Đã nấu xong', icon: 'fas fa-bell-concierge' },
+  { value: 'Completed', label: 'Đã thanh toán', icon: 'fas fa-check-circle' },
+  { value: 'Cancelled', label: 'Đã hủy', icon: 'fas fa-ban' },
+];
 
 
 const OrderList: React.FC = () => {
@@ -221,21 +230,21 @@ const OrderList: React.FC = () => {
           className={`status-card pending ${statusFilter === 'Pending' ? 'active' : ''}`}
           onClick={() => setStatusFilter('Pending')}
         >
-          <div className="status-icon" style={{color: '#F57F17'}}><i className="fas fa-clock"></i></div>
+          <div className="status-icon" style={{color: '#F57F17'}}><i className="fas fa-fire"></i></div>
           <div className="status-info">
-            <div className="status-label">Đang xử lý</div>
+            <div className="status-label">Chờ chế biến</div>
             <div className="status-count">{stats.pending}</div>
           </div>
         </div>
 
-        {/* ✅ NEW: Prepared Card */}
+        {/* Prepared Card */}
         <div 
           className={`status-card prepared ${statusFilter === 'Prepared' ? 'active' : ''}`}
           onClick={() => setStatusFilter('Prepared')}
         >
-          <div className="status-icon" style={{color: '#0288D1'}}><i className="fas fa-bell"></i></div>
+          <div className="status-icon" style={{color: '#0288D1'}}><i className="fas fa-bell-concierge"></i></div>
           <div className="status-info">
-            <div className="status-label">Món đã xong</div>
+            <div className="status-label">Đã nấu xong</div>
             <div className="status-count">{stats.prepared}</div>
           </div>
         </div>
@@ -246,7 +255,7 @@ const OrderList: React.FC = () => {
         >
           <div className="status-icon" style={{color: '#2E7D32'}}><i className="fas fa-check-circle"></i></div>
           <div className="status-info">
-            <div className="status-label">Hoàn thành</div>
+            <div className="status-label">Đã thanh toán</div>
             <div className="status-count">{stats.completed}</div>
           </div>
         </div>
@@ -317,19 +326,15 @@ const OrderList: React.FC = () => {
                         </span>
                       </td>
                       <td className="status-cell">
-                        <select
-                          className={`status-select ${getStatusColor(order.status)}`}
+                        <CustomSelect
+                          options={statusOptions}
                           value={order.status}
-                          onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
-                        >
-                          <option value="Pending">Đang xử lý</option>
-                          <option value="Prepared">Món đã xong</option>
-                          <option value="Completed">Hoàn thành</option>
-                          <option value="Cancelled">Đã hủy</option>
-                        </select>
+                          onChange={(val) => handleUpdateStatus(order.id, val)}
+                          className={`status-dropdown ${getStatusColor(order.status)}`}
+                        />
                       </td>
                       <td className="actions-cell" style={{justifyContent: 'flex-end'}}>
-                        {order.status === 'Pending' && (
+                        {(order.status === 'Pending' || order.status === 'Prepared') && (
                           <button 
                             className="btn-payment-mini"
                             onClick={() => handlePaymentClick(order)}
@@ -411,7 +416,7 @@ const OrderList: React.FC = () => {
                          </div>
                          
                          <div style={{display: 'flex', gap: '0.5rem'}}>
-                            {order.status === 'Pending' && (
+                            {(order.status === 'Pending' || order.status === 'Prepared') && (
                                 <button className="btn-payment-mini" onClick={() => handlePaymentClick(order)} title="Thanh toán">
                                     <i className="fas fa-wallet"></i>
                                 </button>

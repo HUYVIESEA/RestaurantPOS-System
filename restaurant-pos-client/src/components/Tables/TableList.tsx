@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Order } from '../../types';
 import { tableService } from '../../services/tableService';
 import { useToast } from '../../contexts/ToastContext';
+import { TABLE_MESSAGES } from '../../constants/messages';
 import TakeawayModal from './TakeawayModal';
-import TableDetailModal from './TableDetailModal'; // ✅ Import Modal
+import TableDetailModal from './TableDetailModal';
 import './TableList.css';
 
 const TableList: React.FC = () => {
@@ -13,7 +14,6 @@ const TableList: React.FC = () => {
     const [tables, setTables] = useState<Table[]>([]);
     const [selectedTable, setSelectedTable] = useState<Table | null>(null); // ✅ For Detail Modal
     const [takeawayTable, setTakeawayTable] = useState<Table | null>(null);
-    const [loading, setLoading] = useState(true);
     const [showTakeawayModal, setShowTakeawayModal] = useState(false); // Legacy modal (can keep or remove)
     const [selectedFloor, setSelectedFloor] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
@@ -25,7 +25,6 @@ const TableList: React.FC = () => {
 
     const loadTables = async () => {
         try {
-            setLoading(true);
             const allTables = await tableService.getAll();
             
             // Separate "Mang về" from regular tables (like Desktop)
@@ -52,9 +51,7 @@ const TableList: React.FC = () => {
             }
         } catch (err) {
             console.error('Error loading tables:', err);
-            showToast('Lỗi tải danh sách bàn', 'error');
-        } finally {
-            setLoading(false);
+            showToast(TABLE_MESSAGES.LOAD_ERROR, 'error');
         }
     };
 
@@ -72,6 +69,12 @@ const TableList: React.FC = () => {
 
     const handleSelectOrder = (order: Order) => {
         navigate(`/orders/${order.id}`);
+        setSelectedTable(null);
+    };
+
+    const handlePaymentOrder = (order: Order) => {
+        // Navigate to order detail for payment
+        navigate(`/orders/${order.id}?action=payment`);
         setSelectedTable(null);
     };
 
@@ -246,6 +249,7 @@ const TableList: React.FC = () => {
                     onClose={() => setSelectedTable(null)}
                     onSelectOrder={handleSelectOrder}
                     onCreateOrder={handleConfirmCreateOrder}
+                    onPayment={handlePaymentOrder}
                 />
             )}
         </div>

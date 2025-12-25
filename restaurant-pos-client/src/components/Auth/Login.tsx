@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { AUTH_MESSAGES } from '../../constants/messages';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -21,10 +22,10 @@ const handleSubmit = async (e: React.FormEvent) => {
       if (success) {
         navigate('/');
       } else {
-        setError('Tên đăng nhập hoặc mật khẩu không đúng');
+        setError(AUTH_MESSAGES.LOGIN_INVALID);
       }
 } catch (err) {
-      setError('Đã xảy ra lỗi. Vui lòng thử lại.');
+      setError(AUTH_MESSAGES.LOGIN_ERROR);
     } finally {
       setLoading(false);
     }

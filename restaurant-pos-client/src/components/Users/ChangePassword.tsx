@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userService } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
+import { AUTH_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
 import './ChangePassword.css';
 
 const ChangePassword: React.FC = () => {
@@ -54,7 +55,7 @@ const ChangePassword: React.FC = () => {
   e.preventDefault();
 
     if (!validateForm()) {
-    showError('Vui lòng kiểm tra lại thông tin');
+    showError(COMMON_MESSAGES.FORM_INVALID);
       return;
     }
 
@@ -66,7 +67,7 @@ const ChangePassword: React.FC = () => {
         newPassword: formData.newPassword,
       });
 
-      showSuccess('Đổi mật khẩu thành công!');
+      showSuccess(AUTH_MESSAGES.PASSWORD_CHANGE_SUCCESS);
       
     // Reset form
       setFormData({
@@ -82,7 +83,7 @@ confirmPassword: '',
       
     } catch (err: any) {
       console.error('Error changing password:', err);
-      const errorMessage = err.response?.data || 'Không thể đổi mật khẩu';
+      const errorMessage = err.response?.data || AUTH_MESSAGES.PASSWORD_CHANGE_ERROR;
       showError(errorMessage);
     } finally {
       setLoading(false);

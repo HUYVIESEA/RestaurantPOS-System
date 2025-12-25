@@ -440,9 +440,15 @@ Bàn: {order.table?.tableNumber || 'N/A'} |
           </div>
         )}
 
-        {order.status !== 'Pending' && (
+        {order.status !== 'Pending' && order.status !== 'Prepared' && (
        <div className="help-text info">
-          ℹ️ Đơn hàng đã {order.status === 'Completed' ? 'hoàn thành' : 'bị hủy'}. Không thể chỉnh sửa.
+          ℹ️ Đơn hàng đã {order.status === 'Completed' ? 'thanh toán' : 'bị hủy'}. Không thể chỉnh sửa.
+          </div>
+        )}
+
+        {order.status === 'Prepared' && (
+       <div className="help-text success">
+          ✅ Món ăn đã nấu xong. Sẵn sàng thanh toán!
           </div>
         )}
     </div>
@@ -464,6 +470,15 @@ Bàn: {order.table?.tableNumber || 'N/A'} |
             </button>
           </>
 )}
+        {order.status === 'Prepared' && (
+          <button
+            className="btn btn-success btn-lg"
+            onClick={() => setShowPaymentDialog(true)}
+            style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
+          >
+            💳 Thanh toán ngay
+          </button>
+        )}
       </div>
     </div>
   );

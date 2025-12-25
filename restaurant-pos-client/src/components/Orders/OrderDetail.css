@@ -373,6 +373,12 @@
   color: #01579B;
 }
 
+.help-text.success {
+  background: #E8F5E9;
+  border-left-color: #4CAF50;
+  color: #2E7D32;
+}
+
 /* ============ ACTIONS FOOTER ============ */
 .actions-footer {
   display: flex;

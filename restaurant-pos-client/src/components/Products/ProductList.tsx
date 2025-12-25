@@ -8,6 +8,7 @@ import { SkeletonGrid, LoadingOverlay } from '../Common/Skeleton';
 import { useToast } from '../../contexts/ToastContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import ConfirmDialog from '../Common/ConfirmDialog';
+import { PRODUCT_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
 import './ProductList.css';
 
 const ProductList: React.FC = () => {
@@ -42,7 +43,7 @@ const ProductList: React.FC = () => {
       setCategories(categoriesData);
     } catch (err) {
       console.error('Error fetching data:', err);
-      showError('Không thể tải dữ liệu thực đơn');
+      showError(PRODUCT_MESSAGES.LOAD_ERROR);
     } finally {
       setLoading(false);
     }
@@ -60,10 +61,10 @@ const ProductList: React.FC = () => {
       setDeleting(productToDelete.id);
       await productService.delete(productToDelete.id);
       setAllProducts(prev => prev.filter(p => p.id !== productToDelete.id));
-      showSuccess('Đã xóa món ăn thành công');
+      showSuccess(PRODUCT_MESSAGES.DELETE_SUCCESS);
     } catch (err) {
       console.error('Error deleting product:', err);
-      showError('Không thể xóa món ăn');
+      showError(PRODUCT_MESSAGES.DELETE_ERROR);
     } finally {
       setDeleting(null);
       setShowConfirmDialog(false);
@@ -318,8 +319,8 @@ const ProductList: React.FC = () => {
       {/* Confirm Dialog */}
       <ConfirmDialog
         isOpen={showConfirmDialog}
-        title="Xác nhận xóa thực đơn"
-        message={`Bạn có chắc chắn muốn xóa thực đơn "${productToDelete?.name}"? Hành động này không thể hoàn tác.`}
+        title={PRODUCT_MESSAGES.CONFIRM_DELETE_TITLE}
+        message={COMMON_MESSAGES.CONFIRM_DELETE('món ăn', productToDelete?.name)}
         confirmText="Xóa"
         cancelText="Hủy"
         type="danger"

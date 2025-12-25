@@ -6,7 +6,8 @@ import { Product, Category } from '../../types';
 import { useToast } from '../../contexts/ToastContext';
 import { formatCurrency } from '../../utils/priceUtils';
 import { SkeletonGrid } from '../Common/Skeleton';
-import CustomSelect from '../Common/CustomSelect'; 
+import CustomSelect from '../Common/CustomSelect';
+import { INVENTORY_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
 import './InventoryList.css';
 
 const InventoryList: React.FC = () => {
@@ -39,7 +40,7 @@ const InventoryList: React.FC = () => {
       setCategories(categoriesData);
     } catch (err) {
       console.error('Error fetching data:', err);
-      showError('Không thể tải dữ liệu kho');
+      showError(INVENTORY_MESSAGES.LOAD_ERROR);
     } finally {
       setLoading(false);
     }
@@ -50,20 +51,20 @@ const InventoryList: React.FC = () => {
        await productService.update(product.id, { ...product, stockQuantity: newStock });
        // Update local state
        setProducts(products.map(p => p.id === product.id ? { ...p, stockQuantity: newStock } : p));
-       showSuccess(`Đã cập nhật tồn kho cho ${product.name}`);
+       showSuccess(INVENTORY_MESSAGES.UPDATE_SUCCESS(product.name));
     } catch (err) {
-        showError('Lỗi cập nhật tồn kho');
+        showError(INVENTORY_MESSAGES.UPDATE_ERROR);
     }
   };
 
-  const handleDeleteProduct = async (id: number) => {
-    if (!window.confirm('Bạn có chắc muốn xóa sản phẩm này khỏi kho?')) return;
+  const handleDeleteProduct = async (id: number, name: string) => {
+    if (!window.confirm(COMMON_MESSAGES.CONFIRM_DELETE('sản phẩm', name))) return;
     try {
         await productService.delete(id);
         setProducts(products.filter(p => p.id !== id));
-        showSuccess('Đã xóa sản phẩm');
+        showSuccess(INVENTORY_MESSAGES.DELETE_SUCCESS);
     } catch (err) {
-        showError('Không thể xóa sản phẩm');
+        showError(INVENTORY_MESSAGES.DELETE_ERROR);
     }
   };
 
@@ -237,7 +238,7 @@ const InventoryList: React.FC = () => {
                                 </button>
                                 <button 
                                     className="btn-icon delete" 
-                                    onClick={() => handleDeleteProduct(product.id)}
+                                    onClick={() => handleDeleteProduct(product.id, product.name)}
                                     title="Xóa sản phẩm"
                                 >
                                     <i className="fas fa-trash-alt"></i>

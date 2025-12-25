@@ -8,13 +8,15 @@ interface TableDetailModalProps {
     onClose: () => void;
     onSelectOrder: (order: Order) => void;
     onCreateOrder: () => void;
+    onPayment?: (order: Order) => void;
 }
 
 const TableDetailModal: React.FC<TableDetailModalProps> = ({ 
     table, 
     onClose, 
     onSelectOrder, 
-    onCreateOrder 
+    onCreateOrder,
+    onPayment 
 }) => {
     const [orders, setOrders] = useState<Order[]>([]);
 
@@ -42,6 +44,24 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
         }).format(amount);
     };
 
+    const getStatusLabel = (status: string) => {
+        switch (status) {
+            case 'Pending': return 'Chờ chế biến';
+            case 'Prepared': return 'Đã nấu xong';
+            default: return status;
+        }
+    };
+
+    const getStatusClass = (status: string) => {
+        switch (status) {
+            case 'Pending': return 'status-pending';
+            case 'Prepared': return 'status-prepared';
+            default: return '';
+        }
+    };
+
+    const canPay = (status: string) => status === 'Pending' || status === 'Prepared';
+
     return (
         <div className="table-detail-modal-overlay" onClick={onClose}>
             <div className="table-detail-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -68,30 +88,47 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                             </div>
                             <div className="orders-list">
                                 {orders.map((order) => (
-                                    <div 
-                                        key={order.id} 
-                                        className="order-item"
-                                        onClick={() => {
-                                            onClose();
-                                            onSelectOrder(order);
-                                        }}
-                                    >
-                                        <div className="order-info">
-                                            <span className="order-id">#{order.id}</span>
-                                            <div className="order-meta">
-                                                <i className="far fa-clock"></i>
-                                                {new Date(order.orderDate).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                                                {order.customerName && (
-                                                    <>
-                                                        <span>•</span>
-                                                        <i className="far fa-user"></i> {order.customerName}
-                                                    </>
-                                                )}
+                                    <div key={order.id} className="order-item-wrapper">
+                                        <div 
+                                            className="order-item"
+                                            onClick={() => {
+                                                onClose();
+                                                onSelectOrder(order);
+                                            }}
+                                        >
+                                            <div className="order-info">
+                                                <span className="order-id">#{order.id}</span>
+                                                <span className={`order-status-badge ${getStatusClass(order.status)}`}>
+                                                    {getStatusLabel(order.status)}
+                                                </span>
+                                                <div className="order-meta">
+                                                    <i className="far fa-clock"></i>
+                                                    {new Date(order.orderDate).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                                    {order.customerName && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <i className="far fa-user"></i> {order.customerName}
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
+                                            <span className="order-amount">
+                                                {formatCurrency(order.totalAmount)}
+                                            </span>
                                         </div>
-                                        <span className="order-amount">
-                                            {formatCurrency(order.totalAmount)}
-                                        </span>
+                                        {canPay(order.status) && onPayment && (
+                                            <button 
+                                                className="btn-payment-order"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onPayment(order);
+                                                }}
+                                                title="Thanh toán đơn này"
+                                            >
+                                                <i className="fas fa-wallet"></i>
+                                                Thanh toán
+                                            </button>
+                                        )}
                                     </div>
                                 ))}
                             </div>
