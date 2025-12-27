@@ -43,6 +43,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddHttpClient(); // Required for VietQR
 builder.Services.AddScoped<RestaurantPOS.API.Services.VietQR.IVietQRService, RestaurantPOS.API.Services.VietQR.VietQRService>();
+builder.Services.AddScoped<RestaurantPOS.API.Services.SePay.ISePayService, RestaurantPOS.API.Services.SePay.SePayService>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IReportService, ReportService>();

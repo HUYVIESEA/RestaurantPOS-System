@@ -190,6 +190,24 @@
                             </Grid>
                         </Border>
 
+                        <!-- SePay Integration -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="SePay Payment Integration" FontSize="18" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Manage payment gateway tunneling and simulation." Foreground="{StaticResource SubTextColor}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Content="Start Tunnel" Click="BtnStartTunnel_Click" Style="{StaticResource ModernButtonStyle}" Background="{StaticResource WarningColor}" Width="100" Margin="0,0,10,0"/>
+                                    <Button Content="Simulate" Click="BtnSimulateSePay_Click" Style="{StaticResource OutlineButtonStyle}" Width="100"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
                         <!-- Desktop App -->
                         <Border Style="{StaticResource CardStyle}">
                             <Grid>

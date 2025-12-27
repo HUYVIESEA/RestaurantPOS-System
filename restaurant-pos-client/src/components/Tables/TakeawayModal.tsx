@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Order } from '../../types';
 import { orderService } from '../../services/orderService';
-import Loading from '../Common/Loading';
 import './TakeawayModal.css';
 
 interface TakeawayModalProps {
@@ -18,7 +17,7 @@ const TakeawayModal: React.FC<TakeawayModalProps> = ({
     onCreateNew 
 }) => {
     const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [_loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadTakeawayOrders();

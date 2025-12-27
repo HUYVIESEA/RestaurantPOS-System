@@ -251,6 +251,20 @@ namespace RestaurantPOS.Manager
             KillProcessByPort(5173);
         }
 
+        private void BtnStartTunnel_Click(object sender, RoutedEventArgs e)
+        {
+            Log("Starting SePay Tunnel...");
+            // Use -NoExit to keep the window open so user can see the URL
+            StartProcess("powershell", "-NoExit -ExecutionPolicy Bypass -File start-tunnel.ps1", _rootDirectory, false);
+        }
+
+        private void BtnSimulateSePay_Click(object sender, RoutedEventArgs e)
+        {
+            Log("Launching SePay Simulator...");
+            // Use -NoExit to keep the window open so user can see the result
+            StartProcess("powershell", "-NoExit -ExecutionPolicy Bypass -File simulate-sepay.ps1", _rootDirectory, false);
+        }
+
         private void BtnStartDesktop_Click(object sender, RoutedEventArgs e)
         {
             Log("Launching Desktop App...");

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { productService } from '../../services/productService';
 import { categoryService } from '../../services/categoryService';
 import { Product, Category } from '../../types';
-import Loading from '../Common/Loading';
 import './AddItemDialog.css';
 
 interface AddItemDialogProps {
@@ -17,7 +16,7 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();

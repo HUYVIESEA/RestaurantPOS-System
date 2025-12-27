@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Loading from '../Common/Loading';
 import './ActivityLog.css';
 
 // ========================================
@@ -24,7 +23,7 @@ interface ActivityLogProps {
 
 export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) => {
   const [logs, setLogs] = useState<ActivityLogEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchActivityLogs();
