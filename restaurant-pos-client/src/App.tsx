@@ -24,6 +24,7 @@ import InventoryList from './components/Inventory/InventoryList'; // ✅ ADD
 import KitchenView from './components/Kitchen/KitchenView'; // ✅ ADD
 import Dashboard from './components/Dashboard/Dashboard';
 import Statistics from './components/Reports/Statistics'; // ✅ ADD
+import BigDataAnalytics from './components/BigData/BigDataAnalytics';
 import UserList from './components/Users/UserList';
 import UserForm from './components/Users/UserForm';
 import UserProfile from './components/Users/UserProfile';
@@ -82,6 +83,9 @@ function AppContent() {
 
               {/* Statistics (Merged Analytics & Reports) */} {/* ✅ NEW */}
               <Route path="/statistics" element={<PrivateRoute><Statistics /></PrivateRoute>} />
+              
+              {/* Big Data (MongoDB) */}
+              <Route path="/bigdata" element={<PrivateRoute><BigDataAnalytics /></PrivateRoute>} />
               
               {/* Redirect old routes to new one */}
               <Route path="/analytics" element={<Navigate to="/statistics" replace />} />

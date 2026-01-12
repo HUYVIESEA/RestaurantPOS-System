@@ -10,6 +10,7 @@ using System.Security.Claims;
 // using RestaurantPOS.API.Services.VnPay; // Disabled - using VietQR instead
 using RestaurantPOS.API.Hubs;
 using RestaurantPOS.API;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,10 @@ builder.Services.AddControllers()
 // Configure Entity Framework with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add MongoDB
+builder.Services.AddSingleton<IMongoClient>(sp => 
+    new MongoClient(builder.Configuration.GetConnectionString("MongoConnection")));
 
 // Register application services
 builder.Services.AddScoped<IProductService, ProductService>();

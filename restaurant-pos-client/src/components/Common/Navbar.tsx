@@ -28,6 +28,7 @@ const Navbar: React.FC = () => {
     { path: '/categories', label: 'Danh mục', icon: 'fa-folder', permission: true }, // Always visible
     { path: '/suppliers', label: 'Nhà cung cấp', icon: 'fa-truck', permission: permissions.products.canEdit }, // Admin, Manager
     { path: '/statistics', label: 'Thống kê', icon: 'fa-chart-bar', permission: permissions.canAccessAnalytics || permissions.reports.canView }, // Admin, Manager
+    { path: '/bigdata', label: 'Big Data', icon: 'fa-database', permission: permissions.canAccessAnalytics }, // Admin, Manager
     { path: '/users', label: 'Người dùng', icon: 'fa-users', permission: permissions.users.canView }, // Admin only
   ];
 
