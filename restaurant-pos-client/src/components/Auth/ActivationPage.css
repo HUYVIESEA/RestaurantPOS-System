@@ -1,0 +1,139 @@
+.activation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    padding: 20px;
+}
+
+.activation-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.activation-icon {
+    font-size: 3rem;
+    color: #1e3c72;
+    margin-bottom: 20px;
+}
+
+.activation-header h2 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+.activation-header p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.system-id-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px dashed #ced4da;
+    margin-bottom: 25px;
+}
+
+.system-id-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.system-id-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2a5298;
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.copy-btn:hover {
+    color: #1e3c72;
+}
+
+.instruction {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #2a5298;
+    outline: none;
+}
+
+.activate-btn {
+    width: 100%;
+    padding: 12px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.activate-btn:hover {
+    background: #218838;
+}
+
+.activate-btn:disabled {
+    background: #94d3a2;
+    cursor: not-allowed;
+}
+
+.activation-footer {
+    margin-top: 30px;
+    border-top: 1px solid #e9ecef;
+    padding-top: 20px;
+    font-size: 0.85rem;
+    color: #adb5bd;
+}

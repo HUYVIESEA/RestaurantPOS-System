@@ -6,19 +6,35 @@ using RestaurantPOS.API.Hubs;
 
 namespace RestaurantPOS.API.Services
 {
+    /// <summary>
+    /// Order Service with Hybrid Caching for enterprise performance
+    /// </summary>
     public class OrderService : IOrderService
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<RestaurantHub> _hubContext;
         private readonly IFirebaseService _firebaseService;
         private readonly ILogger<OrderService> _logger;
+        private readonly ICacheService _cache;
+        
+        private const string CACHE_KEY_ORDER_PREFIX = "order:";
+        private const string CACHE_KEY_ORDERS_PREFIX = "orders:page:"; // For paginated lists
+        private const string CACHE_KEY_RECENT_ORDERS = "orders:recent:";
+        private const string CACHE_KEY_TABLE_ORDERS = "orders:table:";
+        private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(10);
 
-        public OrderService(ApplicationDbContext context, IHubContext<RestaurantHub> hubContext, IFirebaseService firebaseService, ILogger<OrderService> logger)
+        public OrderService(
+            ApplicationDbContext context, 
+            IHubContext<RestaurantHub> hubContext, 
+            IFirebaseService firebaseService, 
+            ILogger<OrderService> logger,
+            ICacheService cache)
         {
             _context = context;
             _hubContext = hubContext;
             _firebaseService = firebaseService;
             _logger = logger;
+            _cache = cache;
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
@@ -34,6 +50,17 @@ namespace RestaurantPOS.API.Services
 
         public async Task<PagedResult<Order>> GetOrdersAsync(int pageNumber, int pageSize)
         {
+            var cacheKey = $"{CACHE_KEY_RECENT_ORDERS}{pageNumber}:{pageSize}";
+            
+            // Try cache first
+            var cached = await _cache.GetAsync<PagedResult<Order>>(cacheKey);
+            if (cached != null)
+            {
+                _logger.LogInformation("Orders page {Page} found in cache", pageNumber);
+                return cached;
+            }
+
+            // Cache miss - query database
             var query = _context.Orders
                 .AsNoTracking();
 
@@ -48,28 +75,62 @@ namespace RestaurantPOS.API.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<Order>
+            var result = new PagedResult<Order>
             {
                 Items = items,
                 TotalItems = totalItems,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+            
+            // Cache the result
+            await _cache.SetAsync(cacheKey, result, CacheExpiration);
+
+            return result;
         }
 
         public async Task<Order?> GetOrderByIdAsync(int id)
         {
-            return await _context.Orders
+            var cacheKey = $"{CACHE_KEY_ORDER_PREFIX}{id}";
+            
+            // Try cache first
+            var cached = await _cache.GetAsync<Order>(cacheKey);
+            if (cached != null)
+            {
+                _logger.LogInformation("Order {OrderId} found in cache", id);
+                return cached;
+            }
+
+            // Cache miss - query database
+            var order = await _context.Orders
                 .AsNoTracking()
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.Id == id);
+            
+            if (order != null)
+            {
+                await _cache.SetAsync(cacheKey, order, CacheExpiration);
+            }
+            
+            return order;
         }
 
         public async Task<IEnumerable<Order>> GetOrdersByTableAsync(int tableId)
         {
-            return await _context.Orders
+            var cacheKey = $"{CACHE_KEY_TABLE_ORDERS}{tableId}";
+            
+            // Try cache first
+            var cached = await _cache.GetAsync<List<Order>>(cacheKey);
+            if (cached != null)
+            {
+                _logger.LogInformation("Orders for table {TableId} found in cache", tableId);
+                return cached;
+            }
+
+            // Cache miss - query database
+            var orders = await _context.Orders
                 .AsNoTracking()
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
@@ -77,6 +138,40 @@ namespace RestaurantPOS.API.Services
                 .Where(o => o.TableId == tableId)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
+            
+            await _cache.SetAsync(cacheKey, orders, CacheExpiration);
+            
+            return orders;
+        }
+
+        /// <summary>
+        /// Invalidates all cache entries related to an order
+        /// </summary>
+        private async Task InvalidateOrderCacheAsync(int? orderId = null, int? tableId = null, CancellationToken cancellationToken = default)
+        {
+            var keysToRemove = new List<string>();
+            
+            if (orderId.HasValue)
+            {
+                keysToRemove.Add($"{CACHE_KEY_ORDER_PREFIX}{orderId.Value}");
+            }
+            
+            if (tableId.HasValue)
+            {
+                keysToRemove.Add($"{CACHE_KEY_TABLE_ORDERS}{tableId.Value}");
+            }
+            
+            // Always invalidate recent orders list (paginated caches)
+            keysToRemove.Add($"{CACHE_KEY_ORDERS_PREFIX}page:1:size:50");
+            keysToRemove.Add($"{CACHE_KEY_ORDERS_PREFIX}page:1:size:20");
+            keysToRemove.Add($"{CACHE_KEY_ORDERS_PREFIX}page:1:size:10");
+            
+            foreach (var key in keysToRemove)
+            {
+                await _cache.RemoveAsync(key, cancellationToken);
+            }
+            
+            _logger.LogInformation("Invalidated {Count} cache keys for order {OrderId}", keysToRemove.Count, orderId);
         }
 
         public async Task<Order> CreateOrderAsync(Order order)
@@ -119,6 +214,9 @@ namespace RestaurantPOS.API.Services
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
             
+            // Invalidate caches
+            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            
             // Broadcast new order via SignalR
             await _hubContext.Clients.All.SendAsync("OrderCreated", order.Id);
             await _hubContext.Clients.All.SendAsync("TableUpdated");
@@ -159,6 +257,9 @@ namespace RestaurantPOS.API.Services
 
             string oldStatus = order.Status;
             order.Status = status;
+            
+            // Invalidate caches
+            await InvalidateOrderCacheAsync(order.Id, order.TableId);
 
             // ✅ NEW: Auto-free table when order is Completed or Cancelled
             if ((status == "Completed" || status == "Cancelled") && order.TableId.HasValue)
@@ -270,6 +371,10 @@ namespace RestaurantPOS.API.Services
             }
 
             await _context.SaveChangesAsync();
+            
+            // Invalidate caches
+            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            
             return await GetOrderByIdAsync(orderId);
         }
 
@@ -299,6 +404,10 @@ namespace RestaurantPOS.API.Services
             order.TotalAmount += priceDiff;
 
             await _context.SaveChangesAsync();
+            
+            // Invalidate caches
+            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            
             return await GetOrderByIdAsync(orderId);
         }
 
@@ -320,6 +429,10 @@ namespace RestaurantPOS.API.Services
             item.Notes = note;
 
             await _context.SaveChangesAsync();
+            
+            // Invalidate caches
+            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            
             return await GetOrderByIdAsync(orderId);
         }
 
@@ -385,6 +498,10 @@ namespace RestaurantPOS.API.Services
         }
 
         await _context.SaveChangesAsync();
+        
+        // Invalidate caches
+        await InvalidateOrderCacheAsync(order.Id, order.TableId);
+        
         await _hubContext.Clients.All.SendAsync("OrderUpdated", orderId);
         await _hubContext.Clients.All.SendAsync("TableUpdated");
         return await GetOrderByIdAsync(orderId);

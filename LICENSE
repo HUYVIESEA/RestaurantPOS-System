@@ -1,21 +1,28 @@
-MIT License
+CUSTOM LICENSE AGREEMENT
+Copyright (c) 2026 Hoàng Việt Huy. All rights reserved.
 
-Copyright (c) 2025 HUYVESEA
+This software is the intellectual property of Hoàng Việt Huy.
+Use of this software is subject to the following conditions:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. SOURCE CODE INTEGRITY (BẢO TOÀN MÃ NGUỒN)
+   - You may not remove, alter, or obscure any copyright notices, proprietary notices, or author attributions ("Hoàng Việt Huy") contained in the source code headers.
+   - Any derived work must retain the original authorship information in the code structure.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. VISUAL IDENTIFICATION (NHẬN DẠNG GIAO DIỆN)
+   - To prevent illegal usage/claiming of ownership: Any deployed version of this software (web or desktop) MUST clearly display the following text in the login screen, footer, or 'About' section:
+     "Platform developed by Hoàng Việt Huy"
+   - Removing this identification tag constitutes a direct violation of this license.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. USAGE PERMISSIONS
+   - Permission is hereby granted to use this software for personal or educational purposes.
+   - For Commercial Use: You must obtain written permission/license from the author (Hoàng Việt Huy).
+
+4. DISCLAIMER
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY.
+
+-----------------------------------------------------------------------
+ĐIỀU KHOẢN CỤ THỂ (TIẾNG VIỆT):
+Phần mềm này thuộc quyền sở hữu trí tuệ của Hoàng Việt Huy. Để đảm bảo quyền tác giả và ngăn chặn sử dụng bất hợp pháp, người sử dụng phải tuân thủ:
+1. Không được xóa tên tác giả trong code.
+2. Bắt buộc phải hiển thị tên "Hoàng Việt Huy" trên giao diện phần mềm (Footer/Login/About).
+3. Sử dụng thương mại phải có sự đồng ý bằng văn bản.
