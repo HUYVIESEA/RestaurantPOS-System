@@ -11,6 +11,9 @@
 *.sln.docstates
 .idea/
 .env
+.vscode/
+.github/
+.agent/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -211,7 +214,5 @@ doc
 # Release Builds and Artifacts
 restaurant-pos-client/dist/
 RestaurantPOS.Manager/publish/
-Smart Order Web Nhà Hàng_Hoàng Việt Huy/
-Smart Order Web Nhà Hàng_Hoàng Việt Huy.rar
 *.rar
 *.zip
