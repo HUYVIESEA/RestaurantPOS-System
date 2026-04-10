@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { userService, CreateUserRequest, UpdateUserRequest } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
-import './UserForm.css';
 
 const UserForm: React.FC = () => {
   const navigate = useNavigate();
@@ -147,144 +146,151 @@ const UserForm: React.FC = () => {
   // }
 
   return (
-    <div className="user-form-container">
-      <div className="form-header">
-     <h2>{isEditMode ? '✏️ Sửa người dùng' : '➕ Thêm người dùng mới'}</h2>
-     <button className="btn btn-back" onClick={() => navigate('/users')}>
+    <div className="w-full p-4 md:p-6 bg-slate-50 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-200">
+      <div className="flex justify-between items-center mb-6 pb-4 border-b dark:border-slate-700">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{isEditMode ? '✏️ Sửa người dùng' : '➕ Thêm người dùng mới'}</h2>
+        <button 
+          className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors flex items-center gap-2" 
+          onClick={() => navigate('/users')}
+        >
           ← Quay lại
         </button>
       </div>
 
-      <div className="form-card">
-        <form onSubmit={handleSubmit}>
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username */}
-          <div className="form-group">
-            <label htmlFor="username">
-              Tên đăng nhập <span className="required">*</span>
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Tên đăng nhập <span className="text-rose-500">*</span>
             </label>
             <input
-      type="text"
-id="username"
-    name="username"
-       value={formData.username}
-     onChange={handleChange}
-              className={errors.username ? 'error' : ''}
-   disabled={isEditMode} // Can't change username in edit mode
-           placeholder="johndoe"
-       />
-  {errors.username && <span className="error-message">{errors.username}</span>}
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className={`w-full px-4 py-2 rounded-lg border ${errors.username ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-800`}
+              disabled={isEditMode}
+              placeholder="johndoe"
+            />
+            {errors.username && <span className="text-sm text-rose-500 mt-1 block">{errors.username}</span>}
           </div>
 
           {/* Email */}
-<div className="form-group">
-        <label htmlFor="email">
-    Email <span className="required">*</span>
-     </label>
-         <input
-          type="email"
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Email <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="email"
               id="email"
-  name="email"
+              name="email"
               value={formData.email}
-     onChange={handleChange}
-         className={errors.email ? 'error' : ''}
-   placeholder="user@example.com"
-         />
-       {errors.email && <span className="error-message">{errors.email}</span>}
-        </div>
+              onChange={handleChange}
+              className={`w-full px-4 py-2 rounded-lg border ${errors.email ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+              placeholder="user@example.com"
+            />
+            {errors.email && <span className="text-sm text-rose-500 mt-1 block">{errors.email}</span>}
+          </div>
 
           {/* Full Name */}
-    <div className="form-group">
-            <label htmlFor="fullName">
-            Họ và tên <span className="required">*</span>
-    </label>
-       <input
- type="text"
-       id="fullName"
-           name="fullName"
-       value={formData.fullName}
-    onChange={handleChange}
-  className={errors.fullName ? 'error' : ''}
-         placeholder="Nguyễn Văn A"
-          />
-            {errors.fullName && <span className="error-message">{errors.fullName}</span>}
+          <div>
+            <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Họ và tên <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              className={`w-full px-4 py-2 rounded-lg border ${errors.fullName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+              placeholder="Nguyễn Văn A"
+            />
+            {errors.fullName && <span className="text-sm text-rose-500 mt-1 block">{errors.fullName}</span>}
           </div>
 
           {/* Role */}
-       <div className="form-group">
- <label htmlFor="role">
-        Vai trò <span className="required">*</span>
-         </label>
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Vai trò <span className="text-rose-500">*</span>
+            </label>
             <select
-    id="role"
-          name="role"
-            value={formData.role}
-         onChange={handleChange}
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors appearance-none"
             >
-     <option value="Staff">👤 Staff</option>
+              <option value="Staff">👤 Staff</option>
               <option value="Admin">👑 Admin</option>
-      </select>
+            </select>
           </div>
 
           {/* Password fields (only for create mode) */}
-        {!isEditMode && (
-            <>
-              <div className="form-group">
-     <label htmlFor="password">
-         Mật khẩu <span className="required">*</span>
-  </label>
-  <input
-         type="password"
-       id="password"
- name="password"
-                  value={formData.password}
-         onChange={handleChange}
-       className={errors.password ? 'error' : ''}
-           placeholder="••••••••"
-        />
-        {errors.password && <span className="error-message">{errors.password}</span>}
-            <small className="help-text">Mật khẩu phải có ít nhất 6 ký tự</small>
-         </div>
-
-      <div className="form-group">
-      <label htmlFor="confirmPassword">
-      Xác nhận mật khẩu <span className="required">*</span>
+          {!isEditMode && (
+            <div className="space-y-6 pt-4 border-t dark:border-slate-700">
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  Mật khẩu <span className="text-rose-500">*</span>
                 </label>
-      <input
-  type="password"
-                  id="confirmPassword"
-    name="confirmPassword"
-              value={formData.confirmPassword}
-    onChange={handleChange}
-            className={errors.confirmPassword ? 'error' : ''}
-    placeholder="••••••••"
-     />
-    {errors.confirmPassword && (
-        <span className="error-message">{errors.confirmPassword}</span>
-  )}
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 rounded-lg border ${errors.password ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                  placeholder="••••••••"
+                />
+                {errors.password ? (
+                  <span className="text-sm text-rose-500 mt-1 block">{errors.password}</span>
+                ) : (
+                  <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 block">Mật khẩu phải có ít nhất 6 ký tự</span>
+                )}
               </div>
-      </>
-        )}
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  Xác nhận mật khẩu <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 rounded-lg border ${errors.confirmPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                  placeholder="••••••••"
+                />
+                {errors.confirmPassword && (
+                  <span className="text-sm text-rose-500 mt-1 block">{errors.confirmPassword}</span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Form Actions */}
-       <div className="form-actions">
-   <button
-              type="button"
-              className="btn btn-secondary"
-          onClick={() => navigate('/users')}
-     disabled={loading}
-            >
-        Hủy
-  </button>
+          <div className="flex items-center justify-end gap-3 pt-6 border-t dark:border-slate-700 mt-8">
             <button
-          type="submit"
-              className="btn btn-primary"
-   disabled={loading}
+              type="button"
+              className="px-6 py-2.5 rounded-lg font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
+              onClick={() => navigate('/users')}
+              disabled={loading}
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              disabled={loading}
             >
               {loading ? 'Đang lưu...' : isEditMode ? '💾 Cập nhật' : '✓ Tạo người dùng'}
-    </button>
+            </button>
           </div>
- </form>
-  </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -6,6 +6,7 @@ using RestaurantPOS.API.Models;
 using RestaurantPOS.API.Models.DTOs;
 using BCrypt.Net;
 using System.Security.Claims; // ✅ ADD for ClaimTypes
+using System.Security.Cryptography; // ✅ ADD for RandomNumberGenerator
 
 namespace RestaurantPOS.API.Controllers
 {
@@ -320,11 +321,21 @@ if (user == null)
 
         private string GenerateRandomPassword()
         {
-  const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
-    var random = new Random();
-  return new string(Enumerable.Repeat(chars, 12)
-       .Select(s => s[random.Next(s.Length)]).ToArray());
-      }
+   const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+   var passwordChars = new char[12];
+   var randomBytes = new byte[4]; // 4 bytes per character gives us plenty of entropy
+   using (var rng = RandomNumberGenerator.Create())
+   {
+       for (int i = 0; i < passwordChars.Length; i++)
+       {
+           rng.GetBytes(randomBytes);
+           // Convert 4 random bytes to an integer index
+           uint value = BitConverter.ToUInt32(randomBytes, 0);
+           passwordChars[i] = chars[(int)(value % (uint)chars.Length)];
+       }
+   }
+   return new string(passwordChars);
+       }
 }
 
     // ✅ DTOs - Only add new ones that don't exist in AuthDTOs

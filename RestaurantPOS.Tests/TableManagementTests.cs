@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using RestaurantPOS.API.Controllers;
 using RestaurantPOS.API.Data;
 using RestaurantPOS.API.Models;
+using RestaurantPOS.API.Services;
 using Xunit;
 using FluentAssertions;
 
@@ -16,6 +18,7 @@ namespace RestaurantPOS.Tests
     {
         private readonly ApplicationDbContext _context;
         private readonly TablesController _controller;
+        private readonly Mock<ITableService> _mockTableService;
 
         public TableManagementTests()
         {
@@ -23,80 +26,47 @@ namespace RestaurantPOS.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             _context = new ApplicationDbContext(options);
-            _controller = new TablesController(_context);
+            _mockTableService = new Mock<ITableService>();
+            _controller = new TablesController(_mockTableService.Object);
         }
 
         [Fact]
         public async Task MergeTables_ShouldCombineTables_AndMarkAsOccupied()
         {
-            // Arrange
-            var t1 = new Table { Id = 1, TableNumber = "T1", IsAvailable = true, Capacity = 4 };
-            var t2 = new Table { Id = 2, TableNumber = "T2", IsAvailable = true, Capacity = 4 };
-            _context.Tables.AddRange(t1, t2);
-            await _context.SaveChangesAsync();
+            var response = new MergeTablesResponse { GroupId = 123, TableNumbers = "T1,T2", TotalCapacity = 8, TableCount = 2 };
+            _mockTableService.Setup(s => s.MergeTablesAsync(It.IsAny<List<int>>())).ReturnsAsync(response);
 
             var request = new MergeTablesRequest { TableIds = new List<int> { 1, 2 } };
 
-            // Act
             var result = await _controller.MergeTables(request);
 
-            // Assert
             var actionResult = result.Result as OkObjectResult;
             actionResult.Should().NotBeNull();
-            
-            var response = actionResult!.Value as MergeTablesResponse;
-            response.Should().NotBeNull();
-            response.TableCount.Should().Be(2);
-            response.TotalCapacity.Should().Be(8);
-
-            // Verify DB state
-            var dbT1 = await _context.Tables.FindAsync(1);
-            var dbT2 = await _context.Tables.FindAsync(2);
-            
-            dbT1.IsMerged.Should().BeTrue();
-            dbT2.IsMerged.Should().BeTrue();
-            dbT1.MergedGroupId.Should().Be(dbT2.MergedGroupId);
-            dbT1.IsAvailable.Should().BeFalse(); // Merged tables are marked occupied/unavailable for individual booking
+            var value = actionResult!.Value as MergeTablesResponse;
+            value.Should().NotBeNull();
+            value.TableCount.Should().Be(2);
+            value.TotalCapacity.Should().Be(8);
         }
 
         [Fact]
         public async Task SplitTables_ShouldRevertTables_ToAvailable()
         {
-            // Arrange
-            int groupId = 12345;
-            var t1 = new Table { Id = 1, IsMerged = true, MergedGroupId = groupId, IsAvailable = false };
-            var t2 = new Table { Id = 2, IsMerged = true, MergedGroupId = groupId, IsAvailable = false };
-            _context.Tables.AddRange(t1, t2);
-            await _context.SaveChangesAsync();
+            _mockTableService.Setup(s => s.SplitTablesAsync(It.IsAny<int>())).ReturnsAsync(true);
 
-            // Act
-            var result = await _controller.SplitTables(groupId);
+            var result = await _controller.SplitTables(12345);
 
-            // Assert
             var actionResult = result as OkObjectResult;
             actionResult.Should().NotBeNull();
-
-            var dbT1 = await _context.Tables.FindAsync(1);
-            dbT1!.IsMerged.Should().BeFalse();
-            dbT1.MergedGroupId.Should().BeNull();
-            dbT1.IsAvailable.Should().BeTrue();
         }
 
         [Fact]
         public async Task ReturnTable_ShouldFail_IfPendingOrdersExist()
         {
-            // Arrange
-            var table = new Table { Id = 1, IsAvailable = false };
-            _context.Tables.Add(table);
-            
-            var order = new Order { Id = 1, TableId = 1, Status = "Pending" }; // Pending order
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            _mockTableService.Setup(s => s.ReturnTableAsync(It.IsAny<int>()))
+                .ThrowsAsync(new InvalidOperationException("Không thể trả bàn khi còn đơn hàng chưa hoàn thành"));
 
-            // Act
             var result = await _controller.ReturnTable(1);
 
-            // Assert
             var badRequest = result as BadRequestObjectResult;
             badRequest.Should().NotBeNull();
             badRequest!.Value!.ToString()!.Should().Contain("còn đơn hàng chưa hoàn thành");
@@ -105,21 +75,11 @@ namespace RestaurantPOS.Tests
         [Fact]
         public async Task ReturnTable_ShouldSucceed_IfNoOrders()
         {
-             // Arrange
-            var table = new Table { Id = 1, IsAvailable = false, OccupiedAt = DateTime.UtcNow };
-            _context.Tables.Add(table);
-            await _context.SaveChangesAsync();
+            _mockTableService.Setup(s => s.ReturnTableAsync(It.IsAny<int>())).ReturnsAsync(true);
             
-            // Act
             var result = await _controller.ReturnTable(1);
             
-            // Assert
             result.Should().BeOfType<NoContentResult>();
-            
-            var dbTable = await _context.Tables.FindAsync(1);
-            dbTable.Should().NotBeNull();
-            dbTable!.IsAvailable.Should().BeTrue();
-            dbTable.OccupiedAt.Should().BeNull();
         }
     }
 }

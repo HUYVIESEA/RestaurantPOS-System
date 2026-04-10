@@ -60,7 +60,7 @@ public class CacheController : ControllerBase
                 CacheKeys = new
                 {
                     TotalKeys = await server.DatabaseSizeAsync(),
-                    SampleKeys = await GetSampleKeysAsync(server)
+                    SampleKeys = GetSampleKeys(server)
                 },
                 Timestamp = DateTime.UtcNow
             };
@@ -197,7 +197,7 @@ public class CacheController : ControllerBase
         return "N/A";
     }
 
-    private async Task<List<string>> GetSampleKeysAsync(IServer server, int count = 10)
+    private List<string> GetSampleKeys(IServer server, int count = 10)
     {
         var keys = server.Keys(pageSize: count).Take(count).Select(k => k.ToString()).ToList();
         return keys;

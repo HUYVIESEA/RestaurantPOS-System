@@ -15,7 +15,7 @@ namespace RestaurantPOS.API.Models
         [StringLength(200)]
         public string Email { get; set; } = string.Empty;
 
-    [Required]
+        [Required]
         public string PasswordHash { get; set; } = string.Empty;
 
       [Required]
@@ -34,6 +34,18 @@ namespace RestaurantPOS.API.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? LastLoginAt { get; set; }
+
+        // SECURITY: Track failed login attempts for brute force protection
+        public int FailedLoginAttempts { get; set; } = 0;
+
+        // SECURITY: Lockout timestamp (null means not locked out)
+        public DateTime? LockoutEnd { get; set; }
+
+        // SECURITY: Track password change time to invalidate existing tokens
+        public DateTime? PasswordChangedAt { get; set; }
+
+        // SECURITY: Force password change on first login for seeded/admin users
+        public bool MustChangePassword { get; set; } = false;
 
         [StringLength(500)]
         public string? FcmToken { get; set; }

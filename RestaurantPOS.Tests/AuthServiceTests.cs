@@ -29,18 +29,21 @@ namespace RestaurantPOS.Tests
             _context = new ApplicationDbContext(options);
 
             // Mock dependencies
+            var inMemorySettings = new Dictionary<string, string>
+            {
+                {"JwtSettings:SecretKey", "ThisIsAVeryLongSecretKeyForTestingPurposeOnly123!"},
+                {"JwtSettings:Issuer", "TestIssuer"},
+                {"JwtSettings:Audience", "TestAudience"},
+                {"JwtSettings:ExpiryInHours", "24"}
+            };
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings!)
+                .Build();
             _mockConfig = new Mock<IConfiguration>();
-            var mockJwtSection = new Mock<IConfigurationSection>();
-            mockJwtSection.Setup(x => x["SecretKey"]).Returns("ThisIsAVeryLongSecretKeyForTestingPurposeOnly123!");
-            mockJwtSection.Setup(x => x["Issuer"]).Returns("TestIssuer");
-            mockJwtSection.Setup(x => x["Audience"]).Returns("TestAudience");
-            mockJwtSection.Setup(x => x.Value).Returns("TestValue");
-            // Setup GetSection("JwtSettings") to return the mock section
-            _mockConfig.Setup(x => x.GetSection("JwtSettings")).Returns(mockJwtSection.Object);
-            
-            // Fix GetValue extension method mocking requires simpler approach or robust config building
-            // For simplicity in Unit Test, we can skip specific Token Expiry assert or setup properly if needed.
-            // But let's verify Login first.
+            _mockConfig.Setup(x => x.GetSection(It.IsAny<string>()))
+                .Returns((string key) => configuration.GetSection(key));
+            _mockConfig.Setup(x => x[It.IsAny<string>()])
+                .Returns((string key) => configuration[key]);
 
             _mockEmailService = new Mock<IEmailService>();
 
@@ -93,21 +96,11 @@ namespace RestaurantPOS.Tests
             var loginRequest = new LoginRequest { Username = "loginuser", Password = password };
 
             // Act
-            // Note: LoginAsync uses Configuration for JWT generation. If Mock Config is complex, this might fail without full setup.
-            // Let's try basic execution.
-            try 
-            {
-                var result = await _authService.LoginAsync(loginRequest);
-                // Assert
-                result.Should().NotBeNull();
-                result.Token.Should().NotBeNullOrEmpty();
-            }
-            catch (Exception ex)
-            {
-                // If it fails due to Config mocking, strictly speaking we need better config mock, 
-                // but functionally User validation is passed if code reaches Token generation.
-                Assert.True(true, "Reached Token Generation or passed validation step."); 
-            }
+            var result = await _authService.LoginAsync(loginRequest);
+
+            // Assert
+            result.Should().NotBeNull();
+            result!.Token.Should().NotBeNullOrEmpty();
         }
 
         [Fact]

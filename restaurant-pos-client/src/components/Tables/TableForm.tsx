@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { tableService } from '../../services/tableService';
 import { Table } from '../../types';
-import './TableForm.css';
 
 const TableForm: React.FC = () => {
   const navigate = useNavigate();
@@ -130,20 +129,20 @@ const TableForm: React.FC = () => {
   ]));
 
   return (
-    <div className="table-form-container">
-      <div className="form-header">
-     <h2>{isEditMode ? 'Cập nhật bàn' : 'Thêm bàn mới'}</h2>
-  <button onClick={() => navigate('/tables')} className="btn-back">
+    <div className="w-full p-4 sm:p-6 lg:p-8">
+      <div className="flex justify-between items-center mb-6 sm:mb-8">
+     <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{isEditMode ? 'Cập nhật bàn' : 'Thêm bàn mới'}</h2>
+  <button onClick={() => navigate('/tables')} className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors touch-manipulation">
           ← Quay lại
         </button>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl mb-6">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="table-form">
-      <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="tableNumber">Số bàn *</label>
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="tableNumber" className="text-sm font-medium text-gray-700 dark:text-gray-300">Số bàn *</label>
             <input
         type="text"
           id="tableNumber"
@@ -153,11 +152,12 @@ const TableForm: React.FC = () => {
   required
      placeholder="VD: B01, B02..."
        maxLength={20}
+       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
      />
           </div>
 
-          <div className="form-group">
-        <label htmlFor="capacity">Số người *</label>
+          <div className="flex flex-col gap-2">
+        <label htmlFor="capacity" className="text-sm font-medium text-gray-700 dark:text-gray-300">Số người *</label>
             <input
       type="text"
               id="capacity"
@@ -167,9 +167,10 @@ const TableForm: React.FC = () => {
         required
               placeholder="Số người"
       inputMode="numeric"
+      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           />
  {formData.capacity && (
-   <small className="capacity-preview">
+   <small className="text-xs text-gray-500 dark:text-gray-400 mt-1">
       👥 {formData.capacity} người
               </small>
             )}
@@ -177,8 +178,8 @@ const TableForm: React.FC = () => {
         </div>
 
    {/* ✅ Enhanced Floor Selection */}
-      <div className="form-group">
-          <label htmlFor="floor">Tầng / Khu vực *</label>
+      <div className="flex flex-col gap-2">
+          <label htmlFor="floor" className="text-sm font-medium text-gray-700 dark:text-gray-300">Tầng / Khu vực *</label>
       
  {!showCustomFloor ? (
 <>
@@ -188,6 +189,7 @@ const TableForm: React.FC = () => {
        value={formData.floor}
       onChange={handleChange}
       required
+      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
     >
      {allFloorOptions.map(floor => (
 <option key={floor} value={floor}>
@@ -198,7 +200,7 @@ const TableForm: React.FC = () => {
  </select>
         <button
                 type="button"
-            className="btn-add-floor"
+            className="mt-2 text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 hover:text-blue-800 dark:hover:text-blue-300 py-2 touch-manipulation"
         onClick={() => setShowCustomFloor(true)}
     >
          ➕ Thêm tầng mới
@@ -213,11 +215,12 @@ const TableForm: React.FC = () => {
     placeholder="Nhập tên tầng mới (VD: Tầng 3, Khu VIP...)"
       maxLength={50}
                 autoFocus
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               />
-           <div className="custom-floor-actions">
+           <div className="flex items-center justify-between mt-2">
      <button
   type="button"
-    className="btn-cancel-custom"
+    className="text-sm text-red-500 hover:text-red-700 py-1 px-2 rounded touch-manipulation"
         onClick={() => {
                setShowCustomFloor(false);
   setCustomFloorName('');
@@ -225,7 +228,7 @@ const TableForm: React.FC = () => {
          >
         ✗ Hủy
         </button>
-                <small className="custom-floor-hint">
+                <small className="text-xs text-gray-500 dark:text-gray-400">
           💡 Tầng mới sẽ tự động xuất hiện trong danh sách
           </small>
               </div>
@@ -235,30 +238,31 @@ const TableForm: React.FC = () => {
 
         {/* ✅ Show existing floors count */}
         {existingFloors.length > 0 && !showCustomFloor && (
-  <div className="floor-info">
-   <small>
-      📊 Hiện có <strong>{existingFloors.length} tầng</strong>: {existingFloors.join(', ')}
+  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800/50 mt-2">
+   <small className="text-sm text-gray-700 dark:text-gray-300">
+      📊 Hiện có <strong className="font-bold">{existingFloors.length} tầng</strong>: {existingFloors.join(', ')}
        </small>
           </div>
         )}
 
-        <div className="form-group checkbox-group">
-      <label>
+        <div className="mt-6">
+      <label className="flex items-center gap-3 cursor-pointer select-none p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
        <input
 type="checkbox"
               name="isAvailable"
           checked={formData.isAvailable}
  onChange={handleChange}
+ className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
    />
-     <span>Bàn đang trống</span>
+     <span className="text-gray-800 dark:text-white font-medium">Bàn đang trống</span>
           </label>
      </div>
 
-  <div className="form-actions">
-          <button type="button" onClick={() => navigate('/tables')} className="btn-cancel">
+  <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100 dark:border-gray-700 mt-8">
+          <button type="button" onClick={() => navigate('/tables')} className="py-3 px-6 rounded-xl font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex-1 text-center touch-manipulation">
             Hủy
     </button>
-   <button type="submit" disabled={loading} className="btn-submit">
+   <button type="submit" disabled={loading} className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-1 text-center touch-manipulation">
  {loading ? 'Đang xử lý...' : (isEditMode ? 'Cập nhật' : 'Thêm mới')}
           </button>
         </div>

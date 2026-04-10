@@ -7,8 +7,6 @@ import { useToast } from '../../contexts/ToastContext';
 import AddItemDialog from './AddItemDialog';
 import CancelItemDialog from './CancelItemDialog';
 import VietQRView from '../Payment/VietQRView';
-import '../Payment/VietQRView.css';
-import './OrderDetail.css';
 
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,31 +36,22 @@ const OrderDetail: React.FC = () => {
     } catch (err) {
       setError('Không thể tải chi tiết đơn hàng.');
       console.error('Error fetching order:', err);
-    } finally {
-      // setLoading(false);
     }
   };
 
-  // ✅ NEW: Handle add item
   const handleAddItem = async (productId: number, quantity: number, notes: string) => {
     try {
-      // Call API to add item to order
       await orderService.addItem(parseInt(id!), {
         productId,
         quantity,
         notes: notes || undefined,
       });
-      
-      // Close dialog
       setShowAddDialog(false);
-      
-      // Reload order to show new item
       await fetchOrderDetail();
-      
-      showSuccess(`✅ Đã thêm món thành công!\nSố lượng: ${quantity}`); // ✅ MODIFY
+      showSuccess(`✅ Đã thêm món thành công!\nSố lượng: ${quantity}`);
     } catch (err) {
       console.error('Error adding item:', err);
-      showError('Không thể thêm món'); // ✅ MODIFY
+      showError('Không thể thêm món');
     }
   };
 
@@ -78,7 +67,7 @@ const OrderDetail: React.FC = () => {
 
   const handleCancelSelected = async () => {
     if (selectedItems.size === 0) {
-      showWarning('Vui lòng chọn món cần hủy'); // ✅ CHANGED
+      showWarning('Vui lòng chọn món cần hủy');
       return;
     }
 
@@ -88,7 +77,7 @@ const OrderDetail: React.FC = () => {
 
     const totalCancelled = itemsToCancel.reduce(
       (sum, item) => sum + (item.unitPrice * item.quantity), 
-    0
+      0
     );
 
     const confirmMessage = `Bạn có chắc muốn hủy ${selectedItems.size} món?\n` +
@@ -97,26 +86,22 @@ const OrderDetail: React.FC = () => {
     if (!window.confirm(confirmMessage)) return;
 
     try {
-      // TODO: Call API to cancel items
-      // For now, we'll delete them locally
       const remainingItems = order?.orderItems?.filter(item => 
         !selectedItems.has(item.id)
       ) || [];
 
       if (remainingItems.length === 0) {
-        // If all items cancelled, cancel the order
         await orderService.updateStatus(parseInt(id!), 'Cancelled');
-        showSuccess('Đã hủy tất cả món. Đơn hàng chuyển sang trạng thái "Đã hủy".'); // ✅ CHANGED
+        showSuccess('Đã hủy tất cả món. Đơn hàng chuyển sang trạng thái "Đã hủy".');
         navigate('/orders');
       } else {
-        // Update order with remaining items
         setOrder({
           ...order!,
           orderItems: remainingItems,
           totalAmount: order!.totalAmount - totalCancelled
         });
         setSelectedItems(new Set());
-        showSuccess(`Đã hủy ${selectedItems.size} món thành công!`); // ✅ CHANGED
+        showSuccess(`Đã hủy ${selectedItems.size} món thành công!`);
       }
     } catch (err) {
       setError('Không thể hủy món.');
@@ -138,7 +123,7 @@ const OrderDetail: React.FC = () => {
     try {
       await orderService.removeItem(parseInt(id!), itemId);
       await fetchOrderDetail();
-      showSuccess('Đã hủy món thành công!'); // ✅ CHANGED
+      showSuccess('Đã hủy món thành công!');
     } catch (err) {
       setError('Không thể hủy món.');
       console.error('Error:', err);
@@ -146,10 +131,8 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-  // ✅ NEW: Handle quantity change
   const handleQuantityChange = async (itemId: number, newQuantity: number) => {
     if (newQuantity < 1) {
-      // If quantity = 0, remove item
       handleCancelSingleItem(itemId);
       return;
     }
@@ -163,13 +146,11 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-  // ✅ NEW: Handle partial cancel
   const handleCancelItem = (item: OrderItem) => {
     setCancelingItem(item);
     setShowCancelDialog(true);
   };
 
-  // ✅ NEW: Confirm partial cancel
   const handleCancelConfirm = async (cancelQuantity: number) => {
     if (!cancelingItem) return;
 
@@ -177,14 +158,11 @@ const OrderDetail: React.FC = () => {
       const remainingQuantity = cancelingItem.quantity - cancelQuantity;
 
       if (remainingQuantity === 0) {
-        // Remove item completely
         await orderService.removeItem(parseInt(id!), cancelingItem.id);
       } else {
-        // Update quantity
         await orderService.updateItemQuantity(parseInt(id!), cancelingItem.id, remainingQuantity);
       }
 
-      // Close dialog and reload
       setShowCancelDialog(false);
       setCancelingItem(null);
       await fetchOrderDetail();
@@ -201,12 +179,10 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-  // Handle payment completion (Cash or QR confirmed)
   const handlePaymentComplete = async () => {
     try {
       await orderService.updateStatus(order!.id, 'Completed');
       
-      // Release table
       if (order!.tableId) {
           try {
               await tableService.updateAvailability(order!.tableId, true);
@@ -229,13 +205,12 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-
-  if (error) return <div className="error">{error}</div>;
-  if (!order) return <div className="error">Không tìm thấy đơn hàng</div>;
+  if (error) return <div className="p-4 text-red-600 bg-red-50 dark:bg-red-900/30 rounded-xl m-4 font-medium">{error}</div>;
+  if (!order) return <div className="p-4 text-slate-600 dark:text-slate-400">Không tìm thấy đơn hàng</div>;
 
   return (
-    <div className="order-detail-container">
-      {/* ✅ Add Item Dialog */}
+    <div className="w-full p-4 md:p-6 pb-24 space-y-6">
+      {/* Add Item Dialog */}
       {showAddDialog && (
         <AddItemDialog
           onAdd={handleAddItem}
@@ -243,7 +218,7 @@ const OrderDetail: React.FC = () => {
         />
       )}
 
-      {/* ✅ NEW: Cancel Item Dialog */}
+      {/* Cancel Item Dialog */}
       {showCancelDialog && cancelingItem && (
         <CancelItemDialog
           item={cancelingItem}
@@ -257,40 +232,42 @@ const OrderDetail: React.FC = () => {
 
       {/* Payment Method Dialog */}
       {showPaymentDialog && (
-        <div className="modal-overlay" onClick={() => { setShowPaymentDialog(false); setShowQR(false); }}>
-          <div className="modal-content payment-dialog" onClick={(e) => e.stopPropagation()}>
-            <h3>{showQR ? 'Thanh toán VietQR' : 'Chọn hình thức thanh toán'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => { setShowPaymentDialog(false); setShowQR(false); }}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">
+              {showQR ? 'Thanh toán VietQR' : 'Chọn hình thức thanh toán'}
+            </h3>
             
             {!showQR ? (
-                <>
-                    <p className="payment-amount">Tổng tiền: <strong>{order.totalAmount.toLocaleString('vi-VN')} đ</strong></p>
-                    <div className="payment-methods">
+                <div className="space-y-4">
+                    <p className="text-center text-lg text-slate-600 dark:text-slate-300 mb-6">
+                      Tổng tiền: <strong className="text-xl text-slate-900 dark:text-white block mt-2">{order.totalAmount.toLocaleString('vi-VN')} đ</strong>
+                    </p>
+                    <div className="space-y-3">
                         <button 
-                            className="payment-method-btn cash"
+                            className="w-full min-h-[56px] flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-colors shadow-sm"
                             onClick={handleCashPayment}
                         >
-                            <i className="fas fa-money-bill-wave"></i>
-                            <span>Tiền mặt</span>
+                            <i className="fas fa-money-bill-wave text-xl"></i>
+                            <span className="text-lg">Tiền mặt</span>
                         </button>
 
                         <button 
-                            className="payment-method-btn qr"
+                            className="w-full min-h-[56px] flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-semibold transition-colors shadow-sm"
                             onClick={() => setShowQR(true)}
-                            style={{ background: 'linear-gradient(135deg, #0060C0, #363795)', color: 'white', border: 'none' }}
                         >
-                            <i className="fas fa-qrcode"></i>
-                            <span>Chuyển khoản QR</span>
+                            <i className="fas fa-qrcode text-xl"></i>
+                            <span className="text-lg">Chuyển khoản QR</span>
                         </button>
                     </div>
                 
                     <button 
-                        className="btn btn-secondary"
+                        className="w-full min-h-[48px] mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200 rounded-xl font-medium transition-colors"
                         onClick={() => setShowPaymentDialog(false)}
-                        style={{ marginTop: '1rem', width: '100%' }}
                     >
                         Hủy bỏ
                     </button>
-                </>
+                </div>
             ) : (
                 <VietQRView 
                     amount={order.totalAmount}
@@ -303,180 +280,212 @@ const OrderDetail: React.FC = () => {
         </div>
       )}
 
-      <div className="header">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50">
         <div>
-  <h2>Chi tiết Đơn hàng #{order.id}</h2>
-   <p className="subtitle">
-Bàn: {order.table?.tableNumber || 'N/A'} | 
-        Trạng thái: <span className={`status-${order.status.toLowerCase()}`}>{order.status}</span>
-   </p>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Chi tiết Đơn hàng #{order.id}</h2>
+          <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 font-medium">
+            <span className="bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-lg">
+              Bàn: {order.table?.tableNumber || 'N/A'}
+            </span>
+            <span className={`px-3 py-1 rounded-lg ${
+              order.status === 'Pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' :
+              order.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' :
+              'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300'
+            }`}>
+              {order.status}
+            </span>
+          </div>
         </div>
-        <button className="btn btn-back" onClick={() => navigate('/tables')}>
-          ← Quay lại
-  </button>
+        <button 
+          className="min-h-[44px] px-5 bg-white hover:bg-slate-50 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-xl font-medium transition-colors shadow-sm flex items-center gap-2" 
+          onClick={() => navigate('/tables')}
+        >
+          <span>&larr;</span> Quay lại
+        </button>
       </div>
 
-      <div className="order-info-grid">
-        <div className="info-card">
-  <label>Khách hàng</label>
-        <p>{order.customerName || 'Khách vãng lai'}</p>
+      {/* Order Info Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <label className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1 block">Khách hàng</label>
+          <p className="text-lg font-semibold text-slate-800 dark:text-white">{order.customerName || 'Khách vãng lai'}</p>
         </div>
- <div className="info-card">
-      <label>Ngày đặt</label>
-     <p>{new Date(order.orderDate).toLocaleString('vi-VN')}</p>
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50">
+          <label className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1 block">Ngày đặt</label>
+          <p className="text-lg font-semibold text-slate-800 dark:text-white">{new Date(order.orderDate).toLocaleString('vi-VN')}</p>
         </div>
-        <div className="info-card">
-          <label>Tổng tiền</label>
-<p className="total-amount">{order.totalAmount.toLocaleString('vi-VN')} đ</p>
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50 lg:col-span-1 sm:col-span-2">
+          <label className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1 block">Tổng tiền</label>
+          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{order.totalAmount.toLocaleString('vi-VN')} đ</p>
         </div>
-    {order.notes && (
-          <div className="info-card notes">
- <label>Ghi chú</label>
-         <p>{order.notes}</p>
-        </div>
-   )}
+        {order.notes && (
+          <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-2xl border border-amber-100 dark:border-amber-800/30 sm:col-span-2 lg:col-span-3">
+            <label className="text-sm text-amber-700 dark:text-amber-400 font-medium mb-1 block">Ghi chú</label>
+            <p className="text-amber-900 dark:text-amber-200">{order.notes}</p>
+          </div>
+        )}
       </div>
 
-      <div className="items-section">
-        <div className="items-header">
-          <h3>Danh sách món ({order.orderItems?.length || 0})</h3>
-{order.status === 'Pending' && selectedItems.size > 0 && (
+      {/* Items Section */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+        <div className="p-5 border-b border-slate-100 dark:border-slate-700/50 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50 dark:bg-slate-800/50">
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white">
+            Danh sách món ({order.orderItems?.length || 0})
+          </h3>
+          {order.status === 'Pending' && selectedItems.size > 0 && (
             <button 
-       className="btn btn-danger"
- onClick={handleCancelSelected}
-    >
-      🗑️ Hủy {selectedItems.size} món đã chọn
-    </button>
+              className="min-h-[44px] px-4 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors shadow-sm flex items-center gap-2"
+              onClick={handleCancelSelected}
+            >
+              🗑️ Hủy {selectedItems.size} món đã chọn
+            </button>
           )}
         </div>
 
-      <table className="items-table">
-          <thead>
-            <tr>
-              {order.status === 'Pending' && <th style={{ width: '50px' }}>Chọn</th>}
-              <th>Món</th>
-              <th>Đơn giá</th>
-              <th>Số lượng</th>
-              <th>Thành tiền</th>
-              {order.status === 'Pending' && <th>Thao tác</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {order.orderItems?.map(item => (
-      <tr key={item.id} className={selectedItems.has(item.id) ? 'selected' : ''}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-700/30 text-slate-500 dark:text-slate-400 text-sm uppercase tracking-wider">
+                {order.status === 'Pending' && <th className="p-4 font-medium w-16 text-center">Chọn</th>}
+                <th className="p-4 font-medium">Món</th>
+                <th className="p-4 font-medium hidden sm:table-cell">Đơn giá</th>
+                <th className="p-4 font-medium text-center">Số lượng</th>
+                <th className="p-4 font-medium text-right">Thành tiền</th>
+                {order.status === 'Pending' && <th className="p-4 font-medium text-center">Thao tác</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
+              {order.orderItems?.map(item => (
+                <tr 
+                  key={item.id} 
+                  className={`transition-colors ${selectedItems.has(item.id) ? 'bg-indigo-50/50 dark:bg-indigo-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-700/20'}`}
+                >
+                  {order.status === 'Pending' && (
+                    <td className="p-4 text-center align-middle">
+                      <div className="flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 cursor-pointer"
+                          checked={selectedItems.has(item.id)}
+                          onChange={() => handleToggleItem(item.id)}
+                        />
+                      </div>
+                    </td>
+                  )}
+                  <td className="p-4 align-middle">
+                    <div className="font-medium text-slate-800 dark:text-slate-200">{item.product?.name}</div>
+                    {item.notes && <div className="text-sm text-slate-500 dark:text-slate-400 mt-1 italic">({item.notes})</div>}
+                    <div className="sm:hidden text-sm text-slate-500 dark:text-slate-400 mt-1">{item.unitPrice.toLocaleString('vi-VN')} đ</div>
+                  </td>
+                  <td className="p-4 hidden sm:table-cell align-middle text-slate-600 dark:text-slate-300">
+                    {item.unitPrice.toLocaleString('vi-VN')} đ
+                  </td>
+                  
+                  {/* Editable Quantity */}
+                  {order.status === 'Pending' ? (
+                    <td className="p-4 align-middle">
+                      <div className="flex items-center justify-center gap-2">
+                        <button 
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                          disabled={item.quantity <= 1}
+                        >
+                          −
+                        </button>
+                        <span className="w-6 text-center font-medium text-slate-800 dark:text-slate-200">{item.quantity}</span>
+                        <button 
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 transition-colors"
+                          onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+                  ) : (
+                    <td className="p-4 align-middle text-center font-medium text-slate-800 dark:text-slate-200">
+                      {item.quantity}
+                    </td>
+                  )}
+
+                  <td className="p-4 align-middle text-right font-semibold text-slate-800 dark:text-slate-200">
+                    {(item.unitPrice * item.quantity).toLocaleString('vi-VN')} đ
+                  </td>
+                  
+                  {order.status === 'Pending' && (
+                    <td className="p-4 align-middle text-center">
+                      <button
+                        className="min-h-[36px] px-3 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400 rounded-lg text-sm font-medium transition-colors"
+                        onClick={() => handleCancelItem(item)}
+                      >
+                        Hủy
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+            <tfoot className="bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+              <tr>
+                <td colSpan={order.status === 'Pending' ? (window.innerWidth < 640 ? 3 : 4) : (window.innerWidth < 640 ? 2 : 3)} className="p-5 text-right font-semibold text-slate-700 dark:text-slate-300 text-lg">
+                  Tổng cộng:
+                </td>
+                <td className="p-5 text-right font-bold text-indigo-600 dark:text-indigo-400 text-xl">
+                  {order.totalAmount.toLocaleString('vi-VN')} đ
+                </td>
+                {order.status === 'Pending' && <td></td>}
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      {/* Help Texts */}
+      <div className="space-y-3">
         {order.status === 'Pending' && (
-         <td>
-       <input
-     type="checkbox"
-   checked={selectedItems.has(item.id)}
-         onChange={() => handleToggleItem(item.id)}
-       />
-</td>
-        )}
-   <td>
-        <div className="item-name">
-        {item.product?.name}
-     {item.notes && <span className="item-notes">({item.notes})</span>}
-  </div>
- </td>
-    <td>{item.unitPrice.toLocaleString('vi-VN')} đ</td>
-       
-    {/* ✅ NEW: Editable Quantity */}
-         {order.status === 'Pending' ? (
-         <td className="quantity">
-        <div className="quantity-controls-inline">
-    <button 
-            className="qty-btn-sm"
-         onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-   disabled={item.quantity <= 1}
- >
-       −
-     </button>
-      <span className="qty-value">{item.quantity}</span>
-         <button 
-       className="qty-btn-sm"
-  onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-       >
-       +
-           </button>
-                  </div>
-         </td>
-   ) : (
- <td className="quantity">{item.quantity}</td>
- )}
-
-                <td className="item-total">
-     {(item.unitPrice * item.quantity).toLocaleString('vi-VN')} đ
-       </td>
-         {order.status === 'Pending' && (
-   <td>
-     <button
-    className="btn btn-sm btn-cancel"
-         onClick={() => handleCancelItem(item)}
-          >
-   Hủy
-</button>
-  </td>
-   )}
-       </tr>
-      ))}
-          </tbody>
- <tfoot>
-            <tr className="total-row">
-        <td colSpan={order.status === 'Pending' ? 4 : 3} className="text-right">
-        <strong>Tổng cộng:</strong>
-          </td>
-   <td className="total-amount">
-    <strong>{order.totalAmount.toLocaleString('vi-VN')} đ</strong>
-     </td>
-       {order.status === 'Pending' && <td></td>}
-         </tr>
-       </tfoot>
-        </table>
-
- {order.status === 'Pending' && (
-          <div className="help-text">
-        💡 <strong>Lưu ý:</strong> Chỉ có thể hủy món khi đơn hàng đang ở trạng thái "Đang xử lý"
+          <div className="p-4 rounded-xl bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 text-sm">
+            💡 <strong>Lưu ý:</strong> Chỉ có thể hủy món khi đơn hàng đang ở trạng thái "Đang xử lý"
           </div>
         )}
 
         {order.status !== 'Pending' && order.status !== 'Prepared' && (
-       <div className="help-text info">
-          ℹ️ Đơn hàng đã {order.status === 'Completed' ? 'thanh toán' : 'bị hủy'}. Không thể chỉnh sửa.
+          <div className="p-4 rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 text-sm">
+            ℹ️ Đơn hàng đã {order.status === 'Completed' ? 'thanh toán' : 'bị hủy'}. Không thể chỉnh sửa.
           </div>
         )}
 
         {order.status === 'Prepared' && (
-       <div className="help-text success">
-          ✅ Món ăn đã nấu xong. Sẵn sàng thanh toán!
+          <div className="p-4 rounded-xl bg-emerald-50 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300 font-medium">
+            ✅ Món ăn đã nấu xong. Sẵn sàng thanh toán!
           </div>
         )}
-    </div>
+      </div>
 
-   <div className="actions-footer">
-   {order.status === 'Pending' && (
+      {/* Actions Footer */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-center z-40 sm:static sm:bg-transparent sm:border-none sm:p-0 sm:mt-8 sm:backdrop-blur-none">
+        {order.status === 'Pending' && (
           <>
             <button 
-      className="btn btn-warning"
-     onClick={() => setShowAddDialog(true)}
-   >
-     ➕ Thêm món
- </button>
+              className="flex-1 sm:flex-none min-h-[50px] px-6 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-amber-500/20 flex items-center justify-center gap-2"
+              onClick={() => setShowAddDialog(true)}
+            >
+              <span>➕</span> Thêm món
+            </button>
             <button
-              className="btn btn-success"
+              className="flex-1 sm:flex-none min-h-[50px] px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-emerald-500/20 flex items-center justify-center gap-2"
               onClick={() => setShowPaymentDialog(true)}
             >
-              💳 Thanh toán
+              <span>💳</span> Thanh toán
             </button>
           </>
-)}
+        )}
+        
         {order.status === 'Prepared' && (
           <button
-            className="btn btn-success btn-lg"
+            className="w-full sm:max-w-md min-h-[56px] text-lg px-8 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors shadow-md shadow-emerald-500/30 flex items-center justify-center gap-2 mx-auto"
             onClick={() => setShowPaymentDialog(true)}
-            style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
           >
-            💳 Thanh toán ngay
+            <span>💳</span> Thanh toán ngay
           </button>
         )}
       </div>

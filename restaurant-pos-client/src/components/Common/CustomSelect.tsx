@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './CustomSelect.css';
 
 export interface Option {
     value: string | number;
@@ -31,13 +30,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     const getDisplayLabel = () => {
         if (selectedOption) {
             return (
-                <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                    {selectedOption.icon && <i className={selectedOption.icon}></i>}
-                    {selectedOption.label}
+                <span className="flex items-center gap-2">
+                    {selectedOption.icon && <i className={`${selectedOption.icon} text-gray-500 dark:text-gray-400`}></i>}
+                    <span className="text-gray-800 dark:text-white">{selectedOption.label}</span>
                 </span>
             );
         }
-        return <span style={{color: '#94a3b8'}}>{placeholder}</span>;
+        return <span className="text-gray-400 dark:text-gray-500">{placeholder}</span>;
     };
 
     // Close dropdown when clicking outside
@@ -60,31 +59,31 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     };
 
     return (
-        <div className={`custom-select-container ${className}`} ref={containerRef}>
+        <div className={`relative ${className}`} ref={containerRef}>
             {/* Trigger Button */}
             <div 
-                className={`custom-select-trigger ${isOpen ? 'is-open' : ''}`} 
+                className={`flex items-center justify-between w-full px-4 py-2.5 bg-white dark:bg-gray-800 border rounded-lg cursor-pointer transition-all duration-200 hover:border-orange-500 hover:ring-2 hover:ring-orange-500/20 ${isOpen ? 'border-orange-500 ring-2 ring-orange-500/20 dark:border-orange-500' : 'border-gray-300 dark:border-gray-700'}`} 
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {getDisplayLabel()}
-                <i className="fas fa-chevron-down custom-select-arrow"></i>
+                <i className={`fas fa-chevron-down text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}></i>
             </div>
 
             {/* Dropdown Options */}
             {isOpen && (
-                <div className="custom-select-options">
+                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto overflow-x-hidden">
                     {options.map((option) => (
                         <div 
                             key={option.value} 
-                            className={`custom-option ${value === option.value ? 'selected' : ''}`}
+                            className={`flex items-center px-4 py-3 cursor-pointer transition-colors duration-150 gap-3 hover:bg-orange-50 dark:hover:bg-gray-700 ${value === option.value ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-500 font-medium' : 'text-gray-700 dark:text-gray-200'}`}
                             onClick={() => handleSelect(option.value)}
                         >
-                            {option.icon && <i className={option.icon}></i>}
+                            {option.icon && <i className={`${option.icon} ${value === option.value ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'}`}></i>}
                             {option.label}
                         </div>
                     ))}
                     {options.length === 0 && (
-                        <div className="custom-option" style={{justifyContent: 'center', color: '#94a3b8'}}>
+                        <div className="flex items-center justify-center px-4 py-3 text-gray-400 dark:text-gray-500">
                             Không có dữ liệu
                         </div>
                     )}

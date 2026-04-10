@@ -9,17 +9,14 @@ import { useSignalR } from '../../contexts/SignalRContext';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import CustomSelect from '../Common/CustomSelect';
 import VietQRView from '../Payment/VietQRView';
-import '../Payment/VietQRView.css';
-import './OrderList.css';
 
 // Status options for order dropdown - Workflow: Pending → Prepared → Completed
 const statusOptions = [
   { value: 'Pending', label: 'Chờ chế biến', icon: 'fas fa-fire' },
   { value: 'Prepared', label: 'Đã nấu xong', icon: 'fas fa-bell-concierge' },
-  { value: 'Completed', label: 'Đã thanh toán', icon: 'fas fa-check-circle' },
+  { value: 'Completed', label: 'Đã thanh toán', icon: 'fas fa-circle-check' },
   { value: 'Cancelled', label: 'Đã hủy', icon: 'fas fa-ban' },
 ];
-
 
 const OrderList: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +40,7 @@ const OrderList: React.FC = () => {
     fetchOrders();
   }, []);
 
-  // ✅ Listen for SignalR events
+  // Listen for SignalR events
   useEffect(() => {
     if (connection) {
       connection.on('OrderCreated', (newOrder: Order) => {
@@ -73,8 +70,6 @@ const OrderList: React.FC = () => {
     } catch (err) {
       showToast('Không thể tải đơn hàng', 'error');
       console.error('Error fetching orders:', err);
-    } finally {
-      // setLoading(false);
     }
   };
 
@@ -168,42 +163,83 @@ const OrderList: React.FC = () => {
   const stats = {
     total: orders.length,
     pending: orders.filter(o => o.status === 'Pending').length,
-    prepared: orders.filter(o => o.status === 'Prepared').length, // ✅ New
+    prepared: orders.filter(o => o.status === 'Prepared').length,
     completed: orders.filter(o => o.status === 'Completed').length,
     cancelled: orders.filter(o => o.status === 'Cancelled').length,
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColorClass = (status: string, isTextOnly = false) => {
     switch (status) {
-      case 'Pending': return 'status-pending';
-      case 'Prepared': return 'status-prepared'; // ✅ New
-      case 'Completed': return 'status-completed';
-      case 'Cancelled': return 'status-cancelled';
-      default: return '';
+      case 'Pending': return isTextOnly ? 'text-orange-500' : 'bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400';
+      case 'Prepared': return isTextOnly ? 'text-sky-500' : 'bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400';
+      case 'Completed': return isTextOnly ? 'text-emerald-500' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400';
+      case 'Cancelled': return isTextOnly ? 'text-red-500' : 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400';
+      default: return isTextOnly ? 'text-slate-500' : 'bg-slate-100 text-slate-600 dark:bg-slate-500/20 dark:text-slate-400';
     }
   };
 
+  const getStatusIconColor = (status: string) => {
+    switch (status) {
+      case 'Pending': return 'text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10';
+      case 'Prepared': return 'text-sky-500 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10';
+      case 'Completed': return 'text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10';
+      case 'Cancelled': return 'text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
+      case 'all': return 'text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10';
+      default: return 'text-slate-500 bg-slate-50 dark:bg-slate-500/10';
+    }
+  };
 
+  const renderStatusCard = (type: string, label: string, count: number, iconClass: string) => {
+    const isActive = statusFilter === type;
+    
+    return (
+      <div 
+        className={`rounded-xl p-4 flex items-center gap-4 cursor-pointer border-2 transition-all min-h-[80px] shadow-sm select-none
+          ${isActive 
+            ? 'border-indigo-500 bg-indigo-50/30 dark:border-indigo-400 dark:bg-indigo-900/20' 
+            : 'border-transparent bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
+          }`}
+        onClick={() => setStatusFilter(type)}
+      >
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 ${getStatusIconColor(type)}`}>
+          <i className={iconClass}></i>
+        </div>
+        <div className="flex flex-col">
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</div>
+          <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{count}</div>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="orders-container">
-      <div className="orders-header">
+    <div className="p-4 md:p-6 bg-slate-50 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1><i className="fas fa-clipboard-list"></i> Quản lý Đơn hàng</h1>
-            <p className="orders-subtitle">Theo dõi và cập nhật trạng thái đơn hàng</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+              <i className="fas fa-clipboard-list text-indigo-500"></i> 
+              Quản lý Đơn hàng
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Theo dõi và cập nhật trạng thái đơn hàng</p>
         </div>
         
-        <div className="header-controls">
-            <div className="view-switcher">
+        <div className="flex items-center">
+            <div className="flex bg-white dark:bg-slate-800 rounded-xl p-1 shadow-sm border border-slate-200 dark:border-slate-700">
                 <button 
-                    className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                    className={`p-3 rounded-lg min-w-[48px] min-h-[48px] flex items-center justify-center transition-colors focus:outline-none 
+                      ${viewMode === 'list' 
+                        ? 'bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
                     onClick={() => setViewMode('list')}
                     title="Dạng danh sách"
                 >
                     <i className="fas fa-list"></i>
                 </button>
                 <button 
-                    className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                    className={`p-3 rounded-lg min-w-[48px] min-h-[48px] flex items-center justify-center transition-colors focus:outline-none 
+                      ${viewMode === 'grid' 
+                        ? 'bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
                     onClick={() => setViewMode('grid')}
                     title="Dạng lưới"
                 >
@@ -214,149 +250,100 @@ const OrderList: React.FC = () => {
       </div>
 
       {/* Status Overview */}
-      <div className="status-overview">
-        <div 
-          className={`status-card total ${statusFilter === 'all' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('all')}
-        >
-          <div className="status-icon"><i className="fas fa-chart-pie"></i></div>
-          <div className="status-info">
-            <div className="status-label">Tất cả</div>
-            <div className="status-count">{stats.total}</div>
-          </div>
-        </div>
-
-        <div 
-          className={`status-card pending ${statusFilter === 'Pending' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('Pending')}
-        >
-          <div className="status-icon" style={{color: '#F57F17'}}><i className="fas fa-fire"></i></div>
-          <div className="status-info">
-            <div className="status-label">Chờ chế biến</div>
-            <div className="status-count">{stats.pending}</div>
-          </div>
-        </div>
-
-        {/* Prepared Card */}
-        <div 
-          className={`status-card prepared ${statusFilter === 'Prepared' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('Prepared')}
-        >
-          <div className="status-icon" style={{color: '#0288D1'}}><i className="fas fa-bell-concierge"></i></div>
-          <div className="status-info">
-            <div className="status-label">Đã nấu xong</div>
-            <div className="status-count">{stats.prepared}</div>
-          </div>
-        </div>
-
-        <div 
-          className={`status-card completed ${statusFilter === 'Completed' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('Completed')}
-        >
-          <div className="status-icon" style={{color: '#2E7D32'}}><i className="fas fa-check-circle"></i></div>
-          <div className="status-info">
-            <div className="status-label">Đã thanh toán</div>
-            <div className="status-count">{stats.completed}</div>
-          </div>
-        </div>
-
-        <div 
-          className={`status-card cancelled ${statusFilter === 'Cancelled' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('Cancelled')}
-        >
-          <div className="status-icon" style={{color: '#C62828'}}><i className="fas fa-ban"></i></div>
-          <div className="status-info">
-            <div className="status-label">Đã hủy</div>
-            <div className="status-count">{stats.cancelled}</div>
-          </div>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        {renderStatusCard('all', 'Tất cả', stats.total, 'fas fa-chart-pie')}
+        {renderStatusCard('Pending', 'Chờ chế biến', stats.pending, 'fas fa-fire')}
+        {renderStatusCard('Prepared', 'Đã nấu xong', stats.prepared, 'fas fa-bell-concierge')}
+        {renderStatusCard('Completed', 'Đã thanh toán', stats.completed, 'fas fa-circle-check')}
+        {renderStatusCard('Cancelled', 'Đã hủy', stats.cancelled, 'fas fa-ban')}
       </div>
 
       {viewMode === 'list' ? (
           /* Orders Table (List View) */
-          <div className="orders-table-container">
-            <table className="orders-table">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr>
-                  <th>Mã ĐH</th>
-                  <th>Bàn</th>
-                  <th>Khách hàng</th>
-                  <th>Ngày đặt</th>
-                  <th>Tổng tiền</th>
-                  <th>Trạng thái</th>
-                  <th style={{textAlign: 'right'}}>Thao tác</th>
+                  <th className="p-4 font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap">Mã ĐH</th>
+                  <th className="p-4 font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap">Bàn</th>
+                  <th className="p-4 font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap">Khách hàng</th>
+                  <th className="p-4 font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap">Ngày đặt</th>
+                  <th className="p-4 font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap">Tổng tiền</th>
+                  <th className="p-4 font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap">Trạng thái</th>
+                  <th className="p-4 font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 whitespace-nowrap text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="no-data" style={{textAlign: 'center', padding: '3rem', color: '#64748b'}}>
-                      <i className="fas fa-inbox" style={{fontSize: '3rem', marginBottom: '1rem', display: 'block', opacity: 0.5}}></i>
+                    <td colSpan={7} className="p-12 text-center text-slate-500 dark:text-slate-400">
+                      <i className="fas fa-inbox text-5xl mb-4 opacity-50 block"></i>
                       Không có đơn hàng nào
                     </td>
                   </tr>
                 ) : (
                   filteredOrders.map((order) => (
-                    <tr key={order.id}>
-                      <td className="order-id">#{order.id}</td>
-                      <td className="table-number">
+                    <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                      <td className="p-4 font-mono font-medium text-slate-900 dark:text-slate-100 align-middle">#{order.id}</td>
+                      <td className="p-4 align-middle">
                         {order.table ? (
-                          <strong>{order.table.tableNumber}</strong>
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 font-bold whitespace-nowrap">
+                            <i className="fas fa-chair text-sm"></i>
+                            {order.table.tableNumber}
+                          </div>
                         ) : (
-                          <span className="table-badge takeaway">
-                            <i className="fas fa-shopping-bag"></i> Mang về
-                          </span>
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 font-bold whitespace-nowrap">
+                            <i className="fas fa-shopping-bag text-sm"></i> Mang về
+                          </div>
                         )}
                       </td>
-                      <td className="customer-name">
-                        {order.customerName || 'Khách vãng lai'}
+                      <td className="p-4 text-slate-700 dark:text-slate-300 font-medium align-middle">
+                        {order.customerName || <span className="text-slate-400 italic">Khách vãng lai</span>}
                       </td>
-                      <td className="order-date">
+                      <td className="p-4 text-slate-600 dark:text-slate-400 align-middle whitespace-nowrap">
                         {new Date(order.orderDate).toLocaleString('vi-VN', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric'
+                          hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'
                         })}
                       </td>
-                      <td className="total-amount">
-                        <span className="price-highlight">
-                          {formatPrice(order.totalAmount)}
-                        </span>
+                      <td className="p-4 font-bold text-slate-900 dark:text-white align-middle whitespace-nowrap">
+                        {formatPrice(order.totalAmount)}
                       </td>
-                      <td className="status-cell">
-                        <CustomSelect
-                          options={statusOptions}
-                          value={order.status}
-                          onChange={(val) => handleUpdateStatus(order.id, val)}
-                          className={`status-dropdown ${getStatusColor(order.status)}`}
-                        />
+                      <td className="p-4 align-middle">
+                        <div className="w-44">
+                          <CustomSelect
+                            options={statusOptions}
+                            value={order.status}
+                            onChange={(val) => handleUpdateStatus(order.id, val)}
+                            className={`min-h-[44px] ${getStatusColorClass(order.status)}`}
+                          />
+                        </div>
                       </td>
-                      <td className="actions-cell" style={{justifyContent: 'flex-end'}}>
-                        {(order.status === 'Pending' || order.status === 'Prepared') && (
+                      <td className="p-4 align-middle">
+                        <div className="flex items-center justify-end gap-2">
+                          {(order.status === 'Pending' || order.status === 'Prepared') && (
+                            <button 
+                              className="min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+                              onClick={() => handlePaymentClick(order)}
+                              title="Thanh toán ngay"
+                            >
+                               <i className="fas fa-wallet text-lg"></i>
+                            </button>
+                          )}
                           <button 
-                            className="btn-payment-mini"
-                            onClick={() => handlePaymentClick(order)}
-                            title="Thanh toán ngay"
+                            className="min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:text-indigo-400 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+                            onClick={() => handleViewDetails(order.id)}
+                            title="Xem chi tiết"
                           >
-                             <i className="fas fa-wallet"></i>
+                            <i className="fas fa-eye text-lg"></i>
                           </button>
-                        )}
-                        <button 
-                          className="btn-detail"
-                          onClick={() => handleViewDetails(order.id)}
-                          title="Xem chi tiết"
-                        >
-                          <i className="fas fa-eye"></i>
-                        </button>
-                        <button 
-                          className="btn-delete"
-                          onClick={() => handleDeleteClick(order.id)}
-                          title="Xóa đơn hàng"
-                        >
-                          <i className="fas fa-trash"></i>
-                        </button>
+                          <button 
+                            className="min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-500/10 dark:hover:bg-red-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+                            onClick={() => handleDeleteClick(order.id)}
+                            title="Xóa đơn hàng"
+                          >
+                            <i className="fas fa-trash text-lg"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -366,81 +353,87 @@ const OrderList: React.FC = () => {
           </div>
       ) : (
          /* Grid View (Card Layout) */
-         <div className="orders-grid">
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredOrders.map((order) => (
-                <div key={order.id} className="order-card">
-                    <div className="order-card-header">
-                        <span className="order-id-badge">#{order.id}</span>
+                <div key={order.id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                        <span className="font-mono font-bold text-slate-700 dark:text-slate-300">#{order.id}</span>
                         {order.table ? (
-                            <div className="table-badge">
-                                <i className="fas fa-chair"></i> {order.table.tableNumber}
+                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 text-sm font-bold">
+                                <i className="fas fa-chair text-xs"></i> {order.table.tableNumber}
                             </div>
                         ) : (
-                            <div className="table-badge takeaway">
-                                <i className="fas fa-shopping-bag"></i> Mang về
+                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 text-sm font-bold">
+                                <i className="fas fa-shopping-bag text-xs"></i> Mang về
                             </div>
                         )}
                     </div>
                     
-                    <div className="order-card-body">
-                        <div className="customer-info" title="Khách hàng">
-                            <i className="fas fa-user-circle"></i> 
-                            <span>{order.customerName || 'Khách vãng lai'}</span>
+                    <div className="p-5 flex-1 flex flex-col gap-3">
+                        <div className="flex items-center gap-3 text-slate-800 dark:text-slate-200 font-medium" title="Khách hàng">
+                            <i className="fas fa-circle-user text-slate-400 text-lg"></i> 
+                            <span className="truncate">{order.customerName || <span className="text-slate-400 italic font-normal">Khách vãng lai</span>}</span>
                         </div>
-                        <div className="order-time" title="Thời gian đặt">
-                            <i className="far fa-clock"></i>
-                            {new Date(order.orderDate).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} 
-                            <span style={{fontSize: '0.8em', opacity: 0.7}}>
-                                ({new Date(order.orderDate).toLocaleDateString('vi-VN')})
+                        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 text-sm" title="Thời gian đặt">
+                            <i className="far fa-clock text-slate-400 text-lg"></i>
+                            <span>
+                              {new Date(order.orderDate).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} 
+                              <span className="text-xs opacity-70 ml-1">
+                                  ({new Date(order.orderDate).toLocaleDateString('vi-VN')})
+                              </span>
                             </span>
                         </div>
                         
-                        <div className="card-amount">
-                             Total: {formatPrice(order.totalAmount)}
+                        <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/50 flex items-end justify-between">
+                            <span className="text-slate-500 dark:text-slate-400 text-sm">Tổng cộng:</span>
+                            <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                              {formatPrice(order.totalAmount)}
+                            </span>
                         </div>
                     </div>
 
-                    <div className="order-card-footer">
-                         <div style={{flex: 1}}>
+                    <div className="p-4 bg-slate-50/50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-700 flex items-center gap-3">
+                         <div className="flex-1">
                             <select
-                              className={`status-select ${getStatusColor(order.status)}`}
+                              className={`w-full min-h-[44px] px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium appearance-none cursor-pointer ${getStatusColorClass(order.status)}`}
                               value={order.status}
                               onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
-                              style={{width: '100%'}}
                             >
-                              <option value="Pending">Running</option>
-                              <option value="Prepared">Ready</option>
-                              <option value="Completed">Done</option>
-                              <option value="Cancelled">Cancelled</option>
+                              <option value="Pending">Chờ chế biến</option>
+                              <option value="Prepared">Đã nấu xong</option>
+                              <option value="Completed">Đã thanh toán</option>
+                              <option value="Cancelled">Đã hủy</option>
                             </select>
                          </div>
                          
-                         <div style={{display: 'flex', gap: '0.5rem'}}>
+                         <div className="flex items-center gap-2">
                             {(order.status === 'Pending' || order.status === 'Prepared') && (
-                                <button className="btn-payment-mini" onClick={() => handlePaymentClick(order)} title="Thanh toán">
-                                    <i className="fas fa-wallet"></i>
+                                <button 
+                                  className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-emerald-600 bg-emerald-100 hover:bg-emerald-200 dark:text-emerald-400 dark:bg-emerald-500/20 dark:hover:bg-emerald-500/30 transition-colors"
+                                  onClick={() => handlePaymentClick(order)} 
+                                  title="Thanh toán"
+                                >
+                                    <i className="fas fa-wallet text-lg"></i>
                                 </button>
                             )}
-                            <button className="btn-detail" onClick={() => handleViewDetails(order.id)}>
-                                <i className="fas fa-arrow-right"></i>
+                            <button 
+                              className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
+                              onClick={() => handleViewDetails(order.id)}
+                            >
+                                <i className="fas fa-arrow-right text-lg"></i>
                             </button>
                          </div>
                     </div>
                 </div>
             ))}
             {filteredOrders.length === 0 && (
-                <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: '#64748b'}}>
-                    <i className="fas fa-inbox" style={{fontSize: '3rem', marginBottom: '1rem', display: 'block', opacity: 0.5}}></i>
+                <div className="col-span-full p-12 text-center text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                    <i className="fas fa-inbox text-5xl mb-4 opacity-50 block"></i>
                     Không có đơn hàng nào
                 </div>
             )}
          </div>
       )}
-
-      {/* Pagination placeholder */}
-      <div className="pagination">
-        {/* Add pagination later if needed */}
-      </div>
 
       {/* Confirm Dialog */}
       <ConfirmDialog
@@ -456,9 +449,11 @@ const OrderList: React.FC = () => {
 
     {/* Payment Method Dialog */}
     {payingOrder && (
-        <div className="modal-overlay" onClick={() => { setPayingOrder(null); setShowQR(false); }}>
-          <div className="modal-content payment-dialog" onClick={(e) => e.stopPropagation()}>
-            <h3>{showQR ? 'Thanh toán VietQR' : 'Chọn hình thức thanh toán'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" onClick={() => { setPayingOrder(null); setShowQR(false); }}>
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center">
+              {showQR ? 'Thanh toán VietQR' : 'Chọn hình thức thanh toán'}
+            </h3>
             {showQR ? (
                 <VietQRView 
                     amount={payingOrder.totalAmount}
@@ -467,42 +462,47 @@ const OrderList: React.FC = () => {
                     onCancel={() => setShowQR(false)}
                 />
             ) : (
-                <>
-                    <p className="payment-amount">
-                        Đơn hàng #{payingOrder.id}<br/>
-                        Tổng tiền: <strong>{formatPrice(payingOrder.totalAmount)}</strong>
-                    </p>
-                    <div className="payment-methods">
+                <div className="flex flex-col gap-6">
+                    <div className="text-center p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="text-slate-500 dark:text-slate-400 mb-2">Đơn hàng #{payingOrder.id}</div>
+                        <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+                          {formatPrice(payingOrder.totalAmount)}
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <button 
-                            className="payment-method-btn cash"
+                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-700 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all focus:outline-none min-h-[120px]"
                             onClick={handleCashPayment}
                         >
-                            <i className="fas fa-money-bill-wave"></i>
-                            <span>Tiền mặt</span>
+                            <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xl">
+                              <i className="fas fa-money-bill-wave"></i>
+                            </div>
+                            <span className="font-bold">Tiền mặt</span>
                         </button>
 
                         <button 
-                            className="payment-method-btn qr"
+                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:bg-indigo-50 dark:border-slate-700 dark:hover:border-indigo-500 dark:hover:bg-indigo-500/10 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all focus:outline-none min-h-[120px]"
                             onClick={() => setShowQR(true)}
                         >
-                            <i className="fas fa-qrcode"></i>
-                            <span>Chuyển khoản QR</span>
+                            <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl">
+                              <i className="fas fa-qrcode"></i>
+                            </div>
+                            <span className="font-bold">Chuyển khoản</span>
                         </button>
                     </div>
                 
                     <button 
-                        className="btn btn-secondary"
+                        className="mt-2 min-h-[56px] w-full rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold text-lg transition-colors focus:outline-none"
                         onClick={() => { setPayingOrder(null); setShowQR(false); }}
-                        style={{ marginTop: '1rem', width: '100%', padding: '1rem', borderRadius: '12px', border: 'none', background: '#f1f5f9', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}
                     >
                         Hủy bỏ
                     </button>
-                </>
+                </div>
             )}
           </div>
         </div>
       )}
-
     </div>
   );
 };

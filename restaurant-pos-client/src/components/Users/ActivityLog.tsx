@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './ActivityLog.css';
 
 // ========================================
 // ACTIVITY LOG TYPES
@@ -103,18 +102,6 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
     }
   };
 
-  const getActionColor = (action: ActivityLogEntry['action']) => {
-    switch (action) {
-      case 'create': return 'success';
-      case 'update': return 'info';
-      case 'delete': return 'danger';
-      case 'role_change': return 'warning';
-      case 'status_change': return 'warning';
-      case 'password_reset': return 'info';
-      default: return 'default';
-    }
-  };
-
   const getActionText = (action: ActivityLogEntry['action']) => {
     switch (action) {
       case 'create': return 'Tạo mới';
@@ -160,43 +147,46 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
   // }
 
   return (
-    <div className="activity-log">
-      <div className="activity-log-header">
-        <h3>📋 Nhật ký hoạt động</h3>
-        <button className="btn-refresh" onClick={fetchActivityLogs}>
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 space-y-4">
+      <div className="flex justify-between items-center pb-2 border-b dark:border-slate-700">
+        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">📋 Nhật ký hoạt động</h3>
+        <button 
+          className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:text-indigo-400 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors flex items-center gap-2" 
+          onClick={fetchActivityLogs}
+        >
           🔄 Làm mới
         </button>
       </div>
 
-      <div className="activity-log-list">
+      <div className="space-y-3">
         {logs.length === 0 ? (
-          <div className="activity-log-empty">
+          <div className="text-center py-6 text-slate-500 dark:text-slate-400">
             <p>Chưa có hoạt động nào</p>
           </div>
         ) : (
           logs.map((log) => (
-            <div key={log.id} className={`activity-log-item ${getActionColor(log.action)}`}>
-              <div className="activity-icon">
+            <div key={log.id} className="flex gap-4 p-3 rounded-lg border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-lg">
                 {getActionIcon(log.action)}
               </div>
 
-              <div className="activity-content">
-                <div className="activity-header">
-                  <span className="activity-action">{getActionText(log.action)}</span>
-                  <span className="activity-time">{formatTimestamp(log.timestamp)}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="font-medium text-sm text-slate-700 dark:text-slate-200">{getActionText(log.action)}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap ml-2">{formatTimestamp(log.timestamp)}</span>
                 </div>
 
-                <div className="activity-details">
+                <div className="text-sm text-slate-600 dark:text-slate-300">
                   <p>
-                    <strong>{log.performedBy}</strong> {log.details.toLowerCase()} cho{' '}
-                    <strong>{log.targetUser}</strong>
+                    <strong className="text-slate-800 dark:text-slate-100">{log.performedBy}</strong> {log.details.toLowerCase()} cho{' '}
+                    <strong className="text-slate-800 dark:text-slate-100">{log.targetUser}</strong>
                   </p>
 
                   {log.oldValue && log.newValue && (
-                    <div className="activity-change">
-                      <span className="old-value">{log.oldValue}</span>
-                      <span className="arrow">→</span>
-                      <span className="new-value">{log.newValue}</span>
+                    <div className="mt-2 flex items-center gap-2 text-xs font-mono bg-slate-50 dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-700">
+                      <span className="text-rose-500 dark:text-rose-400 line-through">{log.oldValue}</span>
+                      <span className="text-slate-400">→</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{log.newValue}</span>
                     </div>
                   )}
                 </div>
@@ -207,8 +197,8 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
       </div>
 
       {logs.length >= limit && (
-        <div className="activity-log-footer">
-          <button className="btn-view-all">
+        <div className="pt-2">
+          <button className="w-full py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 hover:bg-slate-100 dark:bg-slate-700/50 dark:hover:bg-slate-700 rounded-lg transition-colors">
             Xem tất cả hoạt động →
           </button>
         </div>
@@ -223,7 +213,7 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
 
 export const ActivityLogWidget: React.FC = () => {
   return (
-    <div className="activity-log-widget">
+    <div className="h-full">
       <ActivityLog limit={5} />
     </div>
   );

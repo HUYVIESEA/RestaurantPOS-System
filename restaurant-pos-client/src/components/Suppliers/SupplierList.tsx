@@ -4,7 +4,6 @@ import { supplierService } from '../../services/supplierService';
 import { useToast } from '../../contexts/ToastContext';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import SupplierForm from './SupplierFormModal';
-import './SupplierList.css';
 
 const SupplierList: React.FC = () => {
     const { showSuccess, showError } = useToast();
@@ -132,78 +131,79 @@ const SupplierList: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="supplier-loading">
-                <div className="spinner"></div>
-                <p>Đang tải danh sách nhà cung cấp...</p>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400">
+                <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p className="text-lg font-medium">Đang tải danh sách nhà cung cấp...</p>
             </div>
         );
     }
 
     return (
-        <div className="supplier-container">
+        <div className="p-6 min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
             {/* Header */}
-            <div className="supplier-header">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1><i className="fas fa-truck"></i> Quản lý Nhà cung cấp</h1>
-                    <p className="subtitle">Quản lý thông tin các nhà cung cấp nguyên liệu</p>
+                    <h1 className="text-2xl font-bold"><i className="fas fa-truck-loading mr-2 text-blue-600 dark:text-blue-400"></i> Quản lý Nhà cung cấp</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý thông tin các nhà cung cấp nguyên liệu</p>
                 </div>
-                <button className="btn-add" onClick={handleCreate}>
-                    <i className="fas fa-plus"></i>
+                <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm transition-colors flex items-center gap-2" onClick={handleCreate}>
+                    <i className="fas fa-plus-circle"></i>
                     Thêm nhà cung cấp
                 </button>
             </div>
 
             {/* Stats */}
-            <div className="supplier-stats">
-                <div className="stat-card total">
-                    <div className="stat-icon"><i className="fas fa-building"></i></div>
-                    <div className="stat-info">
-                        <span className="stat-label">Tổng số</span>
-                        <span className="stat-value">{stats.total}</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 text-2xl shrink-0"><i className="fas fa-building"></i></div>
+                    <div>
+                        <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Tổng số</span>
+                        <span className="block text-2xl font-bold">{stats.total}</span>
                     </div>
                 </div>
-                <div className="stat-card active">
-                    <div className="stat-icon"><i className="fas fa-check-circle"></i></div>
-                    <div className="stat-info">
-                        <span className="stat-label">Đang hoạt động</span>
-                        <span className="stat-value">{stats.active}</span>
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 text-2xl shrink-0"><i className="fas fa-circle-check"></i></div>
+                    <div>
+                        <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Đang hoạt động</span>
+                        <span className="block text-2xl font-bold">{stats.active}</span>
                     </div>
                 </div>
-                <div className="stat-card inactive">
-                    <div className="stat-icon"><i className="fas fa-pause-circle"></i></div>
-                    <div className="stat-info">
-                        <span className="stat-label">Ngừng hoạt động</span>
-                        <span className="stat-value">{stats.inactive}</span>
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 text-2xl shrink-0"><i className="fas fa-pause-circle"></i></div>
+                    <div>
+                        <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Ngừng hoạt động</span>
+                        <span className="block text-2xl font-bold">{stats.inactive}</span>
                     </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="supplier-filters">
-                <div className="search-box">
-                    <i className="fas fa-search"></i>
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-4 mb-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                    <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input
                         type="text"
                         placeholder="Tìm kiếm nhà cung cấp..."
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="filter-buttons">
+                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                     <button 
-                        className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === 'all' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                         onClick={() => setFilterStatus('all')}
                     >
                         Tất cả
                     </button>
                     <button 
-                        className={`filter-btn ${filterStatus === 'active' ? 'active' : ''}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === 'active' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                         onClick={() => setFilterStatus('active')}
                     >
                         Hoạt động
                     </button>
                     <button 
-                        className={`filter-btn ${filterStatus === 'inactive' ? 'active' : ''}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === 'inactive' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                         onClick={() => setFilterStatus('inactive')}
                     >
                         Ngừng
@@ -212,93 +212,95 @@ const SupplierList: React.FC = () => {
             </div>
 
             {/* Supplier Table */}
-            <div className="supplier-table-wrapper">
-                <table className="supplier-table">
-                    <thead>
-                        <tr>
-                            <th>Nhà cung cấp</th>
-                            <th>Liên hệ</th>
-                            <th>Địa chỉ</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredSuppliers.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} className="empty-row">
-                                    <i className="fas fa-inbox"></i>
-                                    <p>Không có nhà cung cấp nào</p>
-                                </td>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nhà cung cấp</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Liên hệ</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Địa chỉ</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Trạng thái</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Thao tác</th>
                             </tr>
-                        ) : (
-                            filteredSuppliers.map(supplier => (
-                                <tr key={supplier.id} className={!supplier.isActive ? 'inactive' : ''}>
-                                    <td>
-                                        <div className="supplier-name">
-                                            <span className="name">{supplier.name}</span>
-                                            {supplier.notes && (
-                                                <span className="notes">{supplier.notes}</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="contact-info">
-                                            {supplier.contactPerson && (
-                                                <span><i className="fas fa-user"></i> {supplier.contactPerson}</span>
-                                            )}
-                                            {supplier.phone && (
-                                                <span><i className="fas fa-phone"></i> {supplier.phone}</span>
-                                            )}
-                                            {supplier.email && (
-                                                <span><i className="fas fa-envelope"></i> {supplier.email}</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {supplier.address ? (
-                                            <span className="address">
-                                                <i className="fas fa-map-marker-alt"></i> {supplier.address}
-                                            </span>
-                                        ) : (
-                                            <span className="no-data">-</span>
-                                        )}
-                                    </td>
-                                    <td>
-                                        <span className={`status-badge ${supplier.isActive ? 'active' : 'inactive'}`}>
-                                            {supplier.isActive ? 'Hoạt động' : 'Ngừng'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="action-buttons">
-                                            <button 
-                                                className="btn-action edit"
-                                                onClick={() => handleEdit(supplier)}
-                                                title="Chỉnh sửa"
-                                            >
-                                                <i className="fas fa-edit"></i>
-                                            </button>
-                                            <button 
-                                                className="btn-action toggle"
-                                                onClick={() => handleToggleStatus(supplier)}
-                                                title={supplier.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'}
-                                            >
-                                                <i className={`fas fa-${supplier.isActive ? 'pause' : 'play'}`}></i>
-                                            </button>
-                                            <button 
-                                                className="btn-action delete"
-                                                onClick={() => handleDeleteClick(supplier)}
-                                                title="Xóa"
-                                            >
-                                                <i className="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                            {filteredSuppliers.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
+                                        <i className="fas fa-inbox text-4xl mb-3 opacity-50 block"></i>
+                                        <p>Không có nhà cung cấp nào</p>
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : (
+                                filteredSuppliers.map(supplier => (
+                                    <tr key={supplier.id} className={`hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors ${!supplier.isActive ? 'opacity-70 bg-slate-50 dark:bg-slate-800/50' : ''}`}>
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <span className="font-semibold text-slate-800 dark:text-slate-200 block">{supplier.name}</span>
+                                                {supplier.notes && (
+                                                    <span className="text-xs text-slate-500 dark:text-slate-400 mt-1 block max-w-xs truncate">{supplier.notes}</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col gap-1.5 text-sm text-slate-600 dark:text-slate-300">
+                                                {supplier.contactPerson && (
+                                                    <span className="flex items-center gap-2"><i className="fas fa-user w-4 text-slate-400"></i> {supplier.contactPerson}</span>
+                                                )}
+                                                {supplier.phone && (
+                                                    <span className="flex items-center gap-2"><i className="fas fa-phone w-4 text-slate-400"></i> {supplier.phone}</span>
+                                                )}
+                                                {supplier.email && (
+                                                    <span className="flex items-center gap-2"><i className="fas fa-envelope w-4 text-slate-400"></i> {supplier.email}</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {supplier.address ? (
+                                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-start gap-2">
+                                                    <i className="fas fa-map-marker-alt w-4 mt-0.5 text-slate-400"></i> <span className="max-w-[200px] line-clamp-2">{supplier.address}</span>
+                                                </span>
+                                            ) : (
+                                                <span className="text-slate-400">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${supplier.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50' : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}>
+                                                {supplier.isActive ? 'Hoạt động' : 'Ngừng'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex justify-end items-center gap-2">
+                                                <button 
+                                                    className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 transition-colors"
+                                                    onClick={() => handleEdit(supplier)}
+                                                    title="Chỉnh sửa"
+                                                >
+                                                    <i className="fas fa-pen-to-square"></i>
+                                                </button>
+                                                <button 
+                                                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${supplier.isActive ? 'text-amber-600 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/40' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40'}`}
+                                                    onClick={() => handleToggleStatus(supplier)}
+                                                    title={supplier.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                                                >
+                                                    <i className={`fas fa-${supplier.isActive ? 'pause' : 'play'}`}></i>
+                                                </button>
+                                                <button 
+                                                    className="w-8 h-8 rounded-lg flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition-colors"
+                                                    onClick={() => handleDeleteClick(supplier)}
+                                                    title="Xóa"
+                                                >
+                                                    <i className="fas fa-trash-can"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Form Modal */}

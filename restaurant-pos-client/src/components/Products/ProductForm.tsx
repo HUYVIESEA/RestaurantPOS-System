@@ -5,19 +5,17 @@ import { categoryService } from '../../services/categoryService';
 import { Product, Category } from '../../types';
 import { formatPriceInput, cleanPriceInput, formatCurrency } from '../../utils/priceUtils';
 import { SkeletonForm } from '../Common/Skeleton';
-import { uploadService } from '../../services/uploadService'; // ✅ ADD
-import './ProductForm.css';
+import { uploadService } from '../../services/uploadService';
 
 const ProductForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditMode = !!id;
 
-  /* ✅ State Declarations */
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    price: '', // ✅ Change to empty string instead of 0
+    price: '',
     categoryId: 0,
     imageUrl: '',
     isAvailable: true,
@@ -26,8 +24,6 @@ const ProductForm: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  /* ✅ NEW: Unlimited stock state */
   const [isUnlimitedStock, setIsUnlimitedStock] = useState(false);
 
   useEffect(() => {
@@ -36,10 +32,6 @@ const ProductForm: React.FC = () => {
       fetchProduct();
     }
   }, [id]);
-
-  useEffect(() => {
-    // If we switch to unlimited, update form data effectively or just rely on submit handler
-  }, [isUnlimitedStock]);
 
   const fetchCategories = async () => {
     try {
@@ -65,7 +57,6 @@ const ProductForm: React.FC = () => {
         isAvailable: product.isAvailable,
         stockQuantity: product.stockQuantity || 0,
       });
-      // ✅ Check if stock is unlimited (-1)
       setIsUnlimitedStock((product.stockQuantity !== undefined && product.stockQuantity < 0));
     } catch (err) {
       setError('Không thể tải thông tin thực đơn');
@@ -74,16 +65,14 @@ const ProductForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading) return; // Prevent double submission
+    if (loading) return;
 
     setLoading(true);
     setError(null);
 
-    /* ✅ Validate price and stock */
     const priceValue = Number(formData.price);
     let stockValue = Number(formData.stockQuantity);
     
-    // If unlimited stock is checked, set stock to -1
     if (isUnlimitedStock) {
         stockValue = -1;
     }
@@ -100,7 +89,6 @@ const ProductForm: React.FC = () => {
         return;
     }
 
-    // Only validate positive stock if NOT unlimited
     if (!isUnlimitedStock && (isNaN(stockValue) || stockValue < 0)) {
         setError('Số lượng tồn kho không hợp lệ');
         setLoading(false);
@@ -124,7 +112,6 @@ const ProductForm: React.FC = () => {
       navigate('/products');
     } catch (err: any) {
         console.error("Error submitting form:", err);
-        // Enhanced error handling
         let errorMessage = 'Đã xảy ra lỗi';
         if (err.response?.data) {
             if (err.response.data.message) {
@@ -132,7 +119,6 @@ const ProductForm: React.FC = () => {
             } else if (typeof err.response.data === 'string') {
                 errorMessage = err.response.data;
             } else if (err.response.data.errors) {
-                 // Handle ASP.NET Core validation errors dictionary
                  const errors = err.response.data.errors;
                  const firstErrorKey = Object.keys(errors)[0];
                  if (firstErrorKey && errors[firstErrorKey].length > 0) {
@@ -175,7 +161,6 @@ const ProductForm: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate size/type
     if (file.size > 5 * 1024 * 1024) {
       setError('File quá lớn (Max 5MB)');
       return;
@@ -194,191 +179,219 @@ const ProductForm: React.FC = () => {
   };
 
   return (
-    <div className="product-form-container">
-      <div className="form-header">
-        <h2>{isEditMode ? 'Cập nhật thực đơn' : 'Thêm thực đơn mới'}</h2>
-        <button onClick={() => navigate('/products')} className="btn-back">
+    <div className="w-full p-4 md:p-6 text-slate-800 dark:text-slate-200">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+          {isEditMode ? 'Cập nhật thực đơn' : 'Thêm thực đơn mới'}
+        </h2>
+        <button onClick={() => navigate('/products')} className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 shadow-sm">
           <i className="fas fa-arrow-left"></i> Quay lại
         </button>
       </div>
 
       {error && (
-        <div className="error-message">
-           <i className="fas fa-exclamation-circle"></i>
-           <span>{error}</span>
+        <div className="p-4 mb-6 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl flex items-center gap-3 border border-red-200 dark:border-red-800/50 shadow-sm">
+           <i className="fas fa-exclamation-circle text-lg"></i>
+           <span className="font-medium">{error}</span>
         </div>
       )}
 
-      <div className="form-content">
-        <form onSubmit={handleSubmit} className="product-form">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-slate-100 dark:divide-slate-700">
           {/* LEFT PANEL: MAIN INFO */}
-          <div className="form-left-panel">
-            <h3 className="form-section-title"><i className="fas fa-info-circle"></i> Thông tin chung</h3>
-            
-            <div className="form-group">
-              <label htmlFor="name">Tên thực đơn <span className="required">*</span></label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                placeholder="Nhập tên món ăn..."
-                maxLength={100}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="description">Mô tả</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={5}
-                placeholder="Thành phần, hương vị,..."
-              />
-            </div>
-
-            <h3 className="form-section-title" style={{marginTop: '1rem'}}><i className="fas fa-tag"></i> Giá & Kho</h3>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="price">Giá bán (VNĐ) <span className="required">*</span></label>
-                <input
-                  type="text"
-                  id="price"
-                  name="price"
-                  value={formatPriceInput(formData.price)}
-                  onChange={handleChange}
-                  required
-                  placeholder="0"
-                  inputMode="numeric"
-                />
-                {formData.price && (
-                  <div className="price-preview">
-                    <i className="fas fa-coins"></i> {formatCurrency(formData.price)}
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="categoryId">Danh mục <span className="required">*</span></label>
-                <select
-                  id="categoryId"
-                  name="categoryId"
-                  value={formData.categoryId}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value={0}>-- Chọn danh mục --</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="stockQuantity">Số lượng tồn kho</label>
-                <div className="stock-input-group">
+          <div className="flex-1 p-6 md:p-8 space-y-6">
+            <div>
+               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                 <i className="fas fa-info-circle text-blue-500"></i> Thông tin chung
+               </h3>
+               
+               <div className="space-y-5">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="name" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tên thực đơn <span className="text-red-500 ml-1">*</span></label>
                     <input
-                      type="number"
-                      id="stockQuantity"
-                      name="stockQuantity"
-                      value={isUnlimitedStock ? '' : formData.stockQuantity}
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
-                      min="0"
-                      placeholder={isUnlimitedStock ? "Đang đặt là vô hạn..." : "0"}
-                      disabled={isUnlimitedStock}
+                      required
+                      placeholder="Nhập tên món ăn..."
+                      maxLength={100}
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white"
                     />
-                    <label className="checkbox-label">
-                        <input
-                            type="checkbox"
-                            name="isUnlimitedStock"
-                            checked={isUnlimitedStock}
-                            onChange={handleChange}
-                        />
-                        <span>Không giới hạn</span>
-                    </label>
-                </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="description" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Mô tả</label>
+                    <textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      rows={4}
+                      placeholder="Thành phần, hương vị,..."
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white resize-y"
+                    />
+                  </div>
+               </div>
+            </div>
+
+            <div className="pt-6 border-t border-slate-100 dark:border-slate-700">
+               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                 <i className="fas fa-tag text-blue-500"></i> Giá & Kho
+               </h3>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                 <div className="flex flex-col gap-1.5">
+                   <label htmlFor="price" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Giá bán (VNĐ) <span className="text-red-500 ml-1">*</span></label>
+                   <input
+                     type="text"
+                     id="price"
+                     name="price"
+                     value={formatPriceInput(formData.price)}
+                     onChange={handleChange}
+                     required
+                     placeholder="0"
+                     inputMode="numeric"
+                     className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white font-medium"
+                   />
+                   {formData.price && (
+                     <div className="mt-2 text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 w-max px-3 py-1 rounded-lg">
+                       <i className="fas fa-coins"></i> {formatCurrency(formData.price)}
+                     </div>
+                   )}
+                 </div>
+
+                 <div className="flex flex-col gap-1.5">
+                   <label htmlFor="categoryId" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Danh mục <span className="text-red-500 ml-1">*</span></label>
+                   <select
+                     id="categoryId"
+                     name="categoryId"
+                     value={formData.categoryId}
+                     onChange={handleChange}
+                     required
+                     className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white font-medium appearance-none"
+                   >
+                     <option value={0}>-- Chọn danh mục --</option>
+                     {categories.map(cat => (
+                       <option key={cat.id} value={cat.id}>{cat.name}</option>
+                     ))}
+                   </select>
+                 </div>
+               </div>
+
+               <div className="flex flex-col gap-1.5">
+                   <label htmlFor="stockQuantity" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Số lượng tồn kho</label>
+                   <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                       <input
+                         type="number"
+                         id="stockQuantity"
+                         name="stockQuantity"
+                         value={isUnlimitedStock ? '' : formData.stockQuantity}
+                         onChange={handleChange}
+                         min="0"
+                         placeholder={isUnlimitedStock ? "Vô hạn" : "0"}
+                         disabled={isUnlimitedStock}
+                         className="w-full sm:w-48 p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white disabled:opacity-50 disabled:bg-slate-100 dark:disabled:bg-slate-800"
+                       />
+                       <label className="flex items-center gap-2 cursor-pointer select-none text-slate-700 dark:text-slate-300 font-medium bg-slate-50 dark:bg-slate-900 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+                           <input
+                               type="checkbox"
+                               name="isUnlimitedStock"
+                               checked={isUnlimitedStock}
+                               onChange={handleChange}
+                               className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600"
+                           />
+                           <span>Không giới hạn</span>
+                       </label>
+                   </div>
+               </div>
             </div>
           </div>
 
           {/* RIGHT PANEL: IMAGE & OPTIONS */}
-          <div className="form-right-panel">
-            <h3 className="form-section-title"><i className="fas fa-image"></i> Hình ảnh</h3>
-            
-            <div className="image-upload-card">
-              <div className="image-preview-wrapper">
-                {formData.imageUrl ? (
-                    <img 
-                      src={formData.imageUrl} 
-                      alt="Preview" 
-                      className="preview-image" 
-                      onError={(e) => (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300?text=Error'}
-                    />
-                ) : (
-                    <div className="placeholder-content">
-                        <i className="fas fa-camera"></i>
-                        <span>Chưa có ảnh</span>
-                    </div>
-                )}
-              </div>
-              
-              <div className="upload-buttons">
-                  <label className="btn-select-image">
-                      <i className="fas fa-upload"></i> {formData.imageUrl ? 'Thay ảnh khác' : 'Chọn ảnh'}
-                      <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
-                  </label>
-                  {formData.imageUrl && (
-                      <button type="button" className="btn-remove-image" onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))} style={{borderRadius: '8px', padding: '0.75rem'}}>
-                          <i className="fas fa-trash-alt"></i>
-                      </button>
-                  )}
-              </div>
+          <div className="w-full lg:w-[400px] p-6 md:p-8 bg-slate-50/50 dark:bg-slate-900/50 space-y-6 flex-shrink-0">
+            <div>
+               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                 <i className="fas fa-image text-blue-500"></i> Hình ảnh
+               </h3>
+               
+               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-4 shadow-sm">
+                 <div className="h-48 rounded-xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center overflow-hidden relative group">
+                   {formData.imageUrl ? (
+                       <img 
+                         src={formData.imageUrl} 
+                         alt="Preview" 
+                         className="w-full h-full object-cover" 
+                         onError={(e) => (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300?text=Error'}
+                       />
+                   ) : (
+                       <div className="flex flex-col items-center gap-2 text-slate-400">
+                           <i className="fas fa-camera text-3xl"></i>
+                           <span className="text-sm font-medium">Chưa có ảnh</span>
+                       </div>
+                   )}
+                 </div>
+                 
+                 <div className="flex gap-2">
+                     <label className="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-medium py-2.5 rounded-xl cursor-pointer transition-colors border border-blue-200 dark:border-blue-800 flex items-center justify-center gap-2">
+                         <i className="fas fa-upload"></i> {formData.imageUrl ? 'Thay ảnh' : 'Chọn ảnh'}
+                         <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
+                     </label>
+                     {formData.imageUrl && (
+                         <button type="button" className="px-4 py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-xl transition-colors border border-red-200 dark:border-red-800" onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))} title="Xóa ảnh">
+                             <i className="fas fa-trash-can"></i>
+                         </button>
+                     )}
+                 </div>
 
-              <div className="url-input-container">
-                  <input
-                    type="url"
-                    className="form-control"
-                    placeholder="Hoặc nhập URL ảnh..."
-                    name="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={handleChange}
-                    style={{width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1'}}
-                  />
-              </div>
+                 <div>
+                     <input
+                       type="url"
+                       className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all dark:text-white text-sm"
+                       placeholder="Hoặc nhập URL ảnh..."
+                       name="imageUrl"
+                       value={formData.imageUrl}
+                       onChange={handleChange}
+                     />
+                 </div>
+               </div>
             </div>
 
-            <h3 className="form-section-title"><i className="fas fa-cog"></i> Thiết lập</h3>
-            
-            <div className="options-card">
-                <label className="checkout-option">
-                    <input
-                        type="checkbox"
-                        name="isAvailable"
-                        checked={formData.isAvailable}
-                        onChange={handleChange}
-                    />
-                    <div>
-                        <div style={{fontWeight: 600, color: '#1e293b'}}>Đang kinh doanh</div>
-                        <div style={{fontSize: '0.85rem', color: '#64748b'}}>Hiển thị món này trên thực đơn bán hàng</div>
-                    </div>
-                </label>
+            <div>
+               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                 <i className="fas fa-cog text-blue-500"></i> Thiết lập
+               </h3>
+               
+               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+                   <label className="flex items-start gap-3 cursor-pointer select-none group">
+                       <div className="mt-1">
+                           <input
+                               type="checkbox"
+                               name="isAvailable"
+                               checked={formData.isAvailable}
+                               onChange={handleChange}
+                               className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600"
+                           />
+                       </div>
+                       <div>
+                           <div className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Đang kinh doanh</div>
+                           <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Hiển thị món này trên thực đơn bán hàng</div>
+                       </div>
+                   </label>
+               </div>
             </div>
 
-            <div className="form-actions">
-              <button type="submit" disabled={loading} className="btn-submit">
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-700 flex flex-col gap-3">
+              <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-sm transition-colors flex justify-center items-center gap-2 text-lg">
                 {loading ? (
                   <><i className="fas fa-spinner fa-spin"></i> Đang xử lý...</>
                 ) : (
-                   isEditMode ? <><i className="fas fa-save"></i> Cập nhật</> : <><i className="fas fa-plus-circle"></i> Tạo món mới</>
+                   isEditMode ? <><i className="fas fa-save"></i> Cập nhật món</> : <><i className="fas fa-circle-plus"></i> Tạo món mới</>
                 )}
               </button>
-              <button type="button" onClick={() => navigate('/products')} className="btn-cancel">
-                <i className="fas fa-times"></i> Hủy bỏ
+              <button type="button" onClick={() => navigate('/products')} className="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                Hủy bỏ
               </button>
             </div>
           </div>

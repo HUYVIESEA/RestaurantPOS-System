@@ -1,0 +1,177 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: pos-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-huy@data}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pos-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: pos-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: pos
+      RABBITMQ_DEFAULT_PASS: pos_password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pos-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: pos-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - pos-network
+
+  gateway:
+    build:
+      context: .
+      dockerfile: RestaurantPOS.Gateway/Dockerfile
+    container_name: pos-gateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      order-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      payment-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+    networks:
+      - pos-network
+    restart: unless-stopped
+
+  order-service:
+    build:
+      context: .
+      dockerfile: RestaurantPOS.OrderService/Dockerfile
+    container_name: pos-order-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=RestaurantPOS_Order;Username=postgres;Password=${POSTGRES_PASSWORD:-huy@data}
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=pos
+      - RabbitMQ__Password=pos_password
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=order-service
+    ports:
+      - "5001:5001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pos-network
+    restart: unless-stopped
+
+  product-service:
+    build:
+      context: .
+      dockerfile: RestaurantPOS.ProductService/Dockerfile
+    container_name: pos-product-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=RestaurantPOS_Product;Username=postgres;Password=${POSTGRES_PASSWORD:-huy@data}
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=pos
+      - RabbitMQ__Password=pos_password
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=product-service
+    ports:
+      - "5002:5002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pos-network
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: RestaurantPOS.PaymentService/Dockerfile
+    container_name: pos-payment-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=RestaurantPOS_Payment;Username=postgres;Password=${POSTGRES_PASSWORD:-huy@data}
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=pos
+      - RabbitMQ__Password=pos_password
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=payment-service
+    ports:
+      - "5003:5003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pos-network
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: RestaurantPOS.NotificationService/Dockerfile
+    container_name: pos-notification-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=RestaurantPOS_Notification;Username=postgres;Password=${POSTGRES_PASSWORD:-huy@data}
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=pos
+      - RabbitMQ__Password=pos_password
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_SERVICE_NAME=notification-service
+    ports:
+      - "5004:5004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pos-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  pos-network:
+    driver: bridge

@@ -19,26 +19,37 @@ namespace RestaurantPOS.Tests
         }
 
         [Fact]
-        public void Product_ShouldHaveError_WhenPriceIsNegative()
+        public void Product_ShouldHaveError_WhenNameIsEmpty()
         {
             // Arrange
             var product = new Product
             {
-                Name = "Valid Name",
-                Price = -1000 // Invalid
+                Name = "",
+                Price = 10000
             };
 
             // Act
             var errors = ValidateModel(product);
 
             // Assert
-            // Note: EF Core entities might not always have DataAnnotations. 
-            // If API relies on DTO validation, we should test DTOs preferably.
-            // Assuming Product entity has [Range] or similar validation?
-            // If not, let's assume we want to enforce it.
-            
-            // Checking CreateProduct DTO logic instead if available, or just testing typical data constraints
-            // If no explicit annotation exists, this test might fail (meaning we lack validation).
+            errors.Should().Contain(e => e.MemberNames.Contains("Name"));
+        }
+
+        [Fact]
+        public void Product_ShouldHaveError_WhenPriceIsNegative()
+        {
+            // Arrange
+            var product = new Product
+            {
+                Name = "Valid Name",
+                Price = -1000
+            };
+
+            // Act
+            var errors = ValidateModel(product);
+
+            // Assert
+            errors.Should().Contain(e => e.MemberNames.Contains("Price"));
         }
 
         [Fact]
@@ -49,7 +60,7 @@ namespace RestaurantPOS.Tests
             {
                 Username = "user1",
                 Password = "Password123!",
-                Email = "invalid-email", // Missing @
+                Email = "invalid-email",
                 FullName = "Test User"
             };
 
@@ -67,7 +78,7 @@ namespace RestaurantPOS.Tests
             var request = new RegisterRequest
             {
                 Username = "user1",
-                Password = "123", // Too short
+                Password = "123",
                 Email = "test@example.com",
                 FullName = "Test User"
             };
@@ -80,13 +91,13 @@ namespace RestaurantPOS.Tests
         }
         
         [Fact]
-        public void OrderItem_ShouldHaveError_WhenQuantityIsZeroOrNegative()
+        public void OrderItem_ShouldHaveError_WhenQuantityIsZero()
         {
              // Arrange
             var item = new OrderItem
             {
                 ProductId = 1,
-                Quantity = 0, // Invalid
+                Quantity = 0,
                 UnitPrice = 100
             };
 
@@ -94,9 +105,25 @@ namespace RestaurantPOS.Tests
             var errors = ValidateModel(item);
 
             // Assert
-             // Assuming OrderItem logic or Database constraint should prevent this.
-             // If manual validation in Service, this Unit Test on Model won't catch it unless Model has attribute.
-             // Let's assume we want to verify Model attributes.
+            errors.Should().Contain(e => e.MemberNames.Contains("Quantity"));
+        }
+
+        [Fact]
+        public void OrderItem_ShouldHaveError_WhenQuantityIsNegative()
+        {
+             // Arrange
+            var item = new OrderItem
+            {
+                ProductId = 1,
+                Quantity = -5,
+                UnitPrice = 100
+            };
+
+            // Act
+            var errors = ValidateModel(item);
+
+            // Assert
+            errors.Should().Contain(e => e.MemberNames.Contains("Quantity"));
         }
     }
 }

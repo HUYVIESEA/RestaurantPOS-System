@@ -13,22 +13,17 @@ const SignalRContext = createContext<SignalRContextType>({
 
 export const useSignalR = () => useContext(SignalRContext);
 
-// Auto-detect Hub URL based on current hostname (same logic as api.ts)
+// Auto-detect Hub URL based on current hostname
 const getHubUrl = () => {
-  const hostname = window.location.hostname;
-  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-  
-  if (isLocalhost) {
-    return 'http://localhost:5000/restaurantHub';
+  // Check for explicit env variable first
+  const envUrl = import.meta.env.VITE_SIGNALR_HUB_URL;
+  if (envUrl) {
+    console.log('🔌 SignalR Hub URL (from env):', envUrl);
+    return envUrl;
   }
-  
-  // For LAN access, use current hostname
-  const protocol = window.location.protocol;
-  const apiPort = 5000;
-  const hubUrl = `${protocol}//${hostname}:${apiPort}/restaurantHub`;
-  
-  console.log('🔌 SignalR Hub URL:', hubUrl);
-  return hubUrl;
+
+  // Always use localhost for development
+  return 'http://localhost:5000/restaurantHub';
 };
 
 const HUB_URL = getHubUrl();

@@ -58,7 +58,11 @@ public class HybridCacheService : ICacheService
                 // Promote to L1 cache
                 if (value != null)
                 {
-                    _memoryCache.Set(key, value, MemoryCacheExpiration);
+                    _memoryCache.Set(key, value, new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = MemoryCacheExpiration,
+                        Size = 1
+                    });
                     _logger.LogDebug("Promoted to L1: {Key}", key);
                 }
                 
@@ -87,7 +91,11 @@ public class HybridCacheService : ICacheService
             var l2Expiration = expiration ?? DistributedCacheExpiration;
 
             // Store in L1 (Memory) - Fast access
-            _memoryCache.Set(key, value, l1Expiration);
+            _memoryCache.Set(key, value, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = l1Expiration,
+                Size = 1
+            });
 
             // Store in L2 (Redis) - Distributed access
             var json = JsonSerializer.Serialize(value, _jsonOptions);

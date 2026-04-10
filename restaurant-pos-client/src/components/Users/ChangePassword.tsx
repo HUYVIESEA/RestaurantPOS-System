@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { userService } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
 import { AUTH_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
-import './ChangePassword.css';
 
 const ChangePassword: React.FC = () => {
   const navigate = useNavigate();
@@ -122,154 +121,168 @@ confirmPassword: '',
   const passwordStrength = getPasswordStrength(formData.newPassword);
 
   return (
-    <div className="change-password-container">
-  <div className="change-password-card">
-        <div className="card-header">
-      <div className="header-icon">
+    <div className="p-6 w-full flex items-center justify-center min-h-[calc(100vh-100px)]">
+      <div className="w-full bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400 text-2xl mb-4 shadow-sm">
             <i className="fas fa-key"></i>
           </div>
-          <h2>Đổi mật khẩu</h2>
-          <p>Cập nhật mật khẩu của bạn để bảo mật tài khoản</p>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Đổi mật khẩu</h2>
+          <p className="text-slate-500 dark:text-slate-400">Cập nhật mật khẩu của bạn để bảo mật tài khoản</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="password-form">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
           {/* Current Password */}
- <div className="form-group">
-    <label htmlFor="oldPassword">
-   <i className="fas fa-lock"></i> Mật khẩu hiện tại
-       <span className="required">*</span>
-</label>
-            <div className="password-input-wrapper">
-  <input
-     type={showPasswords.old ? 'text' : 'password'}
-      id="oldPassword"
-name="oldPassword"
-                value={formData.oldPassword}
-              onChange={handleChange}
-  className={errors.oldPassword ? 'error' : ''}
-      placeholder="Nhập mật khẩu hiện tại"
-       />
-              <button
-        type="button"
-    className="toggle-password"
-   onClick={() => togglePasswordVisibility('old')}
-         >
-      <i className={`fas ${showPasswords.old ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-    </button>
-            </div>
-   {errors.oldPassword && <span className="error-message">{errors.oldPassword}</span>}
-     </div>
-
-    {/* New Password */}
-          <div className="form-group">
-            <label htmlFor="newPassword">
-  <i className="fas fa-lock"></i> Mật khẩu mới
-              <span className="required">*</span>
+          <div>
+            <label htmlFor="oldPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+              <i className="fas fa-lock text-slate-400"></i> Mật khẩu hiện tại
+              <span className="text-rose-500">*</span>
             </label>
-    <div className="password-input-wrapper">
-      <input
-        type={showPasswords.new ? 'text' : 'password'}
-      id="newPassword"
-    name="newPassword"
-        value={formData.newPassword}
-        onChange={handleChange}
-     className={errors.newPassword ? 'error' : ''}
-     placeholder="Nhập mật khẩu mới"
+            <div className="relative">
+              <input
+                type={showPasswords.old ? 'text' : 'password'}
+                id="oldPassword"
+                name="oldPassword"
+                value={formData.oldPassword}
+                onChange={handleChange}
+                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.oldPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                placeholder="Nhập mật khẩu hiện tại"
               />
-<button
-        type="button"
-       className="toggle-password"
-          onClick={() => togglePasswordVisibility('new')}
-     >
-<i className={`fas ${showPasswords.new ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-        </button>
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                onClick={() => togglePasswordVisibility('old')}
+              >
+                <i className={`fas ${showPasswords.old ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
             </div>
-          {errors.newPassword && <span className="error-message">{errors.newPassword}</span>}
+            {errors.oldPassword && <span className="text-sm text-rose-500 mt-1 block">{errors.oldPassword}</span>}
+          </div>
+
+          {/* New Password */}
+          <div>
+            <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+              <i className="fas fa-lock text-slate-400"></i> Mật khẩu mới
+              <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPasswords.new ? 'text' : 'password'}
+                id="newPassword"
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.newPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                placeholder="Nhập mật khẩu mới"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                onClick={() => togglePasswordVisibility('new')}
+              >
+                <i className={`fas ${showPasswords.new ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+            </div>
+            {errors.newPassword && <span className="text-sm text-rose-500 mt-1 block">{errors.newPassword}</span>}
             
-      {/* Password Strength Indicator */}
-{formData.newPassword && (
-           <div className="password-strength">
-             <div className="strength-bar">
+            {/* Password Strength Indicator */}
+            {formData.newPassword && (
+              <div className="mt-3">
+                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                   <div 
-            className="strength-fill" 
-            style={{ width: passwordStrength.width, backgroundColor: passwordStrength.color }}
-        ></div>
-   </div>
-        <span className="strength-text" style={{ color: passwordStrength.color }}>
- {passwordStrength.strength}
-        </span>
-  </div>
-       )}
-            <small className="help-text">Mật khẩu phải có ít nhất 6 ký tự</small>
+                    className="h-full transition-all duration-300" 
+                    style={{ width: passwordStrength.width, backgroundColor: passwordStrength.color }}
+                  ></div>
+                </div>
+                <span className="text-xs font-medium mt-1 block" style={{ color: passwordStrength.color }}>
+                  {passwordStrength.strength}
+                </span>
+              </div>
+            )}
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Mật khẩu phải có ít nhất 6 ký tự</p>
           </div>
 
           {/* Confirm Password */}
-      <div className="form-group">
-        <label htmlFor="confirmPassword">
-    <i className="fas fa-lock"></i> Xác nhận mật khẩu mới
-     <span className="required">*</span>
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+              <i className="fas fa-lock text-slate-400"></i> Xác nhận mật khẩu mới
+              <span className="text-rose-500">*</span>
             </label>
-      <div className="password-input-wrapper">
-<input
-              type={showPasswords.confirm ? 'text' : 'password'}
-      id="confirmPassword"
-   name="confirmPassword"
-      value={formData.confirmPassword}
-             onChange={handleChange}
-                className={errors.confirmPassword ? 'error' : ''}
-     placeholder="Nhập lại mật khẩu mới"
-  />
-   <button
-    type="button"
-    className="toggle-password"
+            <div className="relative">
+              <input
+                type={showPasswords.confirm ? 'text' : 'password'}
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.confirmPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                placeholder="Nhập lại mật khẩu mới"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                 onClick={() => togglePasswordVisibility('confirm')}
-    >
-       <i className={`fas ${showPasswords.confirm ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-      </button>
-      </div>
-            {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              >
+                <i className={`fas ${showPasswords.confirm ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+              </button>
+            </div>
+            {errors.confirmPassword && <span className="text-sm text-rose-500 mt-1 block">{errors.confirmPassword}</span>}
           </div>
 
-    {/* Security Tips */}
-          <div className="security-tips">
-  <h4><i className="fas fa-shield-alt"></i> Mẹo bảo mật:</h4>
-      <ul>
-  <li><i className="fas fa-check"></i> Sử dụng kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt</li>
-              <li><i className="fas fa-check"></i> Tránh sử dụng thông tin cá nhân dễ đoán</li>
-              <li><i className="fas fa-check"></i> Không chia sẻ mật khẩu với người khác</li>
-    <li><i className="fas fa-check"></i> Thay đổi mật khẩu định kỳ</li>
+          {/* Security Tips */}
+          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-100 dark:border-slate-700 mt-6">
+            <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+              <i className="fas fa-shield-alt text-indigo-500"></i> Mẹo bảo mật:
+            </h4>
+            <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <li className="flex items-start gap-2">
+                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <span>Sử dụng kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <span>Tránh sử dụng thông tin cá nhân dễ đoán</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <span>Không chia sẻ mật khẩu với người khác</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <span>Thay đổi mật khẩu định kỳ</span>
+              </li>
             </ul>
-    </div>
+          </div>
 
-    {/* Form Actions */}
-          <div className="form-actions">
+          {/* Form Actions */}
+          <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-700 mt-8">
             <button
-  type="button"
-      className="btn btn-secondary"
-         onClick={() => navigate('/profile')}
-      disabled={loading}
-       >
-  <i className="fas fa-times"></i> Hủy
-       </button>
-            <button
-      type="submit"
-    className="btn btn-primary"
+              type="button"
+              className="px-6 py-2.5 rounded-lg font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+              onClick={() => navigate('/profile')}
               disabled={loading}
             >
-         {loading ? (
-            <>
-      <i className="fas fa-spinner fa-spin"></i> Đang xử lý...
-         </>
-              ) : (
-           <>
-    <i className="fas fa-save"></i> Đổi mật khẩu
- </>
-     )}
+              <i className="fas fa-xmark"></i> Hủy
             </button>
-       </div>
-   </form>
+            <button
+              type="submit"
+              className="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <i className="fas fa-spinner fa-spin"></i> Đang xử lý...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-save"></i> Đổi mật khẩu
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
-  </div>
+    </div>
   );
 };
 

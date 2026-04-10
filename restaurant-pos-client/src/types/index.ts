@@ -215,3 +215,28 @@ export interface Supplier {
   createdAt: string;
   updatedAt?: string;
 }
+
+// ? NEW: Shift Management
+export interface Shift {
+  id: number;
+  userId: number;
+  userName?: string;
+  fullName?: string;
+  startTime: string;
+  endTime?: string;
+  startingCash: number;
+  endingCash?: number;
+  expectedCash?: number;
+  status: 'Active' | 'Closed';
+  notes?: string;
+}
+
+export interface CreateShiftRequest {
+  startingCash: number;
+  notes?: string;
+}
+
+export interface CloseShiftRequest {
+  endingCash: number;
+  notes?: string;
+}

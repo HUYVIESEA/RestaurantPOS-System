@@ -38,6 +38,8 @@ namespace RestaurantPOS.API.Models.DTOs
    public string FullName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public DateTime ExpiresAt { get; set; }
+        // SECURITY: Indicate if user must change password on first login
+        public bool MustChangePassword { get; set; }
     }
 
     public class UserResponse

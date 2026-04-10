@@ -1,289 +1,143 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RestaurantPOS.API.Data;
 using RestaurantPOS.API.Models;
+using RestaurantPOS.API.Services;
 
-namespace RestaurantPOS.API.Controllers
+namespace RestaurantPOS.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class TablesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize] // Require authentication for all endpoints
-    public class TablesController : ControllerBase
+    private readonly ITableService _tableService;
+
+    public TablesController(ITableService tableService)
     {
-        private readonly ApplicationDbContext _context;
+        _tableService = tableService;
+    }
 
-        public TablesController(ApplicationDbContext context)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Table>>> GetTables()
+    {
+        var tables = await _tableService.GetAllTablesAsync();
+        return Ok(tables);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Table>> GetTable(int id)
+    {
+        var table = await _tableService.GetTableByIdAsync(id);
+        if (table == null) return NotFound();
+        return Ok(table);
+    }
+
+    [HttpGet("Available")]
+    public async Task<ActionResult<IEnumerable<Table>>> GetAvailableTables()
+    {
+        var tables = await _tableService.GetAvailableTablesAsync();
+        return Ok(tables);
+    }
+
+    [HttpGet("Floor/{floor}")]
+    public async Task<ActionResult<IEnumerable<Table>>> GetTablesByFloor(string floor)
+    {
+        var tables = await _tableService.GetTablesByFloorAsync(floor);
+        return Ok(tables);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<ActionResult<Table>> CreateTable(Table table)
+    {
+        var result = await _tableService.CreateTableAsync(table);
+        return CreatedAtAction(nameof(GetTable), new { id = result.Id }, result);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> UpdateTable(int id, Table table)
+    {
+        if (id != table.Id) return BadRequest();
+
+        var result = await _tableService.UpdateTableAsync(id, table);
+        if (result == null) return NotFound();
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/Availability")]
+    public async Task<IActionResult> UpdateTableAvailability(int id, [FromBody] bool isAvailable)
+    {
+        var result = await _tableService.UpdateTableAvailabilityAsync(id, isAvailable);
+        if (!result) return NotFound();
+        return NoContent();
+    }
+
+    [HttpPost("{id}/Return")]
+    public async Task<IActionResult> ReturnTable(int id)
+    {
+        try
         {
-            _context = context;
-        }
-
-        // GET: api/Tables
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Table>>> GetTables()
-        {
-            return await _context.Tables.AsNoTracking().ToListAsync();
-        }
-
-        // GET: api/Tables/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Table>> GetTable(int id)
-        {
-            var table = await _context.Tables.FindAsync(id);
-
-            if (table == null)
-            {
-                return NotFound();
-            }
-
-            return table;
-        }
-
-        // GET: api/Tables/Available
-        [HttpGet("Available")]
-        public async Task<ActionResult<IEnumerable<Table>>> GetAvailableTables()
-        {
-            return await _context.Tables.AsNoTracking().Where(t => t.IsAvailable).ToListAsync();
-        }
-
-        // GET: api/Tables/Floor/Tầng 1
-        [HttpGet("Floor/{floor}")]
-        public async Task<ActionResult<IEnumerable<Table>>> GetTablesByFloor(string floor)
-        {
-            return await _context.Tables.AsNoTracking().Where(t => t.Floor == floor).ToListAsync();
-        }
-
-        // POST: api/Tables
-        [HttpPost]
-        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can create tables
-        public async Task<ActionResult<Table>> CreateTable(Table table)
-        {
-            _context.Tables.Add(table);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetTable), new { id = table.Id }, table);
-        }
-
-        // PUT: api/Tables/5
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can update tables
-        public async Task<IActionResult> UpdateTable(int id, Table table)
-        {
-            if (id != table.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(table).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TableExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            var result = await _tableService.ReturnTableAsync(id);
+            if (!result) return NotFound();
             return NoContent();
         }
-
-        // PATCH: api/Tables/5/Availability
-        [HttpPatch("{id}/Availability")]
-        public async Task<IActionResult> UpdateTableAvailability(int id, [FromBody] bool isAvailable)
+        catch (InvalidOperationException ex)
         {
-            var table = await _context.Tables.FindAsync(id);
-            if (table == null)
-            {
-                return NotFound();
-            }
-
-            table.IsAvailable = isAvailable;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // POST: api/Tables/5/Return - Return a table (make it available)
-        [HttpPost("{id}/Return")]
-        public async Task<IActionResult> ReturnTable(int id)
-        {
-            var table = await _context.Tables.FindAsync(id);
-            if (table == null)
-            {
-                return NotFound();
-            }
-
-            // Check if table has pending orders
-            var hasPendingOrders = await _context.Orders
-                .AnyAsync(o => o.TableId == id && (o.Status == "Pending" || o.Status == "Processing"));
-
-            if (hasPendingOrders)
-            {
-                return BadRequest("Không thể trả bàn khi còn đơn hàng chưa hoàn thành. Vui lòng hoàn thành hoặc hủy đơn trước.");
-            }
-
-            table.IsAvailable = true;
-            table.OccupiedAt = null;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // DELETE: api/Tables/5
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can delete tables
-        public async Task<IActionResult> DeleteTable(int id)
-        {
-            var table = await _context.Tables.FindAsync(id);
-            if (table == null)
-            {
-                return NotFound();
-            }
-
-            _context.Tables.Remove(table);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        // POST: api/Tables/Merge - Merge multiple tables
-        [HttpPost("Merge")]
-        public async Task<ActionResult<MergeTablesResponse>> MergeTables([FromBody] MergeTablesRequest request)
-        {
-            if (request.TableIds == null || request.TableIds.Count < 2)
-            {
-                return BadRequest("Cần ít nhất 2 bàn để ghép");
-            }
-
-            var tables = await _context.Tables
-                .Where(t => request.TableIds.Contains(t.Id))
-                .ToListAsync();
-
-            if (tables.Count != request.TableIds.Count)
-            {
-                return NotFound("Một số bàn không tồn tại");
-            }
-
-            // Check if all tables are available
-            if (tables.Any(t => !t.IsAvailable))
-            {
-                return BadRequest("Tất cả bàn phải trống để ghép");
-            }
-
-            // Generate unique group ID
-            var groupId = DateTime.UtcNow.Ticks.GetHashCode();
-            var tableNumbers = string.Join(",", tables.Select(t => t.TableNumber));
-
-            // Update all tables
-            foreach (var table in tables)
-            {
-                table.IsMerged = true;
-                table.MergedGroupId = groupId;
-                table.MergedTableNumbers = tableNumbers;
-                table.IsAvailable = false; // Mark as occupied when merged
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new MergeTablesResponse
-            {
-                GroupId = groupId,
-                TableNumbers = tableNumbers,
-                TotalCapacity = tables.Sum(t => t.Capacity),
-                TableCount = tables.Count
-            });
-        }
-
-        // POST: api/Tables/Split/{groupId} - Split merged tables
-        [HttpPost("Split/{groupId}")]
-        public async Task<IActionResult> SplitTables(int groupId)
-        {
-            var tables = await _context.Tables
-                .Where(t => t.MergedGroupId == groupId)
-                .ToListAsync();
-
-            if (tables.Count == 0)
-            {
-                return NotFound("Không tìm thấy nhóm bàn ghép");
-            }
-
-            // Check if there are pending orders
-            var hasPendingOrders = await _context.Orders
-                .AnyAsync(o => o.OrderGroupId == groupId && o.Status == "Pending");
-
-            if (hasPendingOrders)
-            {
-                return BadRequest("Không thể tách bàn khi còn đơn hàng đang xử lý. Vui lòng hoàn thành hoặc hủy đơn trước.");
-            }
-
-            // Unmerge all tables
-            foreach (var table in tables)
-            {
-                table.IsMerged = false;
-                table.MergedGroupId = null;
-                table.MergedTableNumbers = null;
-                table.IsAvailable = true;
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new { Message = $"Đã tách {tables.Count} bàn thành công" });
-        }
-
-        // GET: api/Tables/Merged - Get all merged table groups
-        [HttpGet("Merged")]
-        public async Task<ActionResult<IEnumerable<MergedTableGroup>>> GetMergedTables()
-        {
-            var mergedTables = await _context.Tables
-                .Where(t => t.IsMerged)
-                .GroupBy(t => t.MergedGroupId)
-                .Select(g => new MergedTableGroup
-                {
-                    GroupId = g.Key ?? 0,
-                    TableNumbers = g.First().MergedTableNumbers,
-                    TotalCapacity = g.Sum(t => t.Capacity),
-                    TableCount = g.Count(),
-                    IsOccupied = !g.First().IsAvailable
-                })
-                .ToListAsync();
-
-            return Ok(mergedTables);
-        }
-
-        private bool TableExists(int id)
-        {
-            return _context.Tables.Any(e => e.Id == id);
+            return BadRequest(ex.Message);
         }
     }
 
-    // DTOs for merge/split operations
-    public class MergeTablesRequest
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> DeleteTable(int id)
     {
-        public List<int> TableIds { get; set; } = new();
+        var result = await _tableService.DeleteTableAsync(id);
+        if (!result) return NotFound();
+        return NoContent();
     }
 
-    public class MergeTablesResponse
+    [HttpPost("Merge")]
+    public async Task<ActionResult<MergeTablesResponse>> MergeTables([FromBody] MergeTablesRequest request)
     {
-        public int GroupId { get; set; }
-        public string TableNumbers { get; set; } = string.Empty;
-        public int TotalCapacity { get; set; }
-        public int TableCount { get; set; }
+        try
+        {
+            var result = await _tableService.MergeTablesAsync(request.TableIds);
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
-    public class MergedTableGroup
+    [HttpPost("Split/{groupId}")]
+    public async Task<IActionResult> SplitTables(int groupId)
     {
-        public int GroupId { get; set; }
-        public string? TableNumbers { get; set; }
-        public int TotalCapacity { get; set; }
-        public int TableCount { get; set; }
-        public bool IsOccupied { get; set; }
+        try
+        {
+            var result = await _tableService.SplitTablesAsync(groupId);
+            if (!result) return NotFound("Không tìm thấy nhóm bàn ghép");
+            return Ok(new { Message = "Đã tách bàn thành công" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("Merged")]
+    public async Task<ActionResult<IEnumerable<MergedTableGroup>>> GetMergedTables()
+    {
+        var groups = await _tableService.GetMergedTablesAsync();
+        return Ok(groups);
     }
 }

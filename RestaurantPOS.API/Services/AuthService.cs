@@ -29,35 +29,74 @@ namespace RestaurantPOS.API.Services
         public async Task<LoginResponse?> LoginAsync(LoginRequest request)
         {
             var user = await _context.Users
-      .FirstOrDefaultAsync(u => u.Username == request.Username);
+        .FirstOrDefaultAsync(u => u.Username == request.Username);
 
-   if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            {
-       return null;
+    // Check if user exists
+    if (user == null)
+    {
+        // User doesn't exist - return null to avoid user enumeration
+        return null;
     }
 
-       if (!user.IsActive)
-      {
-             return null;
-       }
-
-  // Update last login
-  user.LastLoginAt = DateTime.UtcNow;
-   await _context.SaveChangesAsync();
-
-   // Generate JWT token
-  var token = GenerateJwtToken(user);
-
-      return new LoginResponse
+    // Check if account is locked out
+    if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
     {
-        Id = user.Id, // ✅ ADD user ID
-    Token = token,
-       Username = user.Username,
-         Email = user.Email,
-                FullName = user.FullName,
-    Role = user.Role,
-  ExpiresAt = DateTime.UtcNow.AddHours(_configuration.GetValue<int>("JwtSettings:ExpiryInHours"))
-  };
+        // Account is locked out
+        return null;
+    }
+
+    // Check password
+    if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+    {
+        // Increment failed login attempts
+        user.FailedLoginAttempts++;
+
+        // Lock account after 5 failed attempts
+        if (user.FailedLoginAttempts >= 5)
+        {
+            user.LockoutEnd = DateTime.UtcNow.AddMinutes(15); // Lock for 15 minutes
+        }
+
+        await _context.SaveChangesAsync();
+        return null;
+    }
+
+    // Password is correct - reset failed attempts and check if active
+    user.FailedLoginAttempts = 0;
+    user.LockoutEnd = null;
+
+    if (!user.IsActive)
+    {
+        return null;
+    }
+
+    // Check if this is first login with default password
+    bool mustChangePassword = false;
+    if (user.LastLoginAt == null && 
+        user.Username == "admin" && 
+        BCrypt.Net.BCrypt.Verify("Admin@123", user.PasswordHash))
+    {
+        mustChangePassword = true;
+    }
+
+    // Update last login
+    user.LastLoginAt = DateTime.UtcNow;
+    await _context.SaveChangesAsync();
+
+    // Generate JWT token
+   var token = GenerateJwtToken(user);
+
+       return new LoginResponse
+     {
+         Id = user.Id, // ✅ ADD user ID
+     Token = token,
+        Username = user.Username,
+          Email = user.Email,
+                 FullName = user.FullName,
+     Role = user.Role,
+   ExpiresAt = DateTime.UtcNow.AddHours(_configuration.GetValue<int>("JwtSettings:ExpiryInHours")),
+   MustChangePassword = mustChangePassword
+   };
         }
 
         public async Task<UserResponse?> RegisterAsync(RegisterRequest request)
@@ -77,14 +116,14 @@ namespace RestaurantPOS.API.Services
         var user = new User
             {
           Username = request.Username,
-   Email = request.Email,
- PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-       FullName = request.FullName,
-           PhoneNumber = request.PhoneNumber,
-       Role = request.Role,
-IsActive = true,
-       CreatedAt = DateTime.UtcNow
-    };
+    Email = request.Email,
+  PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+        FullName = request.FullName,
+          PhoneNumber = request.PhoneNumber,
+        Role = "Staff", // SECURITY: Force default role, ignore client-supplied role
+ IsActive = true,
+        CreatedAt = DateTime.UtcNow
+     };
 
   _context.Users.Add(user);
    await _context.SaveChangesAsync();
@@ -161,20 +200,21 @@ Role = user.Role,
          return true;
         }
 
-public async Task<bool> ChangePasswordAsync(int userId, string oldPassword, string newPassword)
-     {
-  var user = await _context.Users.FindAsync(userId);
-         if (user == null) return false;
+    public async Task<bool> ChangePasswordAsync(int userId, string oldPassword, string newPassword)
+      {
+   var user = await _context.Users.FindAsync(userId);
+          if (user == null) return false;
 
-      if (!BCrypt.Net.BCrypt.Verify(oldPassword, user.PasswordHash))
-            {
-  return false;
-  }
-
-    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
- await _context.SaveChangesAsync();
-        return true;
+       if (!BCrypt.Net.BCrypt.Verify(oldPassword, user.PasswordHash))
+             {
+   return false;
    }
+
+     user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+     user.PasswordChangedAt = DateTime.UtcNow; // Track when password was changed
+  await _context.SaveChangesAsync();
+         return true;
+    }
 
    public async Task<bool> ForgotPasswordAsync(string email)
         {
@@ -214,34 +254,41 @@ return false;
         }
 
         public async Task<bool> ResetPasswordAsync(string token, string newPassword)
-     {
-   var resetToken = await _context.PasswordResetTokens
-        .Include(rt => rt.User)
-       .FirstOrDefaultAsync(rt => rt.Token == token && !rt.IsUsed);
+      {
+    var resetToken = await _context.PasswordResetTokens
+         .Include(rt => rt.User)
+        .FirstOrDefaultAsync(rt => rt.Token == token && !rt.IsUsed);
 
-       if (resetToken == null)
-       return false;
-            var user = resetToken.User;
+        if (resetToken == null)
+        return false;
+
+        // Check if token is expired
+        if (resetToken.ExpiresAt < DateTime.UtcNow)
+        {
+            return false; // Reject expired tokens
+        }
+
+             var user = resetToken.User;
 
         if (user == null) return false;
 
-       user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
-    // Mark token as used
-   resetToken.IsUsed = true;
-  resetToken.UsedAt = DateTime.UtcNow;
+     // Mark token as used
+    resetToken.IsUsed = true;
+   resetToken.UsedAt = DateTime.UtcNow;
 
-  await _context.SaveChangesAsync();
+   await _context.SaveChangesAsync();
 
-         // Send confirmation email
-            try
- {
-      await _emailService.SendPasswordChangedEmailAsync(user.Email, user.FullName);
-   }
-       catch { /* Ignore email errors */ }
+          // Send confirmation email
+             try
+  {
+       await _emailService.SendPasswordChangedEmailAsync(user.Email, user.FullName);
+    }
+        catch { /* Ignore email errors */ }
 
-      return true;
-        }
+       return true;
+         }
 
         public async Task<bool> ValidateResetTokenAsync(string token)
         {
@@ -285,11 +332,15 @@ return false;
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"];
-            var issuer = jwtSettings["Issuer"];
-            var audience = jwtSettings["Audience"];
-            var expiryInHours = jwtSettings.GetValue<int>("ExpiryInHours");
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                secretKey = "RestaurantPOS_Super_Secret_Development_Key_2026_DoNotUseInProd!";
+            }
+            var issuer = jwtSettings["Issuer"] ?? "RestaurantPOS";
+            var audience = jwtSettings["Audience"] ?? "RestaurantPOSClient";
+            var expiryInHours = jwtSettings.GetValue<int?>("ExpiryInHours") ?? 24;
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -297,6 +348,7 @@ return false;
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
                 new Claim("UserId", user.Id.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.FullName),

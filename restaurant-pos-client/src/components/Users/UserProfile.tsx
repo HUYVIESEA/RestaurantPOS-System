@@ -4,7 +4,6 @@ import { userService, UpdateProfileRequest } from '../../services/userService';
 import { useToast } from '../../contexts/ToastContext';
 import { SkeletonProfile } from '../Common/Skeleton';
 import { USER_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
-import './UserProfile.css';
 
 const UserProfile: React.FC = () => {
   const navigate = useNavigate();
@@ -111,172 +110,176 @@ const UserProfile: React.FC = () => {
     setErrors({});
   };
 
-if (loading) {
+  if (loading) {
     return <SkeletonProfile />; // ✅ Use skeleton instead of plain text
   }
 
   return (
-    <div className="user-profile-container">
-      <div className="profile-header">
-        <div className="header-content">
-        <div className="avatar-large">
-          <i className="fas fa-user-circle"></i>
-          </div>
-       <div className="header-info">
-            <h2>{formData.fullName}</h2>
-            <p className="username">@{formData.username}</p>
-     <span className={`role-badge ${formData.role.toLowerCase()}`}>
-     <i className={`fas ${formData.role === 'Admin' ? 'fa-crown' : 'fa-user'}`}></i>
-      {formData.role}
-            </span>
-          </div>
-        </div>
-    <div className="header-actions">
-        {!isEditing ? (
-   <>
-      <button 
-            className="btn btn-primary"
-       onClick={() => setIsEditing(true)}
-   >
-     <i className="fas fa-edit"></i> Chỉnh sửa
-   </button>
-   <button 
-         className="btn btn-secondary"
-       onClick={() => navigate('/change-password')}
-      >
-     <i className="fas fa-key"></i> Đổi mật khẩu
-              </button>
-      </>
-          ) : null}
-      </div>
-      </div>
-
-      <div className="profile-content">
-      <form onSubmit={handleSubmit}>
-          <div className="profile-section">
-          <h3>
-    <i className="fas fa-user"></i> Thông tin cá nhân
-            </h3>
-         
-         <div className="form-grid">
-    {/* Username - Read only */}
-  <div className="form-group">
-        <label>
-        <i className="fas fa-user"></i> Tên đăng nhập
-                </label>
-           <input
-            type="text"
-       value={formData.username}
-  disabled
-           className="input-disabled"
-        />
-  <small className="help-text">Tên đăng nhập không thể thay đổi</small>
+    <div className="p-6 w-full space-y-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        {/* Banner/Header background */}
+        <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+        
+        <div className="px-8 pb-8 relative">
+          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6 -mt-16 mb-6">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 bg-white dark:bg-slate-700 flex items-center justify-center text-6xl text-slate-300 dark:text-slate-500 shadow-md">
+                <i className="fas fa-circle-user"></i>
               </div>
+              <div className="text-center md:text-left mt-2 md:mt-16">
+                <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{formData.fullName}</h2>
+                <p className="text-lg text-slate-500 dark:text-slate-400 mb-2">@{formData.username}</p>
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border ${formData.role === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400'}`}>
+                  <i className={`fas ${formData.role === 'Admin' ? 'fa-crown' : 'fa-user'}`}></i>
+                  {formData.role}
+                </span>
+              </div>
+            </div>
 
-  {/* Email */}
-    <div className="form-group">
-     <label>
-     <i className="fas fa-envelope"></i> Email
-            {isEditing && <span className="required">*</span>}
-    </label>
-          <input
-    type="email"
-       name="email"
-          value={formData.email}
-       onChange={handleChange}
-      disabled={!isEditing}
-          className={errors.email ? 'error' : ''}
-     />
-           {errors.email && <span className="error-message">{errors.email}</span>}
-           </div>
+            {!isEditing ? (
+              <div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0">
+                <button 
+                  className="flex-1 md:flex-none px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <i className="fas fa-pen-to-square"></i> Chỉnh sửa
+                </button>
+                <button 
+                  className="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200 rounded-lg font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
+                  onClick={() => navigate('/change-password')}
+                >
+                  <i className="fas fa-key"></i> Đổi mật khẩu
+                </button>
+              </div>
+            ) : null}
+          </div>
 
-  {/* Full Name */}
-    <div className="form-group">
-      <label>
-     <i className="fas fa-id-card"></i> Họ và tên
-    {isEditing && <span className="required">*</span>}
-          </label>
-   <input
-                  type="text"
-     name="fullName"
-        value={formData.fullName}
-    onChange={handleChange}
-               disabled={!isEditing}
-className={errors.fullName ? 'error' : ''}
- />
-         {errors.fullName && <span className="error-message">{errors.fullName}</span>}
+          <form onSubmit={handleSubmit} className="mt-8">
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-700 pb-3 flex items-center gap-2">
+                <i className="fas fa-user text-indigo-500"></i> Thông tin cá nhân
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Username - Read only */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+                    <i className="fas fa-user text-slate-400"></i> Tên đăng nhập
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.username}
+                    disabled
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                  />
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Tên đăng nhập không thể thay đổi</p>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+                    <i className="fas fa-envelope text-slate-400"></i> Email
+                    {isEditing && <span className="text-rose-500">*</span>}
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.email ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} ${!isEditing ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100'} focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                  />
+                  {errors.email && <span className="text-sm text-rose-500 mt-1 block">{errors.email}</span>}
+                </div>
+
+                {/* Full Name */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+                    <i className="fas fa-id-card text-slate-400"></i> Họ và tên
+                    {isEditing && <span className="text-rose-500">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.fullName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} ${!isEditing ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100'} focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                  />
+                  {errors.fullName && <span className="text-sm text-rose-500 mt-1 block">{errors.fullName}</span>}
+                </div>
+
+                {/* Role - Read only */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+                    <i className="fas fa-shield-alt text-slate-400"></i> Vai trò
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.role}
+                    disabled
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 cursor-not-allowed font-medium"
+                  />
+                </div>
+
+                {/* Created At - Read only */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+                    <i className="fas fa-calendar text-slate-400"></i> Ngày tạo
+                  </label>
+                  <input
+                    type="text"
+                    value={new Date(formData.createdAt).toLocaleDateString('vi-VN')}
+                    disabled
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 cursor-not-allowed"
+                  />
+                </div>
+
+                {/* Status - Read only */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2">
+                    <i className="fas fa-circle-check text-slate-400"></i> Trạng thái
+                  </label>
+                  <div className="pt-2">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${formData.isActive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
+                      {formData.isActive ? '✅ Hoạt động' : '⛔ Khóa'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            {isEditing && (
+              <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-700">
+                <button
+                  type="button"
+                  className="px-6 py-2.5 rounded-lg font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+                  onClick={handleCancel}
+                  disabled={saving}
+                >
+                  <i className="fas fa-xmark"></i> Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i> Đang lưu...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-save"></i> Lưu thay đổi
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </form>
         </div>
-
-   {/* Role - Read only */}
-          <div className="form-group">
-     <label>
-      <i className="fas fa-shield-alt"></i> Vai trò
-      </label>
-            <input
-         type="text"
-  value={formData.role}
-      disabled
-       className="input-disabled"
-       />
       </div>
-
-              {/* Created At - Read only */}
-       <div className="form-group">
- <label>
-<i className="fas fa-calendar"></i> Ngày tạo
-       </label>
-     <input
-     type="text"
-        value={new Date(formData.createdAt).toLocaleDateString('vi-VN')}
-  disabled
-       className="input-disabled"
-         />
-       </div>
-
-     {/* Status - Read only */}
-              <div className="form-group">
-          <label>
-       <i className="fas fa-circle-check"></i> Trạng thái
-      </label>
-         <div className="status-display">
-    <span className={`status-badge ${formData.isActive ? 'active' : 'inactive'}`}>
-               {formData.isActive ? '✅ Hoạt động' : '⛔ Khóa'}
-        </span>
-          </div>
-        </div>
-   </div>
-          </div>
-
-          {/* Form Actions */}
-{isEditing && (
-    <div className="form-actions">
-   <button
-     type="button"
-        className="btn btn-secondary"
-      onClick={handleCancel}
-          disabled={saving}
-  >
-  <i className="fas fa-times"></i> Hủy
-              </button>
-  <button
-         type="submit"
-     className="btn btn-primary"
-       disabled={saving}
-         >
-     {saving ? (
-            <>
-                    <i className="fas fa-spinner fa-spin"></i> Đang lưu...
-       </>
-    ) : (
-           <>
- <i className="fas fa-save"></i> Lưu thay đổi
-                  </>
-     )}
-    </button>
-          </div>
-     )}
-        </form>
-   </div>
     </div>
   );
 };

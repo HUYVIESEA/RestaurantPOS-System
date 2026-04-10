@@ -13,7 +13,6 @@ import {
   Filler
 } from 'chart.js';
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
-import './Charts.css';
 
 // Register Chart.js components
 ChartJS.register(
@@ -29,6 +28,9 @@ ChartJS.register(
   Filler
 );
 
+// Common container class
+const chartContainerClass = "relative w-full h-[300px] md:h-[400px] bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center";
+
 // Common chart options
 const commonOptions: any = {
   responsive: true,
@@ -42,11 +44,12 @@ const commonOptions: any = {
         font: {
           size: 12,
           family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-        }
+        },
+        color: '#64748b' // text-slate-500
       }
     },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: 'rgba(15, 23, 42, 0.9)', // slate-900 with opacity
       padding: 12,
       titleFont: {
         size: 14,
@@ -55,7 +58,29 @@ const commonOptions: any = {
       bodyFont: {
         size: 13
       },
-      cornerRadius: 8
+      cornerRadius: 8,
+      borderColor: 'rgba(51, 65, 85, 0.5)', // slate-700
+      borderWidth: 1
+    }
+  },
+  scales: {
+    x: {
+      grid: {
+        color: 'rgba(148, 163, 184, 0.1)', // slate-400
+        borderColor: 'rgba(148, 163, 184, 0.2)'
+      },
+      ticks: {
+        color: '#64748b'
+      }
+    },
+    y: {
+      grid: {
+        color: 'rgba(148, 163, 184, 0.1)',
+        borderColor: 'rgba(148, 163, 184, 0.2)'
+      },
+      ticks: {
+        color: '#64748b'
+      }
     }
   }
 };
@@ -75,11 +100,15 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({ data }) => {
       {
         label: 'Doanh Thu (₫)',
         data: data.revenue,
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        borderColor: 'rgba(54, 162, 235, 1)',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)', // blue-500
+        borderColor: 'rgba(59, 130, 246, 1)',
         borderWidth: 2,
         fill: true,
-        tension: 0.4
+        tension: 0.4,
+        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(59, 130, 246, 1)'
       }
     ]
   };
@@ -87,9 +116,12 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({ data }) => {
   const options = {
     ...commonOptions,
     scales: {
+      ...commonOptions.scales,
       y: {
+        ...commonOptions.scales.y,
         beginAtZero: true,
         ticks: {
+          ...commonOptions.scales.y.ticks,
           callback: function(value: any) {
             return new Intl.NumberFormat('vi-VN').format(value) + '₫';
           }
@@ -99,7 +131,7 @@ export const RevenueChart: React.FC<RevenueChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="chart-container">
+    <div className={chartContainerClass}>
       <Line data={chartData} options={options} />
     </div>
   );
@@ -122,36 +154,25 @@ export const ProductBarChart: React.FC<ProductChartProps> = ({ data, title }) =>
         label: title || 'Số Lượng Bán',
         data: data.values,
         backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-          'rgba(255, 159, 64, 0.6)',
-          'rgba(199, 199, 199, 0.6)',
-          'rgba(83, 102, 255, 0.6)',
-          'rgba(255, 102, 178, 0.6)',
-          'rgba(102, 255, 178, 0.6)'
+          'rgba(239, 68, 68, 0.8)',   // red-500
+          'rgba(59, 130, 246, 0.8)',  // blue-500
+          'rgba(245, 158, 11, 0.8)',  // amber-500
+          'rgba(16, 185, 129, 0.8)',  // emerald-500
+          'rgba(139, 92, 246, 0.8)',  // violet-500
+          'rgba(249, 115, 22, 0.8)',  // orange-500
+          'rgba(100, 116, 139, 0.8)', // slate-500
+          'rgba(99, 102, 241, 0.8)',  // indigo-500
+          'rgba(236, 72, 153, 0.8)',  // pink-500
+          'rgba(20, 184, 166, 0.8)'   // teal-500
         ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-          'rgba(199, 199, 199, 1)',
-          'rgba(83, 102, 255, 1)',
-          'rgba(255, 102, 178, 1)',
-          'rgba(102, 255, 178, 1)'
-        ],
-        borderWidth: 2
+        borderRadius: 6,
+        borderWidth: 0
       }
     ]
   };
 
   return (
-    <div className="chart-container">
+    <div className={chartContainerClass}>
       <Bar data={chartData} options={commonOptions} />
     </div>
   );
@@ -172,24 +193,33 @@ export const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
       {
         data: data.values,
         backgroundColor: [
-          'rgba(255, 99, 132, 0.8)',
-          'rgba(54, 162, 235, 0.8)',
-          'rgba(255, 206, 86, 0.8)',
-          'rgba(75, 192, 192, 0.8)',
-          'rgba(153, 102, 255, 0.8)',
-          'rgba(255, 159, 64, 0.8)',
-          'rgba(199, 199, 199, 0.8)',
-          'rgba(83, 102, 255, 0.8)'
+          'rgba(239, 68, 68, 0.8)',   // red-500
+          'rgba(59, 130, 246, 0.8)',  // blue-500
+          'rgba(245, 158, 11, 0.8)',  // amber-500
+          'rgba(16, 185, 129, 0.8)',  // emerald-500
+          'rgba(139, 92, 246, 0.8)',  // violet-500
+          'rgba(249, 115, 22, 0.8)',  // orange-500
+          'rgba(100, 116, 139, 0.8)', // slate-500
+          'rgba(99, 102, 241, 0.8)'   // indigo-500
         ],
-        borderColor: '#ffffff',
-        borderWidth: 3
+        borderColor: 'transparent',
+        borderWidth: 2,
+        hoverOffset: 4
       }
     ]
   };
 
+  const pieOptions = {
+    ...commonOptions,
+    scales: {
+      x: { display: false },
+      y: { display: false }
+    }
+  };
+
   return (
-    <div className="chart-container">
-      <Pie data={chartData} options={commonOptions} />
+    <div className={chartContainerClass}>
+      <Pie data={chartData} options={pieOptions} />
     </div>
   );
 };
@@ -210,19 +240,29 @@ export const OrderStatusChart: React.FC<OrderStatusChartProps> = ({ data }) => {
       {
         data: [data.completed, data.pending, data.cancelled],
         backgroundColor: [
-          'rgba(75, 192, 192, 0.8)',
-          'rgba(255, 206, 86, 0.8)',
-          'rgba(255, 99, 132, 0.8)'
+          'rgba(16, 185, 129, 0.8)', // emerald-500 (success)
+          'rgba(245, 158, 11, 0.8)', // amber-500 (warning)
+          'rgba(239, 68, 68, 0.8)'   // red-500 (danger)
         ],
-        borderColor: '#ffffff',
-        borderWidth: 3
+        borderColor: 'transparent',
+        borderWidth: 2,
+        hoverOffset: 4
       }
     ]
   };
 
+  const doughnutOptions = {
+    ...commonOptions,
+    cutout: '70%',
+    scales: {
+      x: { display: false },
+      y: { display: false }
+    }
+  };
+
   return (
-    <div className="chart-container">
-      <Doughnut data={chartData} options={commonOptions} />
+    <div className={chartContainerClass}>
+      <Doughnut data={chartData} options={doughnutOptions} />
     </div>
   );
 };
@@ -246,14 +286,19 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({ data }) => {
       label: dataset.label,
       data: dataset.data,
       borderColor: dataset.color,
-      backgroundColor: dataset.color.replace('1)', '0.2)'),
+      backgroundColor: dataset.color.replace('1)', '0.1)'),
       fill: true,
-      tension: 0.4
+      tension: 0.4,
+      borderWidth: 2,
+      pointBackgroundColor: dataset.color,
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: dataset.color
     }))
   };
 
   return (
-    <div className="chart-container">
+    <div className={chartContainerClass}>
       <Line data={chartData} options={commonOptions} />
     </div>
   );
@@ -274,9 +319,9 @@ export const HourlyChart: React.FC<HourlyChartProps> = ({ data }) => {
       {
         label: 'Doanh Thu Theo Giờ',
         data: data.revenue,
-        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-        borderColor: 'rgba(153, 102, 255, 1)',
-        borderWidth: 2
+        backgroundColor: 'rgba(139, 92, 246, 0.8)', // violet-500
+        borderRadius: 4,
+        borderWidth: 0
       }
     ]
   };
@@ -284,9 +329,12 @@ export const HourlyChart: React.FC<HourlyChartProps> = ({ data }) => {
   const options = {
     ...commonOptions,
     scales: {
+      ...commonOptions.scales,
       y: {
+        ...commonOptions.scales.y,
         beginAtZero: true,
         ticks: {
+          ...commonOptions.scales.y.ticks,
           callback: function(value: any) {
             return new Intl.NumberFormat('vi-VN').format(value) + '₫';
           }
@@ -296,7 +344,7 @@ export const HourlyChart: React.FC<HourlyChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="chart-container">
+    <div className={chartContainerClass}>
       <Bar data={chartData} options={options} />
     </div>
   );
@@ -317,9 +365,9 @@ export const WeeklyChart: React.FC<WeeklyChartProps> = ({ data }) => {
       {
         label: 'Doanh Thu Theo Ngày',
         data: data.revenue,
-        backgroundColor: 'rgba(255, 159, 64, 0.6)',
-        borderColor: 'rgba(255, 159, 64, 1)',
-        borderWidth: 2
+        backgroundColor: 'rgba(249, 115, 22, 0.8)', // orange-500
+        borderRadius: 4,
+        borderWidth: 0
       }
     ]
   };
@@ -327,9 +375,12 @@ export const WeeklyChart: React.FC<WeeklyChartProps> = ({ data }) => {
   const options = {
     ...commonOptions,
     scales: {
+      ...commonOptions.scales,
       y: {
+        ...commonOptions.scales.y,
         beginAtZero: true,
         ticks: {
+          ...commonOptions.scales.y.ticks,
           callback: function(value: any) {
             return new Intl.NumberFormat('vi-VN').format(value) + '₫';
           }
@@ -339,7 +390,7 @@ export const WeeklyChart: React.FC<WeeklyChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="chart-container">
+    <div className={chartContainerClass}>
       <Bar data={chartData} options={options} />
     </div>
   );

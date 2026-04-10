@@ -196,22 +196,23 @@ namespace RestaurantPOS.API.Services
             if (startDate.Kind != DateTimeKind.Utc) startDate = startDate.ToUniversalTime();
             if (endDate.Kind != DateTimeKind.Utc) endDate = endDate.ToUniversalTime();
 
-            var query = _context.Orders
+            var stats = await _context.Orders
                 .AsNoTracking()
-                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate);
-
-            var totalOrders = await query.CountAsync();
-            var completedOrders = await query.CountAsync(o => o.Status == "Completed");
-            var pendingOrders = await query.CountAsync(o => o.Status == "Pending");
-            var cancelledOrders = await query.CountAsync(o => o.Status == "Cancelled");
-            
-            // Note: Fetch amounts to memory to avoid EF Core translation issues with DefaultIfEmpty on Postgres
-            var completedOrderAmounts = await query
-                .Where(o => o.Status == "Completed")
-                .Select(o => o.TotalAmount)
+                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+                .GroupBy(o => o.Status)
+                .Select(g => new 
+                { 
+                    Status = g.Key, 
+                    Count = g.Count(), 
+                    Revenue = g.Sum(o => o.TotalAmount) 
+                })
                 .ToListAsync();
 
-            var totalRevenue = completedOrderAmounts.Sum();
+            var totalOrders = stats.Sum(s => s.Count);
+            var completedOrders = stats.FirstOrDefault(s => s.Status == "Completed")?.Count ?? 0;
+            var pendingOrders = stats.FirstOrDefault(s => s.Status == "Pending")?.Count ?? 0;
+            var cancelledOrders = stats.FirstOrDefault(s => s.Status == "Cancelled")?.Count ?? 0;
+            var totalRevenue = stats.FirstOrDefault(s => s.Status == "Completed")?.Revenue ?? 0;
 
             return new OrderStatisticsDto
             {
@@ -334,18 +335,28 @@ namespace RestaurantPOS.API.Services
             var monthStart = new DateTime(today.Year, today.Month, 1, 0, 0, 0, DateTimeKind.Utc);
             var yearStart = new DateTime(today.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-            var todayRevenue = await GetRevenueForPeriodAsync(today, today.AddDays(1));
-            var yesterdayRevenue = await GetRevenueForPeriodAsync(yesterday, today);
-            var weekRevenue = await GetRevenueForPeriodAsync(weekStart, today.AddDays(1));
-            var monthRevenue = await GetRevenueForPeriodAsync(monthStart, today.AddDays(1));
-            var yearRevenue = await GetRevenueForPeriodAsync(yearStart, today.AddDays(1));
+            var earliestDate = new[] { yesterday, weekStart, monthStart, yearStart }.Min();
+            var tomorrow = today.AddDays(1);
 
-            var todayOrders = await GetOrderCountForPeriodAsync(today, today.AddDays(1));
-            var weekOrders = await GetOrderCountForPeriodAsync(weekStart, today.AddDays(1));
-            var monthOrders = await GetOrderCountForPeriodAsync(monthStart, today.AddDays(1));
+            // Fetch required data in a single query
+            var orders = await _context.Orders
+                .AsNoTracking()
+                .Where(o => o.OrderDate >= earliestDate && o.OrderDate < tomorrow && o.Status == "Completed")
+                .Select(o => new { o.OrderDate, o.TotalAmount })
+                .ToListAsync();
 
-            var topProducts = await GetTopSellingProductsAsync(monthStart, today.AddDays(1), 5);
-            var categoryBreakdown = await GetCategoryReportAsync(monthStart, today.AddDays(1));
+            var todayRevenue = orders.Where(o => o.OrderDate >= today).Sum(o => o.TotalAmount);
+            var yesterdayRevenue = orders.Where(o => o.OrderDate >= yesterday && o.OrderDate < today).Sum(o => o.TotalAmount);
+            var weekRevenue = orders.Where(o => o.OrderDate >= weekStart).Sum(o => o.TotalAmount);
+            var monthRevenue = orders.Where(o => o.OrderDate >= monthStart).Sum(o => o.TotalAmount);
+            var yearRevenue = orders.Where(o => o.OrderDate >= yearStart).Sum(o => o.TotalAmount);
+
+            var todayOrders = orders.Count(o => o.OrderDate >= today);
+            var weekOrders = orders.Count(o => o.OrderDate >= weekStart);
+            var monthOrders = orders.Count(o => o.OrderDate >= monthStart);
+
+            var topProducts = await GetTopSellingProductsAsync(monthStart, tomorrow, 5);
+            var categoryBreakdown = await GetCategoryReportAsync(monthStart, tomorrow);
 
             return new SalesSummaryDto
             {

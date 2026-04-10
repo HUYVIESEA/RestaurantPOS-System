@@ -9,7 +9,6 @@ import { useToast } from '../../contexts/ToastContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import { PRODUCT_MESSAGES, COMMON_MESSAGES } from '../../constants/messages';
-import './ProductList.css';
 
 const ProductList: React.FC = () => {
   const navigate = useNavigate();
@@ -95,11 +94,11 @@ const ProductList: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="product-list-container">
-        <div className="product-header-section">
-          <div className="header-content">
-             <h2><i className="fas fa-box"></i> QUẢN LÝ THỰC ĐƠN</h2>
-          </div>
+      <div className="p-6 bg-slate-50 dark:bg-slate-900 min-h-screen">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <i className="fas fa-hamburger"></i> QUẢN LÝ THỰC ĐƠN
+          </h2>
         </div>
         <SkeletonGrid items={6} columns={3} />
       </div>
@@ -107,69 +106,73 @@ const ProductList: React.FC = () => {
   }
 
   return (
-    <div className="product-list-container">
+    <div className="p-4 md:p-6 bg-slate-50 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-200">
       {/* Header Section */}
-      <div className="product-header-section">
-        <div className="header-content">
-          <h2>QUẢN LÝ THỰC ĐƠN</h2>
-          <p>Quản lý danh sách món ăn, giá cả và tình trạng kho</p>
-          <div className="header-stats">
-             <div className="stat-badge">
-                <span className="label">Tổng món</span>
-                <span className="value">{stats.total}</span>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">QUẢN LÝ THỰC ĐƠN</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý danh sách món ăn, giá cả và tình trạng kho</p>
+          <div className="flex gap-3 mt-3 flex-wrap">
+             <div className="px-3 py-1.5 rounded-xl text-sm font-medium border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 flex gap-2 items-center">
+                <span className="text-slate-500 dark:text-slate-400">Tổng món</span>
+                <span className="text-slate-900 dark:text-white font-bold">{stats.total}</span>
              </div>
-             <div className="stat-badge success">
-                <span className="label">Đang bán</span>
-                <span className="value">{stats.active}</span>
+             <div className="px-3 py-1.5 rounded-xl text-sm font-medium border bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50 flex gap-2 items-center">
+                <span>Đang bán</span>
+                <span className="font-bold">{stats.active}</span>
              </div>
-             <div className="stat-badge warning">
-                <span className="label">Sắp hết</span>
-                <span className="value">{stats.lowStock}</span>
+             <div className="px-3 py-1.5 rounded-xl text-sm font-medium border bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800/50 flex gap-2 items-center">
+                <span>Sắp hết</span>
+                <span className="font-bold">{stats.lowStock}</span>
              </div>
-             <div className="stat-badge danger">
-                <span className="label">Hết hàng</span>
-                <span className="value">{stats.outOfStock}</span>
+             <div className="px-3 py-1.5 rounded-xl text-sm font-medium border bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50 flex gap-2 items-center">
+                <span>Hết hàng</span>
+                <span className="font-bold">{stats.outOfStock}</span>
              </div>
           </div>
         </div>
         
         {permissions.products.canCreate && (
           <button 
-            className="btn-add-product"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap"
             onClick={() => navigate('/products/new')}
           >
-            <i className="fas fa-plus"></i> THÊM MÓN MỚI
+            <i className="fas fa-circle-plus"></i> THÊM MÓN MỚI
           </button>
         )}
       </div>
 
       {/* Toolbar */}
-      <div className="product-toolbar">
-         <div className="search-box">
-            <i className="fas fa-search"></i>
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+         <div className="relative w-full sm:w-96 flex items-center">
+            <i className="fas fa-search absolute left-3.5 text-slate-400"></i>
             <input 
               type="text" 
+              className="w-full pl-10 pr-10 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all dark:text-white"
               placeholder="Tìm kiếm món ăn..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {searchTerm && (
-                <button className="clear-search" onClick={() => setSearchTerm('')}>
-                   <i className="fas fa-times"></i>
+                <button 
+                  className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" 
+                  onClick={() => setSearchTerm('')}
+                >
+                   <i className="fas fa-xmark"></i>
                 </button>
             )}
          </div>
 
-         <div className="view-toggle">
+         <div className="flex gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
             <button
-               className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+               className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-100'}`}
                onClick={() => setViewMode('grid')}
                title="Dạng lưới"
             >
                <i className="fas fa-th"></i>
             </button>
             <button
-               className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+               className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-800 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-100'}`}
                onClick={() => setViewMode('list')}
                title="Dạng danh sách"
             >
@@ -179,133 +182,137 @@ const ProductList: React.FC = () => {
       </div>
 
       {/* Category Filters */}
-      <div className="category-filters-scroll">
-         <div className="category-filters">
+      <div className="overflow-x-auto pb-2 mb-6 scrollbar-hide">
+         <div className="flex gap-2 min-w-max">
             <button
-               className={`category-chip ${selectedCategory === null ? 'active' : ''}`}
+               className={`whitespace-nowrap px-4 py-2 rounded-xl border font-medium text-sm transition-all flex items-center gap-2 ${selectedCategory === null ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 text-slate-700 dark:text-slate-300'}`}
                onClick={() => setSelectedCategory(null)}
             >
                <i className="fas fa-utensils"></i>
                Tất cả
-               <span className="count">{allProducts.length}</span>
+               <span className={`px-2 py-0.5 rounded-full text-xs ${selectedCategory === null ? 'bg-blue-100 dark:bg-blue-800' : 'bg-slate-100 dark:bg-slate-700'}`}>{allProducts.length}</span>
             </button>
-            {categories.map(category => (
-               <button
-                  key={category.id}
-                  className={`category-chip ${selectedCategory === category.id ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory(category.id)}
-               >
-                  <i className="fas fa-tag"></i>
-                  {category.name}
-                  <span className="count">
-                     {allProducts.filter(p => p.categoryId === category.id).length}
-                  </span>
-               </button>
-            ))}
+            {categories.map(category => {
+               const isActive = selectedCategory === category.id;
+               const count = allProducts.filter(p => p.categoryId === category.id).length;
+               return (
+                 <button
+                    key={category.id}
+                    className={`whitespace-nowrap px-4 py-2 rounded-xl border font-medium text-sm transition-all flex items-center gap-2 ${isActive ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 text-slate-700 dark:text-slate-300'}`}
+                    onClick={() => setSelectedCategory(category.id)}
+                 >
+                    <i className="fas fa-tag"></i>
+                    {category.name}
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${isActive ? 'bg-blue-100 dark:bg-blue-800' : 'bg-slate-100 dark:bg-slate-700'}`}>
+                       {count}
+                    </span>
+                 </button>
+               );
+            })}
          </div>
       </div>
 
       {/* Products Grid/List */}
       {filteredProducts.length > 0 ? (
-        <div className={`products-view ${viewMode}`}>
+        <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'flex flex-col gap-4'}>
           {filteredProducts.map(product => (
-            <div key={product.id} className="product-card">
-              <div className="product-image">
+            <div key={product.id} className={`bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all flex ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}>
+              <div className={`relative bg-slate-100 dark:bg-slate-900 flex-shrink-0 group ${viewMode === 'list' ? 'w-48 h-auto' : 'h-48 w-full'}`}>
                 {product.imageUrl ? (
-                  <img src={product.imageUrl} alt={product.name} />
+                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="no-image">
-                     <i className="fas fa-image"></i>
-                     <span>Không có ảnh</span>
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
+                     <i className="fas fa-image text-3xl"></i>
+                     <span className="text-sm">Không có ảnh</span>
                   </div>
                 )}
-                <div className="image-overlay">
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                    <button
-                     className="quick-view-btn"
+                     className="bg-white text-slate-900 px-4 py-2 rounded-xl font-medium shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-2"
                      onClick={() => navigate(`/products/edit/${product.id}`)}
                    >
-                     <i className="fas fa-pen"></i> Chỉnh sửa
+                     <i className="fas fa-pen-to-square"></i> Chỉnh sửa
                    </button>
                 </div>
                 {/* Stock Badge Overlay */}
-                <div className="stock-overlay-badge">
+                <div className="absolute top-3 left-3 flex flex-col gap-1">
                    {(product.stockQuantity !== undefined) && (
                      product.stockQuantity < 0 ? (
-                        <span className="badge infinite"><i className="fas fa-infinity"></i></span>
+                        <span className="bg-blue-500 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1"><i className="fas fa-infinity"></i></span>
                      ) : product.stockQuantity === 0 ? (
-                        <span className="badge out">Hết hàng</span>
+                        <span className="bg-red-500 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">Hết hàng</span>
                      ) : product.stockQuantity < 10 ? (
-                        <span className="badge low">{product.stockQuantity}</span>
+                        <span className="bg-orange-500 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">Còn {product.stockQuantity}</span>
                      ) : null
                    )}
                 </div>
               </div>
 
-              <div className="product-content">
-                  <div className="product-main">
-                     <div className="product-header-row">
-                        <h3 className="product-name">{product.name}</h3>
-                        <span className="price">{formatCurrency(product.price)}</span>
+              <div className="p-5 flex flex-col flex-grow">
+                  <div className="flex-grow">
+                     <div className="flex justify-between items-start gap-2 mb-1">
+                        <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-2 leading-tight">{product.name}</h3>
+                        <span className="font-semibold text-blue-600 dark:text-blue-400 flex-shrink-0 text-lg">{formatCurrency(product.price)}</span>
                      </div>
-                     <p className="product-category">
+                     <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                         {categories.find(c => c.id === product.categoryId)?.name || 'Chưa phân loại'}
                      </p>
                   </div>
 
                   {product.description && (
-                     <p className="product-description">{product.description}</p>
+                     <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 mb-4 leading-relaxed">{product.description}</p>
                   )}
 
-                  <div className={`status-bar ${product.isAvailable ? 'available' : 'unavailable'}`}>
-                     <span className="status-text">
-                        <i className={`fas fa-${product.isAvailable ? 'check-circle' : 'times-circle'}`}></i>
-                        {product.isAvailable ? 'Đang kinh doanh' : 'Ngừng kinh doanh'}
-                     </span>
-                  </div>
+                  <div className="mt-auto">
+                      <div className={`flex items-center gap-1.5 text-sm font-medium mb-4 ${product.isAvailable ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                         <i className={`fas fa-${product.isAvailable ? 'check-circle' : 'times-circle'}`}></i>
+                         {product.isAvailable ? 'Đang kinh doanh' : 'Ngừng kinh doanh'}
+                      </div>
 
-                  <div className="action-row">
-                     {permissions.products.canEdit && (
-                       <button
-                         className="btn-icon btn-edit"
-                         onClick={() => navigate(`/products/edit/${product.id}`)}
-                         title="Chỉnh sửa"
-                       >
-                         <i className="fas fa-edit"></i>
-                       </button>
-                     )}
-                     {permissions.products.canDelete && (
-                       <button
-                         className="btn-icon btn-delete"
-                         onClick={() => handleDeleteClick(product.id, product.name)}
-                         disabled={deleting === product.id}
-                         title="Xóa"
-                       >
-                         {deleting === product.id ? (
-                           <i className="fas fa-spinner fa-spin"></i>
-                         ) : (
-                           <i className="fas fa-trash-alt"></i>
+                      <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                         {permissions.products.canEdit && (
+                           <button
+                             className="p-2.5 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 dark:hover:text-blue-400 transition-colors"
+                             onClick={() => navigate(`/products/edit/${product.id}`)}
+                             title="Chỉnh sửa"
+                           >
+                             <i className="fas fa-pen-to-square"></i>
+                           </button>
                          )}
-                       </button>
-                     )}
+                         {permissions.products.canDelete && (
+                           <button
+                             className="p-2.5 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-800 dark:hover:text-red-400 transition-colors"
+                             onClick={() => handleDeleteClick(product.id, product.name)}
+                             disabled={deleting === product.id}
+                             title="Xóa"
+                           >
+                             {deleting === product.id ? (
+                               <i className="fas fa-spinner fa-spin"></i>
+                             ) : (
+                               <i className="fas fa-trash-can"></i>
+                             )}
+                           </button>
+                         )}
+                      </div>
                   </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="empty-state">
-           <div className="empty-icon">
-              <i className="fas fa-box-open"></i>
+        <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+           <div className="w-16 h-16 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-400 text-2xl mb-4">
+              <i className="fas fa-hamburger-open"></i>
            </div>
-           <h3>Không tìm thấy món ăn</h3>
-           <p>
+           <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Không tìm thấy món ăn</h3>
+           <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md">
             {searchTerm 
               ? `Không có kết quả nào khớp với "${searchTerm}"`
               : (selectedCategory ? 'Danh mục này chưa có món ăn nào' : 'Chưa có dữ liệu thực đơn')}
            </p>
            {permissions.products.canCreate && !searchTerm && !selectedCategory && (
              <button 
-               className="btn-primary"
+               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-medium shadow-sm transition-colors"
                onClick={() => navigate('/products/new')}
              >
                + Thêm món đầu tiên

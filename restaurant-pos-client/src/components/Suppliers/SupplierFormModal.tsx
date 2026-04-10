@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Supplier } from '../../types';
-import './SupplierFormModal.css';
 
 interface SupplierFormProps {
     supplier: Supplier | null;
@@ -73,23 +72,23 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
     };
 
     return (
-        <div className="supplier-form-overlay" onClick={onCancel}>
-            <div className="supplier-form-modal" onClick={e => e.stopPropagation()}>
-                <div className="form-header">
-                    <h2>
-                        <i className={`fas fa-${supplier ? 'edit' : 'plus-circle'}`}></i>
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={onCancel}>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl my-8 overflow-hidden border border-slate-200 dark:border-slate-700" onClick={e => e.stopPropagation()}>
+                <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                        <i className={`fas fa-${supplier ? 'edit text-blue-500' : 'plus-circle text-emerald-500'}`}></i>
                         {supplier ? 'Chỉnh sửa nhà cung cấp' : 'Thêm nhà cung cấp mới'}
                     </h2>
-                    <button className="btn-close" onClick={onCancel}>
-                        <i className="fas fa-times"></i>
+                    <button className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" onClick={onCancel}>
+                        <i className="fas fa-xmark"></i>
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    <div className="form-body">
-                        <div className="form-group">
-                            <label htmlFor="name">
-                                Tên nhà cung cấp <span className="required">*</span>
+                    <div className="p-6 space-y-5 max-h-[calc(100vh-16rem)] overflow-y-auto custom-scrollbar">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                Tên nhà cung cấp <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -98,14 +97,14 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="VD: Công ty TNHH ABC"
-                                className={errors.name ? 'error' : ''}
+                                className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.name ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500 focus:border-transparent'}`}
                             />
-                            {errors.name && <span className="error-text">{errors.name}</span>}
+                            {errors.name && <span className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><i className="fas fa-exclamation-circle"></i> {errors.name}</span>}
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label htmlFor="contactPerson">Người liên hệ</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label htmlFor="contactPerson" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Người liên hệ</label>
                                 <input
                                     type="text"
                                     id="contactPerson"
@@ -113,10 +112,11 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                     value={formData.contactPerson}
                                     onChange={handleChange}
                                     placeholder="VD: Nguyễn Văn A"
+                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all"
                                 />
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="phone">Số điện thoại</label>
+                            <div>
+                                <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Số điện thoại</label>
                                 <input
                                     type="text"
                                     id="phone"
@@ -124,14 +124,14 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                     value={formData.phone}
                                     onChange={handleChange}
                                     placeholder="VD: 0901234567"
-                                    className={errors.phone ? 'error' : ''}
+                                    className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.phone ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500 focus:border-transparent'}`}
                                 />
-                                {errors.phone && <span className="error-text">{errors.phone}</span>}
+                                {errors.phone && <span className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><i className="fas fa-exclamation-circle"></i> {errors.phone}</span>}
                             </div>
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="email">Email</label>
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
                             <input
                                 type="email"
                                 id="email"
@@ -139,13 +139,13 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 value={formData.email}
                                 onChange={handleChange}
                                 placeholder="VD: contact@abc.com"
-                                className={errors.email ? 'error' : ''}
+                                className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.email ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500 focus:border-transparent'}`}
                             />
-                            {errors.email && <span className="error-text">{errors.email}</span>}
+                            {errors.email && <span className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><i className="fas fa-exclamation-circle"></i> {errors.email}</span>}
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="address">Địa chỉ</label>
+                        <div>
+                            <label htmlFor="address" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Địa chỉ</label>
                             <input
                                 type="text"
                                 id="address"
@@ -153,11 +153,12 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 value={formData.address}
                                 onChange={handleChange}
                                 placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all"
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="notes">Ghi chú</label>
+                        <div>
+                            <label htmlFor="notes" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Ghi chú</label>
                             <textarea
                                 id="notes"
                                 name="notes"
@@ -165,28 +166,34 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 onChange={handleChange}
                                 placeholder="Ghi chú thêm về nhà cung cấp..."
                                 rows={3}
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all resize-none"
                             />
                         </div>
 
-                        <div className="form-group checkbox-group">
-                            <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    name="isActive"
-                                    checked={formData.isActive}
-                                    onChange={handleChange}
-                                />
-                                <span className="checkmark"></span>
-                                Đang hoạt động
+                        <div>
+                            <label className="flex items-center gap-3 cursor-pointer group">
+                                <div className="relative flex items-center justify-center">
+                                    <input
+                                        type="checkbox"
+                                        name="isActive"
+                                        checked={formData.isActive}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 appearance-none border-2 border-slate-300 dark:border-slate-500 rounded-md checked:bg-blue-600 checked:border-transparent outline-none transition-colors cursor-pointer group-hover:border-blue-400"
+                                    />
+                                    {formData.isActive && (
+                                        <i className="fas fa-check text-white text-xs absolute pointer-events-none"></i>
+                                    )}
+                                </div>
+                                <span className="font-medium text-slate-700 dark:text-slate-300 select-none">Đang hoạt động</span>
                             </label>
                         </div>
                     </div>
 
-                    <div className="form-footer">
-                        <button type="button" className="btn-cancel" onClick={onCancel}>
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3 rounded-b-2xl">
+                        <button type="button" className="px-5 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" onClick={onCancel}>
                             Hủy bỏ
                         </button>
-                        <button type="submit" className="btn-submit">
+                        <button type="submit" className="px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2">
                             <i className="fas fa-save"></i>
                             {supplier ? 'Cập nhật' : 'Thêm mới'}
                         </button>

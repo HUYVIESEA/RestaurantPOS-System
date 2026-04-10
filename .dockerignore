@@ -1,0 +1,17 @@
+**/.dockerignore
+**/.env
+**/.git
+**/.gitignore
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/publish
+**/*.md
+**/docker-compose*.yml
+**/Dockerfile*
+**/.env.*
+!restaurant-pos-client/Dockerfile
+!restaurant-pos-client/nginx.conf

@@ -50,29 +50,15 @@ const VnPayButton: React.FC<VnPayButtonProps> = ({
     <button 
       onClick={handlePayment}
       disabled={loading}
-      className={`btn-vnpay ${className}`}
-      style={{
-        background: 'linear-gradient(90deg, #005C97 0%, #363795 100%)',
-        color: 'white',
-        border: 'none',
-        padding: '0.75rem 1.5rem',
-        borderRadius: '2rem',
-        fontWeight: 'bold',
-        cursor: loading ? 'wait' : 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        transition: 'all 0.3s ease',
-        boxShadow: '0 4px 15px rgba(0, 92, 151, 0.3)'
-      }}
+      className={`inline-flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#005C97] to-[#363795] hover:opacity-90 active:opacity-100 text-white border-none rounded-xl font-bold cursor-pointer transition-all duration-300 shadow-md shadow-blue-900/30 focus:outline-none focus:ring-4 focus:ring-blue-500/30 disabled:opacity-70 disabled:cursor-wait w-full sm:w-auto ${className}`}
     >
       {loading ? (
         <>
-          <i className="fas fa-spinner fa-spin"></i> Đang xử lý...
+          <i className="fas fa-spinner fa-spin text-lg"></i> Đang xử lý...
         </>
       ) : (
         <>
-          <i className="fas fa-wallet"></i> Thanh toán VNPay
+          <i className="fas fa-wallet text-lg"></i> Thanh toán VNPay
         </>
       )}
     </button>

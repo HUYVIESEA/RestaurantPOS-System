@@ -3,7 +3,6 @@ import { useSignalR } from '../../contexts/SignalRContext';
 import { orderService } from '../../services/orderService';
 import { Order, OrderItem } from '../../types';
 import { useToast } from '../../contexts/ToastContext';
-import './KitchenView.css';
 
 interface KitchenOrder {
   id: number;
@@ -109,55 +108,97 @@ const KitchenView: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="kitchen-loading"><div className="spinner"></div></div>;
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-900">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-orange-500"></div>
+            </div>
+        );
+    }
 
     return (
-        <div className="kitchen-container">
-            <div className="kitchen-header">
-                <h1><i className="fas fa-fire"></i> KITCHEN DISPLAY</h1>
-                <div className="kitchen-stats">
-                    <span className="stat-badge pending">{kitchenOrders.length} Đang chờ</span>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-6 font-sans text-slate-800 dark:text-slate-100">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
+                <h1 className="text-2xl md:text-3xl font-extrabold flex items-center gap-4 text-orange-600 dark:text-orange-500 tracking-tight">
+                    <i className="fas fa-fire text-3xl"></i> KITCHEN DISPLAY
+                </h1>
+                <div className="flex items-center">
+                    <span className="px-5 py-2.5 bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 font-bold rounded-full shadow-sm text-lg border border-orange-200 dark:border-orange-800">
+                        {kitchenOrders.length} Đang chờ
+                    </span>
                 </div>
             </div>
 
-            <div className="kitchen-grid">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {kitchenOrders.length === 0 ? (
-                    <div className="kitchen-empty">
-                        <i className="fas fa-check-circle"></i>
-                        <p>Hết đơn chờ! Bếp nghỉ ngơi.</p>
+                    <div className="col-span-full flex flex-col items-center justify-center py-32 text-slate-400 dark:text-slate-500">
+                        <i className="fas fa-circle-check text-7xl mb-6 text-slate-300 dark:text-slate-600"></i>
+                        <p className="text-2xl font-medium">Hết đơn chờ! Bếp nghỉ ngơi.</p>
                     </div>
                 ) : (
                     kitchenOrders.map(order => (
-                        <div key={order.id} className={`kitchen-ticket ${order.isTakeaway ? 'takeaway' : ''}`}>
-                            <div className="ticket-header">
-                                <div className="table-info">
-                                    <span className="table-num">{order.tableNumber}</span>
-                                    {order.isTakeaway && <i className="fas fa-shopping-bag"></i>}
+                        <div 
+                            key={order.id} 
+                            className={`bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col transform transition-transform hover:-translate-y-1 ${
+                                order.isTakeaway ? 'border-t-4 border-t-blue-500' : 'border-t-4 border-t-orange-500'
+                            }`}
+                        >
+                            <div className="bg-slate-50 dark:bg-slate-700/60 px-5 py-4 flex justify-between items-start border-b border-slate-100 dark:border-slate-700">
+                                <div className="flex flex-col">
+                                    <span className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        {order.tableNumber}
+                                        {order.isTakeaway && <i className="fas fa-shopping-bag text-blue-500 text-base"></i>}
+                                    </span>
+                                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
+                                        Đơn #{order.id}
+                                    </span>
                                 </div>
-                                <div className="time-info">
-                                    <span className="order-id">#{order.id}</span>
-                                    <span className="elapsed-time">{order.elapsedTime}</span>
+                                <div className="flex flex-col items-end">
+                                    <span className={`text-lg font-bold px-3 py-1 rounded-lg ${
+                                        parseInt(order.elapsedTime || '0') > 15 
+                                            ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400' 
+                                            : 'bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-300'
+                                    }`}>
+                                        <i className="far fa-clock mr-1.5"></i>
+                                        {order.elapsedTime}
+                                    </span>
                                 </div>
                             </div>
                             
-                            <div className="ticket-body">
-                                <ul className="item-list">
+                            <div className="p-6 flex-grow">
+                                <ul className="space-y-4">
                                     {order.items.map((item, idx) => (
-                                        <li key={idx}>
-                                            <span className="qty">{item.quantity}</span>
-                                            <span className="name">
-                                                {item.product?.name}
-                                                {item.unitPrice === 0 && <span className="free-tag">Khoan tính</span>}
+                                        <li key={idx} className="flex items-start gap-4">
+                                            <span className="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold px-3 py-1.5 rounded-lg text-lg min-w-[3rem] text-center border border-slate-200 dark:border-slate-600 shadow-sm">
+                                                {item.quantity}
                                             </span>
-                                            {item.notes && <div className="item-note">Note: {item.notes}</div>}
+                                            <div className="flex-grow pt-1">
+                                                <div className="text-lg font-semibold text-slate-800 dark:text-slate-200 leading-tight">
+                                                    {item.product?.name}
+                                                    {item.unitPrice === 0 && (
+                                                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400">
+                                                            Khoan tính
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {item.notes && (
+                                                    <div className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 p-2 rounded-md border border-red-100 dark:border-red-800/30 flex items-start gap-2">
+                                                        <i className="fas fa-exclamation-circle mt-0.5"></i>
+                                                        <span>{item.notes}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
-                            <div className="ticket-footer">
-                                <button className="btn-done" onClick={() => handleCompleteOrder(order.id)}>
-                                    <i className="fas fa-check"></i> Xong
+                            <div className="p-4 bg-slate-50 dark:bg-slate-700/40 border-t border-slate-100 dark:border-slate-700 mt-auto">
+                                <button 
+                                    className="w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold text-xl rounded-xl shadow-md transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-green-500/50 active:scale-[0.98]"
+                                    onClick={() => handleCompleteOrder(order.id)}
+                                >
+                                    <i className="fas fa-circle-check text-2xl"></i> BÁO XONG
                                 </button>
                             </div>
                         </div>

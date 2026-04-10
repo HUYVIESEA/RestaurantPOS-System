@@ -1,0 +1,6 @@
+@RestaurantPOS.NotificationService_HostAddress = http://localhost:5072
+
+GET {{RestaurantPOS.NotificationService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

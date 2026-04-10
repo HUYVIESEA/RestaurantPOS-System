@@ -176,10 +176,13 @@ namespace RestaurantPOS.API.Services
 
         public async Task<Order> CreateOrderAsync(Order order)
         {
-            // ✅ Ensure OrderDate is UTC
+            // SECURITY: Override client-supplied server-controlled fields
             order.OrderDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
+            order.Status = "Pending"; // SECURITY: Force default status
+            order.PaymentStatus = "Unpaid"; // SECURITY: Force default payment status
+            order.PaidAmount = 0; // SECURITY: Reset paid amount
 
-            // Calculate total amount
+            // Calculate total amount from DB product prices
             decimal total = 0;
             if (order.OrderItems != null && order.OrderItems.Any())
             {
@@ -193,7 +196,7 @@ namespace RestaurantPOS.API.Services
                 {
                     if (products.TryGetValue(item.ProductId, out var product))
                     {
-                        item.UnitPrice = product.Price;
+                        item.UnitPrice = product.Price; // SECURITY: Use DB price, not client price
                         total += item.UnitPrice * item.Quantity;
                     }
                 }

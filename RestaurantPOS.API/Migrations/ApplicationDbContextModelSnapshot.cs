@@ -370,6 +370,48 @@ namespace RestaurantPOS.API.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("RestaurantPOS.API.Models.Shift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal?>("EndingCash")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("ExpectedCash")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal>("StartingCash")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Shifts");
+                });
+
             modelBuilder.Entity("RestaurantPOS.API.Models.Supplier", b =>
                 {
                     b.Property<int>("Id")
@@ -935,6 +977,9 @@ namespace RestaurantPOS.API.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("integer");
+
                     b.Property<string>("FcmToken")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -948,6 +993,15 @@ namespace RestaurantPOS.API.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("LockoutEnd")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("PasswordChangedAt")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PasswordHash")
@@ -982,11 +1036,13 @@ namespace RestaurantPOS.API.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 25, 18, 14, 53, 154, DateTimeKind.Utc).AddTicks(8637),
+                            CreatedAt = new DateTime(2026, 4, 10, 5, 39, 28, 427, DateTimeKind.Utc).AddTicks(2495),
                             Email = "admin@restaurantpos.com",
+                            FailedLoginAttempts = 0,
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = "$2a$11$Tr9ozLVESpvikkS48kT9q.vLlGO6NgK7GhhFPoGVtM29BrCmg0N0S",
+                            MustChangePassword = false,
+                            PasswordHash = "$2a$11$lbNmRcUexj.4rzwRl6kc2.WJ0eHMxXFB3oR868ihEYPvNm8trhrdC",
                             Role = "Admin",
                             Username = "admin"
                         });
@@ -1079,6 +1135,17 @@ namespace RestaurantPOS.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("RestaurantPOS.API.Models.Shift", b =>
+                {
+                    b.HasOne("RestaurantPOS.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RestaurantPOS.API.Models.UserDevice", b =>

@@ -9,11 +9,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-.idea/
-.env
-.vscode/
-.github/
-.agent/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -216,3 +211,48 @@ restaurant-pos-client/dist/
 RestaurantPOS.Manager/publish/
 *.rar
 *.zip
+*.bak
+RestaurantPOS-System-old/
+
+# Secrets and Environment Variables
+.env
+.env.local
+.env.*.local
+!.env.example
+.env.docker
+key_gen.txt
+
+# Editor and AI Agent directories
+.agent/
+.opencode/
+.claude/
+.cline/
+.cursor/
+.idea/
+.vscode/
+.opencoderc
+
+# Build artifacts & dependencies
+node_modules/
+bin/
+obj/
+publish/
+
+# Logs
+*.log
+api.log
+api.err.log
+gitnexus.log
+
+# Database files
+*.sqlite
+*.db
+*.mdf
+*.ldf
+
+# GitNexus
+.gitnexus
+.gitnexus/
+
+# System specific files
+nul

@@ -6,6 +6,7 @@ using RestaurantPOS.API.Services;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 // using RestaurantPOS.API.Services.VnPay; // Disabled - using VietQR instead
 using RestaurantPOS.API.Hubs;
@@ -16,6 +17,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Fix DateTime issues with Postgres
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+// Support environment variable overrides for secrets
+// Priority: Environment Variables > appsettings.json
+builder.Configuration.AddEnvironmentVariables();
 
 
 // Add services to the container.
@@ -36,9 +41,7 @@ builder.Services.AddControllers()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add MongoDB
-
-
+// Add MongoDB - Not configured
 // Add Memory Cache (L1) for hybrid caching
 builder.Services.AddMemoryCache(options =>
 {
@@ -61,21 +64,20 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-// builder.Services.AddScoped<IVnPayService, VnPayService>();
-
-builder.Services.AddHttpClient(); // Required for VietQR
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<RestaurantPOS.API.Services.VietQR.IVietQRService, RestaurantPOS.API.Services.VietQR.VietQRService>();
 builder.Services.AddScoped<RestaurantPOS.API.Services.SePay.ISePayService, RestaurantPOS.API.Services.SePay.SePayService>();
 
-// License Service Removed - Using Simple Startup Check
-// builder.Services.AddScoped<ILicenseService, LicenseService>();
-
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
+builder.Services.AddScoped<ITableService, TableService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IPaymentSettingsService, PaymentSettingsService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IShiftService, ShiftService>();
 
-// BigData Services
-
-
+// BigData Services - Not configured
 // Cache Warming Service (pre-load frequently accessed data)
 builder.Services.AddHostedService<CacheWarmingService>();
 
@@ -106,6 +108,21 @@ else
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
+if (string.IsNullOrEmpty(secretKey))
+{
+    if (!builder.Environment.IsDevelopment())
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[CRITICAL] JwtSettings__SecretKey environment variable is required in production.");
+        Console.ResetColor();
+        Environment.Exit(1);
+    }
+    else
+    {
+        secretKey = "RestaurantPOS_Super_Secret_Development_Key_2026_DoNotUseInProd!";
+    }
+}
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -123,6 +140,37 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
         RoleClaimType = ClaimTypes.Role // Explicitly tell middleware which claim is the role
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            // Get the user ID from the token
+            var userIdClaim = context.Principal?.FindFirst("UserId") ?? 
+                             context.Principal?.FindFirst(ClaimTypes.NameIdentifier);
+            
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                // Get the user from database
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var user = await dbContext.Users.FindAsync(userId);
+                if (user != null && user.PasswordChangedAt.HasValue)
+                {
+                    // Get the token issuance time
+                    var issuedAtClaim = context.Principal?.FindFirst(JwtRegisteredClaimNames.Iat);
+                    if (issuedAtClaim != null && long.TryParse(issuedAtClaim.Value, out long issuedAtUnix))
+                    {
+                        var issuedAt = DateTimeOffset.FromUnixTimeSeconds(issuedAtUnix).UtcDateTime;
+                        
+                        // If token was issued before password was changed, reject it
+                        if (issuedAt < user.PasswordChangedAt.Value)
+                        {
+                            context.Fail("Token issued before password change");
+                        }
+                    }
+                }
+            }
+        }
     };
 });
 
@@ -202,6 +250,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseResponseCompression(); // ✅ NEW: Enable Response Compression
 
+// SECURITY: Add security headers to all responses
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.Append("Permissions-Policy", "geolocation=(), camera=(), microphone=()");
+    
+    // HSTS only in production
+    if (!app.Environment.IsDevelopment())
+    {
+        context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    }
+    
+    await next();
+});
+
 // app.UseHttpsRedirection(); // Disable for local dev to avoid Auth header stripping on redirect
 
 app.UseCors("AllowAll");
@@ -211,7 +277,8 @@ app.UseStaticFiles(); // Enable serving static files (images)
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseMiddleware<RestaurantPOS.API.Middleware.GlobalExceptionMiddleware>();
+
 app.MapControllers();
 app.MapHub<RestaurantHub>("/restaurantHub");
 
@@ -221,12 +288,7 @@ app.MapHub<RestaurantHub>("/restaurantHub");
 // If the key in 'appsettings.json' does not match this signature, the system refuses to start.
 
 string activationKey = builder.Configuration["SourceCode:ActivationKey"] ?? "";
-string validHash = "c18092497d3967396180352737603525203360216447883901"; // Fake simplified signature for demo or real one?
-// Real one for "HUYVESEA-2026-POS-SYSTEM":
-// Let's implement the hashing helper locally to check.
-// Since I can't generate the hash reliably here without running code, I will stick to a direct secure string check but implemented as a "Service".
 
-// To satisfy "Cơ chế kiểm tra":
 if (!RestaurantPOS.API.Security.ActivationGuard.Validate(activationKey))
 {
     Console.ForegroundColor = ConsoleColor.Red;

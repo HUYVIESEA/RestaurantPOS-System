@@ -21,6 +21,7 @@ namespace RestaurantPOS.Tests
         private readonly Mock<IHubContext<RestaurantHub>> _mockHubContext;
         private readonly Mock<IFirebaseService> _mockFirebaseService;
         private readonly Mock<ILogger<OrderService>> _mockLogger;
+        private readonly Mock<ICacheService> _mockCache;
         private readonly OrderService _orderService;
 
         public OrderServiceTests()
@@ -38,8 +39,9 @@ namespace RestaurantPOS.Tests
 
             _mockFirebaseService = new Mock<IFirebaseService>();
             _mockLogger = new Mock<ILogger<OrderService>>();
+            _mockCache = new Mock<ICacheService>();
 
-            _orderService = new OrderService(_context, _mockHubContext.Object, _mockFirebaseService.Object, _mockLogger.Object);
+            _orderService = new OrderService(_context, _mockHubContext.Object, _mockFirebaseService.Object, _mockLogger.Object, _mockCache.Object);
         }
 
         [Fact]
@@ -109,7 +111,7 @@ namespace RestaurantPOS.Tests
             completedOrder.Status.Should().Be("Completed");
             
             var tableInDb = await _context.Tables.FindAsync(10);
-            tableInDb.IsAvailable.Should().BeTrue(); // Table should be freed
+            tableInDb!.IsAvailable.Should().BeTrue();
             tableInDb.OccupiedAt.Should().BeNull();
         }
         [Fact]
@@ -160,7 +162,7 @@ namespace RestaurantPOS.Tests
             result.Status.Should().Be("Cancelled"); // Order cancelled
             
             var tableDb = await _context.Tables.FindAsync(1);
-            tableDb.IsAvailable.Should().BeTrue(); // Table freed
+            tableDb!.IsAvailable.Should().BeTrue();
         }
 
         [Fact]
@@ -169,33 +171,43 @@ namespace RestaurantPOS.Tests
             // Arrange
             var orderItems = new List<OrderItem> 
             {
-                new OrderItem { Id = 1, ProductId = 1, Quantity = 2, UnitPrice = 10000 }, // Keep this
-                new OrderItem { Id = 2, ProductId = 2, Quantity = 1, UnitPrice = 20000 }  // Move this
+                new OrderItem { ProductId = 1, Quantity = 2, UnitPrice = 10000 },
+                new OrderItem { ProductId = 2, Quantity = 1, UnitPrice = 20000 }
             };
             var order = new Order 
             { 
-                Id = 1, TableId = 1, Status = "Pending", 
+                TableId = 1, Status = "Pending", 
                 OrderItems = orderItems, 
                 TotalAmount = 40000 
             };
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
+            var itemIdToMove = orderItems[1].Id;
+            var originalOrderId = order.Id;
+
             // Act
-            var result = await _orderService.SplitOrderAsync(1, new List<int> { 2 }); // Move Item ID 2
+            var result = await _orderService.SplitOrderAsync(originalOrderId, new List<int> { itemIdToMove });
 
             // Assert
             result.Should().NotBeNull();
             
-            // Check Original Order
-            result.OriginalOrder.Id.Should().Be(1);
-            result.OriginalOrder.TotalAmount.Should().Be(20000); // 40k - 20k
-            
-            // Check New Order
-            result.NewOrder.Id.Should().NotBe(1);
-            result.NewOrder.ParentOrderId.Should().Be(1);
-            result.NewOrder.TotalAmount.Should().Be(20000);
-            result.NewOrder.OrderItems!.Should().ContainSingle(i => i.Id == 2);
+            // Verify a new order was created with parent reference
+            var newOrder = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.ParentOrderId == originalOrderId);
+            newOrder.Should().NotBeNull();
+            newOrder!.ParentOrderId.Should().Be(originalOrderId);
+            newOrder.TotalAmount.Should().Be(20000);
+            newOrder.OrderItems.Should().ContainSingle(i => i.ProductId == 2);
+
+            // Verify original order was updated
+            var originalOrder = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == originalOrderId);
+            originalOrder.Should().NotBeNull();
+            originalOrder!.TotalAmount.Should().Be(20000);
+            originalOrder.OrderItems.Should().ContainSingle(i => i.ProductId == 1);
         }
     }
 }
