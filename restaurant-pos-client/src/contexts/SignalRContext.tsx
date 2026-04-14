@@ -38,7 +38,7 @@ export const SignalRProvider: React.FC<{ children: ReactNode }> = ({ children })
         // If you have authentication, you might need to pass the token here
         // accessTokenFactory: () => localStorage.getItem('token') || ''
       })
-      .configureLogging(signalR.LogLevel.Warning)
+      .configureLogging(signalR.LogLevel.Error)
       .withAutomaticReconnect()
       .build();
 
