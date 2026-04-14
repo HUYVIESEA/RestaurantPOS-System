@@ -77,7 +77,7 @@ public class HybridCacheService : ICacheService
         {
             if (ex.GetType().Name == "RedisConnectionException")
             {
-                _logger.LogWarning("Redis connection failed. Falling back to Memory Cache for GET. Key: {Key}", key);
+                _logger.LogDebug("Redis connection failed. Falling back to Memory Cache for GET. Key: {Key}", key);
             }
             else
             {
@@ -121,7 +121,7 @@ public class HybridCacheService : ICacheService
         {
             if (ex.GetType().Name == "RedisConnectionException")
             {
-                _logger.LogWarning("Redis connection failed. Falling back to Memory Cache for SET. Key: {Key}", key);
+                _logger.LogDebug("Redis connection failed. Falling back to Memory Cache for SET. Key: {Key}", key);
             }
             else if (ex.GetType().Name == "JsonException" && ex.Message.Contains("cycle"))
             {
@@ -148,7 +148,7 @@ public class HybridCacheService : ICacheService
         {
             if (ex.GetType().Name == "RedisConnectionException")
             {
-                _logger.LogWarning("Redis connection failed for REMOVE. Key: {Key}", key);
+                _logger.LogDebug("Redis connection failed for REMOVE. Key: {Key}", key);
             }
             else
             {

@@ -159,9 +159,9 @@ namespace RestaurantPOS.API.Services
             }
             
             // Always invalidate recent orders list (paginated caches)
-            keysToRemove.Add($"{CACHE_KEY_ORDERS_PREFIX}page:1:size:50");
-            keysToRemove.Add($"{CACHE_KEY_ORDERS_PREFIX}page:1:size:20");
-            keysToRemove.Add($"{CACHE_KEY_ORDERS_PREFIX}page:1:size:10");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:50");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:20");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10");
             
             foreach (var key in keysToRemove)
             {
