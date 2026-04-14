@@ -27,7 +27,7 @@ namespace RestaurantPOS.API.Controllers
                 return Unauthorized();
 
             var shift = await _shiftService.GetActiveShiftAsync(userId);
-            if (shift == null) return NotFound("No active shift found");
+            if (shift == null) return NoContent();
 
             return Ok(shift);
         }

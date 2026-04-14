@@ -5,9 +5,9 @@ export const shiftService = {
   getActiveShift: async (): Promise<Shift | null> => {
     try {
       const response = await api.get('/shifts/active');
-      return response.data;
+      return response.data ? response.data : null;
     } catch (error: any) {
-      if (error.response?.status === 404) {
+      if (error.response?.status === 404 || error.response?.status === 204) {
         return null;
       }
       throw error;

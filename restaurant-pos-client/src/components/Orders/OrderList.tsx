@@ -42,21 +42,50 @@ const OrderList: React.FC = () => {
 
   // Listen for SignalR events
   useEffect(() => {
-    if (connection) {
-      connection.on('OrderCreated', (newOrder: Order) => {
-        setOrders(prev => [newOrder, ...prev]);
+    if (!connection) return;
+
+    const handleOrderCreated = async (orderId: number) => {
+      try {
+        const newOrder = await orderService.getById(orderId);
+        setOrders(prev => {
+          if (prev.some(o => o.id === orderId)) return prev;
+          return [newOrder, ...prev];
+        });
         showToast(`Đơn hàng mới #${newOrder.id} vừa được tạo!`, 'info');
-      });
+      } catch (err) {
+        console.error("Failed to fetch new order details", err);
+      }
+    };
 
-      connection.on('OrderUpdated', (updatedOrder: Order) => {
-        setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
-      });
+    const handleOrderUpdated = async (orderId: number) => {
+      try {
+        const updatedOrder = await orderService.getById(orderId);
+        setOrders(prev => {
+          const exists = prev.some(o => o.id === orderId);
+          if (exists) {
+            return prev.map(o => o.id === orderId ? updatedOrder : o);
+          } else {
+            return [updatedOrder, ...prev].sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+          }
+        });
+      } catch (err) {
+        console.error("Failed to fetch updated order details", err);
+      }
+    };
 
-      return () => {
-        connection.off('OrderCreated');
-        connection.off('OrderUpdated');
-      };
-    }
+    const handleOrderCompleted = (orderId: number) => {
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'Completed' } : o));
+    };
+
+    connection.on('ordercreated', handleOrderCreated);
+    connection.on('orderupdated', handleOrderUpdated);
+    connection.on('ordercompleted', handleOrderCompleted);
+
+    return () => {
+      connection.off('ordercreated', handleOrderCreated);
+      connection.off('orderupdated', handleOrderUpdated);
+      connection.off('ordercompleted', handleOrderCompleted);
+    };
   }, [connection, showToast]);
 
   const fetchOrders = async () => {

@@ -17,7 +17,8 @@ public class HybridCacheService : ICacheService
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        WriteIndented = false
+        WriteIndented = false,
+        ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
     };
 
     // L1 cache (memory) - Very fast but limited size
@@ -74,7 +75,14 @@ public class HybridCacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting cache key: {Key}", key);
+            if (ex.GetType().Name == "RedisConnectionException")
+            {
+                _logger.LogWarning("Redis connection failed. Falling back to Memory Cache for GET. Key: {Key}", key);
+            }
+            else
+            {
+                _logger.LogError(ex, "Error getting cache key: {Key}", key);
+            }
             return default;
         }
     }
@@ -111,7 +119,18 @@ public class HybridCacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error setting cache key: {Key}", key);
+            if (ex.GetType().Name == "RedisConnectionException")
+            {
+                _logger.LogWarning("Redis connection failed. Falling back to Memory Cache for SET. Key: {Key}", key);
+            }
+            else if (ex.GetType().Name == "JsonException" && ex.Message.Contains("cycle"))
+            {
+                _logger.LogWarning("Object cycle detected when serializing cache key: {Key}. Error: {Message}", key, ex.Message);
+            }
+            else
+            {
+                _logger.LogError(ex, "Error setting cache key: {Key}", key);
+            }
         }
     }
 
@@ -127,7 +146,14 @@ public class HybridCacheService : ICacheService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error removing cache key: {Key}", key);
+            if (ex.GetType().Name == "RedisConnectionException")
+            {
+                _logger.LogWarning("Redis connection failed for REMOVE. Key: {Key}", key);
+            }
+            else
+            {
+                _logger.LogError(ex, "Error removing cache key: {Key}", key);
+            }
         }
     }
 

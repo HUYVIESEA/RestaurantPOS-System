@@ -32,16 +32,16 @@ const TableList: React.FC = () => {
                 loadTables();
             };
 
-            connection.on('TableUpdated', handleTableUpdate);
-            connection.on('OrderCreated', handleTableUpdate);
-            connection.on('OrderUpdated', handleTableUpdate);
-            connection.on('OrderCompleted', handleTableUpdate);
+            connection.on('tableupdated', handleTableUpdate);
+            connection.on('ordercreated', handleTableUpdate);
+            connection.on('orderupdated', handleTableUpdate);
+            connection.on('ordercompleted', handleTableUpdate);
 
             return () => {
-                connection.off('TableUpdated', handleTableUpdate);
-                connection.off('OrderCreated', handleTableUpdate);
-                connection.off('OrderUpdated', handleTableUpdate);
-                connection.off('OrderCompleted', handleTableUpdate);
+                connection.off('tableupdated', handleTableUpdate);
+                connection.off('ordercreated', handleTableUpdate);
+                connection.off('orderupdated', handleTableUpdate);
+                connection.off('ordercompleted', handleTableUpdate);
             };
         }
     }, [connection, isConnected]);

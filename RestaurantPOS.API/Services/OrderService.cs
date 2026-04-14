@@ -12,7 +12,7 @@ namespace RestaurantPOS.API.Services
     public class OrderService : IOrderService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IHubContext<RestaurantHub> _hubContext;
+        private readonly IHubContext<RestaurantHub, IRestaurantClient> _hubContext;
         private readonly IFirebaseService _firebaseService;
         private readonly ILogger<OrderService> _logger;
         private readonly ICacheService _cache;
@@ -25,7 +25,7 @@ namespace RestaurantPOS.API.Services
 
         public OrderService(
             ApplicationDbContext context, 
-            IHubContext<RestaurantHub> hubContext, 
+            IHubContext<RestaurantHub, IRestaurantClient> hubContext, 
             IFirebaseService firebaseService, 
             ILogger<OrderService> logger,
             ICacheService cache)
@@ -221,29 +221,32 @@ namespace RestaurantPOS.API.Services
             await InvalidateOrderCacheAsync(order.Id, order.TableId);
             
             // Broadcast new order via SignalR
-            await _hubContext.Clients.All.SendAsync("OrderCreated", order.Id);
-            await _hubContext.Clients.All.SendAsync("TableUpdated");
+            await _hubContext.Clients.All.OrderCreated(order.Id);
+            await _hubContext.Clients.All.TableUpdated();
 
-            // ✅ Send Firebase Notification to Kitchen
-            try 
+            // ✅ Send Firebase Notification to Kitchen (Fire and Forget)
+            _ = Task.Run(async () =>
             {
-                string title = $"New Order #{order.Id}";
-                string body = order.TableId.HasValue ? $"Table {order.TableId}" : "Takeaway";
-                if (order.OrderItems != null && order.OrderItems.Any())
+                try 
                 {
-                    body += $" - {order.OrderItems.Count} items";
+                    string title = $"New Order #{order.Id}";
+                    string body = order.TableId.HasValue ? $"Table {order.TableId}" : "Takeaway";
+                    if (order.OrderItems != null && order.OrderItems.Any())
+                    {
+                        body += $" - {order.OrderItems.Count} items";
+                    }
+                    
+                    await _firebaseService.SendTopicNotificationAsync(title, body, "Kitchen", new Dictionary<string, string>
+                    {
+                        { "orderId", order.Id.ToString() },
+                        { "type", "new_order" }
+                    });
                 }
-                
-                await _firebaseService.SendTopicNotificationAsync(title, body, "Kitchen", new Dictionary<string, string>
+                catch (Exception ex)
                 {
-                    { "orderId", order.Id.ToString() },
-                    { "type", "new_order" }
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send Firebase notification for new order");
-            }
+                    _logger.LogError(ex, "Failed to send Firebase notification for new order");
+                }
+            });
             
             // Reload order with includes to return complete data
             return await GetOrderByIdAsync(order.Id) ?? order;
@@ -303,35 +306,38 @@ namespace RestaurantPOS.API.Services
             await _context.SaveChangesAsync();
             
             // Broadcast update via SignalR
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", order.Id);
-            await _hubContext.Clients.All.SendAsync("TableUpdated");
+            await _hubContext.Clients.All.OrderUpdated(order.Id);
+            await _hubContext.Clients.All.TableUpdated();
 
-            // ✅ Send Firebase Notification for Status Change
+            // ✅ Send Firebase Notification for Status Change (Fire and Forget)
             if (oldStatus != status)
             {
-                try
+                _ = Task.Run(async () =>
                 {
-                    string topic = "Waiters"; // Default to waiters
-                    string title = $"Order #{order.Id} Updated";
-                    string body = $"Status changed to {status}";
-                    
-                    if (status == "Ready") // Assuming we might add this status later
+                    try
                     {
-                        title = $"Order #{order.Id} Ready";
-                        body = $"Table {order.TableId} is ready to serve";
-                    }
+                        string topic = "Waiters"; // Default to waiters
+                        string title = $"Order #{order.Id} Updated";
+                        string body = $"Status changed to {status}";
+                        
+                        if (status == "Ready") // Assuming we might add this status later
+                        {
+                            title = $"Order #{order.Id} Ready";
+                            body = $"Table {order.TableId} is ready to serve";
+                        }
 
-                    await _firebaseService.SendTopicNotificationAsync(title, body, topic, new Dictionary<string, string>
+                        await _firebaseService.SendTopicNotificationAsync(title, body, topic, new Dictionary<string, string>
+                        {
+                            { "orderId", order.Id.ToString() },
+                            { "type", "order_update" },
+                            { "status", status }
+                        });
+                    }
+                    catch (Exception ex)
                     {
-                        { "orderId", order.Id.ToString() },
-                        { "type", "order_update" },
-                        { "status", status }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to send Firebase notification for order update");
-                }
+                        _logger.LogError(ex, "Failed to send Firebase notification for order update");
+                    }
+                });
             }
             
             return order;
@@ -505,8 +511,8 @@ namespace RestaurantPOS.API.Services
         // Invalidate caches
         await InvalidateOrderCacheAsync(order.Id, order.TableId);
         
-        await _hubContext.Clients.All.SendAsync("OrderUpdated", orderId);
-        await _hubContext.Clients.All.SendAsync("TableUpdated");
+        await _hubContext.Clients.All.OrderUpdated(orderId);
+        await _hubContext.Clients.All.TableUpdated();
         return await GetOrderByIdAsync(orderId);
     }
 
@@ -648,8 +654,8 @@ namespace RestaurantPOS.API.Services
             await _context.SaveChangesAsync();
 
             // Broadcast completion
-            await _hubContext.Clients.All.SendAsync("OrderCompleted", order.Id);
-            await _hubContext.Clients.All.SendAsync("TableUpdated");
+            await _hubContext.Clients.All.OrderCompleted(order.Id);
+            await _hubContext.Clients.All.TableUpdated();
 
             return await GetOrderByIdAsync(orderId);
         }

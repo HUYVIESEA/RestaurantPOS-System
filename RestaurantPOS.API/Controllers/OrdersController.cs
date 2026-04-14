@@ -13,9 +13,9 @@ namespace RestaurantPOS.API.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        private readonly IHubContext<RestaurantHub> _hubContext;
+        private readonly IHubContext<RestaurantHub, IRestaurantClient> _hubContext;
 
-        public OrdersController(IOrderService orderService, IHubContext<RestaurantHub> hubContext)
+        public OrdersController(IOrderService orderService, IHubContext<RestaurantHub, IRestaurantClient> hubContext)
         {
     _orderService = orderService;
             _hubContext = hubContext;
@@ -59,7 +59,7 @@ namespace RestaurantPOS.API.Controllers
      var createdOrder = await _orderService.CreateOrderAsync(order);
             
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderCreated", createdOrder.Id);
+            await _hubContext.Clients.All.OrderCreated(createdOrder.Id);
             
         return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.Id }, createdOrder);
         }
@@ -76,7 +76,7 @@ namespace RestaurantPOS.API.Controllers
     }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
+            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
        return NoContent();
         }
@@ -93,7 +93,7 @@ namespace RestaurantPOS.API.Controllers
     }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
+            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
   return Ok(updatedOrder);
         }
@@ -110,7 +110,7 @@ namespace RestaurantPOS.API.Controllers
        }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
+            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
    return Ok(updatedOrder);
         }
@@ -127,7 +127,7 @@ namespace RestaurantPOS.API.Controllers
         }
 
         // ✅ Broadcast to all clients
-        await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
+        await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
         return Ok(updatedOrder);
     }
@@ -144,7 +144,7 @@ namespace RestaurantPOS.API.Controllers
        }
 
             // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", updatedOrder.Id);
+            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
    return Ok(updatedOrder);
         }
@@ -161,7 +161,7 @@ namespace RestaurantPOS.API.Controllers
         }
 
         // ✅ Broadcast to all clients (send orderId for consistency)
-        await _hubContext.Clients.All.SendAsync("OrderCompleted", completedOrder.Id);
+        await _hubContext.Clients.All.OrderCompleted(completedOrder.Id);
 
         return Ok(completedOrder);
     }

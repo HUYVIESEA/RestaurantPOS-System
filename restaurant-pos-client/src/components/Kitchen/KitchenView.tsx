@@ -39,26 +39,55 @@ const KitchenView: React.FC = () => {
     useEffect(() => {
         if (!connection) return;
 
-        connection.on('OrderCreated', (newOrder: Order) => {
-           // Play sound?
-           const kOrder = mapToKitchenOrder(newOrder);
-           setKitchenOrders(prev => [kOrder, ...prev]);
-           showToast(`Đơn mới từ ${kOrder.tableNumber}`, 'info');
-        });
+        const handleOrderCreated = async (orderId: number) => {
+            // We only receive the ID from the strongly-typed hub, so fetch the details
+            try {
+                const newOrder = await orderService.getById(orderId);
+                const kOrder = mapToKitchenOrder(newOrder);
+                setKitchenOrders(prev => {
+                    if (prev.some(o => o.id === orderId)) return prev;
+                    return [...prev, kOrder].sort((a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime());
+                });
+                showToast(`Đơn mới từ ${kOrder.tableNumber}`, 'info');
+            } catch (err) {
+                console.error("Failed to fetch new order details", err);
+            }
+        };
 
-        // If an order status changes elsewhere (e.g. Cancelled)
-        connection.on('OrderUpdated', (updatedOrder: Order) => {
-             if (updatedOrder.status !== 'Pending' && updatedOrder.status !== 'Prepared') {
-                 // Remove from kitchen view if completed/cancelled
-                 setKitchenOrders(prev => prev.filter(o => o.id !== updatedOrder.id));
-             }
+        const handleOrderUpdated = async (orderId: number) => {
+            try {
+                const updatedOrder = await orderService.getById(orderId);
+                if (updatedOrder.status !== 'Pending' && updatedOrder.status !== 'Processing') {
+                    // Remove if no longer relevant to kitchen
+                    setKitchenOrders(prev => prev.filter(o => o.id !== orderId));
+                } else {
+                    const kOrder = mapToKitchenOrder(updatedOrder);
+                    setKitchenOrders(prev => {
+                        const exists = prev.some(o => o.id === orderId);
+                        if (exists) {
+                            return prev.map(o => o.id === orderId ? kOrder : o);
+                        } else {
+                            return [...prev, kOrder].sort((a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime());
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch updated order details", err);
+            }
+        };
+
+        connection.on('ordercreated', handleOrderCreated);
+        connection.on('orderupdated', handleOrderUpdated);
+        connection.on('ordercompleted', (orderId: number) => {
+            setKitchenOrders(prev => prev.filter(o => o.id !== orderId));
         });
 
         return () => {
-            connection.off('OrderCreated');
-            connection.off('OrderUpdated');
+            connection.off('ordercreated', handleOrderCreated);
+            connection.off('orderupdated', handleOrderUpdated);
+            connection.off('ordercompleted');
         }
-    }, [connection]);
+    }, [connection, showToast]);
 
     const fetchPendingOrders = async () => {
         try {

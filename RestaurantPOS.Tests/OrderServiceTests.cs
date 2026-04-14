@@ -18,7 +18,7 @@ namespace RestaurantPOS.Tests
     public class OrderServiceTests
     {
         private readonly ApplicationDbContext _context;
-        private readonly Mock<IHubContext<RestaurantHub>> _mockHubContext;
+        private readonly Mock<IHubContext<RestaurantHub, IRestaurantClient>> _mockHubContext;
         private readonly Mock<IFirebaseService> _mockFirebaseService;
         private readonly Mock<ILogger<OrderService>> _mockLogger;
         private readonly Mock<ICacheService> _mockCache;
@@ -31,9 +31,9 @@ namespace RestaurantPOS.Tests
                 .Options;
             _context = new ApplicationDbContext(options);
 
-            _mockHubContext = new Mock<IHubContext<RestaurantHub>>();
-            var mockClients = new Mock<IHubClients>();
-            var mockClientProxy = new Mock<IClientProxy>();
+            _mockHubContext = new Mock<IHubContext<RestaurantHub, IRestaurantClient>>();
+            var mockClients = new Mock<IHubClients<IRestaurantClient>>();
+            var mockClientProxy = new Mock<IRestaurantClient>();
             mockClients.Setup(c => c.All).Returns(mockClientProxy.Object);
             _mockHubContext.Setup(c => c.Clients).Returns(mockClients.Object);
 

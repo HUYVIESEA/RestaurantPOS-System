@@ -124,11 +124,11 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <SignalRProvider>
-              <ShiftProvider>
-                <ToastProvider>
+              <ToastProvider>
+                <ShiftProvider>
                   <AppContent />
-                </ToastProvider>
-              </ShiftProvider>
+                </ShiftProvider>
+              </ToastProvider>
             </SignalRProvider>
           </NotificationProvider>
         </AuthProvider>

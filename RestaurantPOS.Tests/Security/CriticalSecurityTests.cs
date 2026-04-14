@@ -180,8 +180,8 @@ namespace RestaurantPOS.Tests.Security
                 .Options;
             using var context = new ApplicationDbContext(options);
 
-            var mockHubContext = new Mock<IHubContext<RestaurantHub>>();
-            mockHubContext.Setup(h => h.Clients.All).Returns(Mock.Of<IClientProxy>());
+            var mockHubContext = new Mock<IHubContext<RestaurantHub, IRestaurantClient>>();
+            mockHubContext.Setup(h => h.Clients.All).Returns(Mock.Of<IRestaurantClient>());
 
             var mockFirebaseService = new Mock<IFirebaseService>();
             var mockLogger = new Mock<ILogger<OrderService>>();

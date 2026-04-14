@@ -18,7 +18,6 @@ const getHubUrl = () => {
   // Check for explicit env variable first
   const envUrl = import.meta.env.VITE_SIGNALR_HUB_URL;
   if (envUrl) {
-    console.log('🔌 SignalR Hub URL (from env):', envUrl);
     return envUrl;
   }
 
@@ -39,6 +38,7 @@ export const SignalRProvider: React.FC<{ children: ReactNode }> = ({ children })
         // If you have authentication, you might need to pass the token here
         // accessTokenFactory: () => localStorage.getItem('token') || ''
       })
+      .configureLogging(signalR.LogLevel.Warning)
       .withAutomaticReconnect()
       .build();
 
@@ -50,14 +50,12 @@ export const SignalRProvider: React.FC<{ children: ReactNode }> = ({ children })
       connection
         .start()
         .then(() => {
-          console.log('SignalR Connected');
           setIsConnected(true);
         })
         .catch((err) => console.error('SignalR Connection Error: ', err));
 
       connection.onclose(() => {
         setIsConnected(false);
-        console.log('SignalR Disconnected');
       });
 
       return () => {

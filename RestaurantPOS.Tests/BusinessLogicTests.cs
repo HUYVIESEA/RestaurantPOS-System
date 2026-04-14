@@ -27,8 +27,8 @@ namespace RestaurantPOS.Tests
                 .Options;
             _context = new ApplicationDbContext(options);
 
-            var mockHub = new Mock<IHubContext<RestaurantHub>>();
-            mockHub.Setup(h => h.Clients.All).Returns(Mock.Of<IClientProxy>());
+            var mockHub = new Mock<IHubContext<RestaurantHub, IRestaurantClient>>();
+            mockHub.Setup(h => h.Clients.All).Returns(Mock.Of<IRestaurantClient>());
             
             _orderService = new OrderService(
                 _context, 

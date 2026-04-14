@@ -44,16 +44,16 @@ const Dashboard: React.FC = () => {
         fetchDashboardData();
       };
 
-      connection.on('OrderCreated', handleOrderUpdate);
-      connection.on('OrderUpdated', handleOrderUpdate);
-      connection.on('OrderCompleted', handleOrderUpdate);
-      connection.on('TableUpdated', handleOrderUpdate);
+      connection.on('ordercreated', handleOrderUpdate);
+      connection.on('orderupdated', handleOrderUpdate);
+      connection.on('ordercompleted', handleOrderUpdate);
+      connection.on('tableupdated', handleOrderUpdate);
 
       return () => {
-        connection.off('OrderCreated', handleOrderUpdate);
-        connection.off('OrderUpdated', handleOrderUpdate);
-        connection.off('OrderCompleted', handleOrderUpdate);
-        connection.off('TableUpdated', handleOrderUpdate);
+        connection.off('ordercreated', handleOrderUpdate);
+        connection.off('orderupdated', handleOrderUpdate);
+        connection.off('ordercompleted', handleOrderUpdate);
+        connection.off('tableupdated', handleOrderUpdate);
       };
     }
   }, [connection, isConnected]);

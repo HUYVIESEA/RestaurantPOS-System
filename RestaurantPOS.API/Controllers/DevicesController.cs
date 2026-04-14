@@ -11,9 +11,9 @@ namespace RestaurantPOS.API.Controllers;
 public class DevicesController : ControllerBase
 {
     private readonly IDeviceService _deviceService;
-    private readonly IHubContext<RestaurantHub> _hubContext;
+    private readonly IHubContext<RestaurantHub, IRestaurantClient> _hubContext;
 
-    public DevicesController(IDeviceService deviceService, IHubContext<RestaurantHub> hubContext)
+    public DevicesController(IDeviceService deviceService, IHubContext<RestaurantHub, IRestaurantClient> hubContext)
     {
         _deviceService = deviceService;
         _hubContext = hubContext;
@@ -45,7 +45,7 @@ public class DevicesController : ControllerBase
             return BadRequest("Device Identifier is required.");
 
         var result = await _deviceService.RequestConnectionAsync(device);
-        await _hubContext.Clients.All.SendAsync("DevicesUpdated");
+        await _hubContext.Clients.All.DevicesUpdated();
         return CreatedAtAction(nameof(GetDevices), new { id = result.Id }, result);
     }
 
@@ -55,7 +55,7 @@ public class DevicesController : ControllerBase
         try
         {
             var result = await _deviceService.LinkInternetAsync(request.Device, request.StoreCode);
-            await _hubContext.Clients.All.SendAsync("DevicesUpdated");
+            await _hubContext.Clients.All.DevicesUpdated();
             return Ok(result);
         }
         catch (InvalidOperationException ex)
@@ -70,7 +70,7 @@ public class DevicesController : ControllerBase
         try
         {
             var result = await _deviceService.ApproveDeviceAsync(id);
-            await _hubContext.Clients.All.SendAsync("DevicesUpdated");
+            await _hubContext.Clients.All.DevicesUpdated();
             return Ok(result);
         }
         catch (KeyNotFoundException)
@@ -85,7 +85,7 @@ public class DevicesController : ControllerBase
         var result = await _deviceService.RejectDeviceAsync(id);
         if (!result) return NotFound();
 
-        await _hubContext.Clients.All.SendAsync("DevicesUpdated");
+        await _hubContext.Clients.All.DevicesUpdated();
         return Ok();
     }
 
@@ -95,7 +95,7 @@ public class DevicesController : ControllerBase
         var result = await _deviceService.RevokeDeviceAsync(id);
         if (!result) return NotFound();
 
-        await _hubContext.Clients.All.SendAsync("DevicesUpdated");
+        await _hubContext.Clients.All.DevicesUpdated();
         return NoContent();
     }
 }

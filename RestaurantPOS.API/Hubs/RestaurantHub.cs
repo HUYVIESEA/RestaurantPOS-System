@@ -1,24 +1,23 @@
 using Microsoft.AspNetCore.SignalR;
+using System.Threading.Tasks;
 
 namespace RestaurantPOS.API.Hubs
 {
-    public class RestaurantHub : Hub
+    public class RestaurantHub : Hub<IRestaurantClient>
     {
-        // Example method for clients to call if needed
         public async Task SendMessage(string user, string message)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            await Clients.All.ReceiveMessage(user, message);
         }
 
-        // We can add more specific groups here later, e.g., "Kitchen", "Waiters"
-        public async Task JoinGroup(string groupName)
+        public async Task JoinRoleGroup(string roleName)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+            await Groups.AddToGroupAsync(Context.ConnectionId, roleName);
         }
 
-        public async Task LeaveGroup(string groupName)
+        public async Task LeaveRoleGroup(string roleName)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roleName);
         }
     }
 }

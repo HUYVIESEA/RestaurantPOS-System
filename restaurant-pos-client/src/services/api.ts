@@ -41,19 +41,22 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', {
-      message: error.message,
-      code: error.code,
-      config: {
-        url: error.config?.url,
-        baseURL: error.config?.baseURL,
-        method: error.config?.method
-      },
-      response: {
-        status: error.response?.status,
-        data: error.response?.data
-      }
-    });
+    // Suppress console.error for expected 404s (like checking for an active shift)
+    if (error.response?.status !== 404) {
+      console.error('API Error:', {
+        message: error.message,
+        code: error.code,
+        config: {
+          url: error.config?.url,
+          baseURL: error.config?.baseURL,
+          method: error.config?.method
+        },
+        response: {
+          status: error.response?.status,
+          data: error.response?.data
+        }
+      });
+    }
 
     if (error.response?.status === 401) {
       localStorage.removeItem('token');

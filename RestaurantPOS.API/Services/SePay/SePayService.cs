@@ -12,9 +12,9 @@ namespace RestaurantPOS.API.Services.SePay
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<SePayService> _logger;
-        private readonly IHubContext<RestaurantHub> _hubContext;
+        private readonly IHubContext<RestaurantHub, IRestaurantClient> _hubContext;
 
-        public SePayService(ApplicationDbContext context, ILogger<SePayService> logger, IHubContext<RestaurantHub> hubContext)
+        public SePayService(ApplicationDbContext context, ILogger<SePayService> logger, IHubContext<RestaurantHub, IRestaurantClient> hubContext)
         {
             _context = context;
             _logger = logger;
@@ -120,7 +120,7 @@ namespace RestaurantPOS.API.Services.SePay
             await _context.SaveChangesAsync();
             
             _logger.LogInformation($"Successfully processed payment for Order {matchedOrder.Id}. Amount: {model.TransferAmount}");
-            await _hubContext.Clients.All.SendAsync("OrderUpdated", matchedOrder.Id);
+            await _hubContext.Clients.All.OrderUpdated(matchedOrder.Id);
         }
     }
 }
