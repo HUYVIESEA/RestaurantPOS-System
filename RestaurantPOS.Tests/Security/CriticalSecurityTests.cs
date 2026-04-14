@@ -183,10 +183,9 @@ namespace RestaurantPOS.Tests.Security
             var mockHubContext = new Mock<IHubContext<RestaurantHub, IRestaurantClient>>();
             mockHubContext.Setup(h => h.Clients.All).Returns(Mock.Of<IRestaurantClient>());
 
-            var mockFirebaseService = new Mock<IFirebaseService>();
             var mockLogger = new Mock<ILogger<OrderService>>();
             var mockCache = new Mock<ICacheService>();
-            var orderService = new OrderService(context, mockHubContext.Object, mockFirebaseService.Object, mockLogger.Object, mockCache.Object);
+            var orderService = new OrderService(context, mockHubContext.Object, mockLogger.Object, mockCache.Object);
 
             // Arrange: Add a product to DB (service fetches price from DB)
             var product = new Product { Id = 1, Name = "Pho", Price = 50000 };

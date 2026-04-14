@@ -19,7 +19,7 @@ namespace RestaurantPOS.Tests
     {
         private readonly ApplicationDbContext _context;
         private readonly Mock<IHubContext<RestaurantHub, IRestaurantClient>> _mockHubContext;
-        private readonly Mock<IFirebaseService> _mockFirebaseService;
+        
         private readonly Mock<ILogger<OrderService>> _mockLogger;
         private readonly Mock<ICacheService> _mockCache;
         private readonly OrderService _orderService;
@@ -37,11 +37,11 @@ namespace RestaurantPOS.Tests
             mockClients.Setup(c => c.All).Returns(mockClientProxy.Object);
             _mockHubContext.Setup(c => c.Clients).Returns(mockClients.Object);
 
-            _mockFirebaseService = new Mock<IFirebaseService>();
+            
             _mockLogger = new Mock<ILogger<OrderService>>();
             _mockCache = new Mock<ICacheService>();
 
-            _orderService = new OrderService(_context, _mockHubContext.Object, _mockFirebaseService.Object, _mockLogger.Object, _mockCache.Object);
+            _orderService = new OrderService(_context, _mockHubContext.Object, _mockLogger.Object, _mockCache.Object);
         }
 
         [Fact]

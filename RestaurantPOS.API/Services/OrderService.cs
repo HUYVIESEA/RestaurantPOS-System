@@ -13,7 +13,6 @@ namespace RestaurantPOS.API.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<RestaurantHub, IRestaurantClient> _hubContext;
-        private readonly IFirebaseService _firebaseService;
         private readonly ILogger<OrderService> _logger;
         private readonly ICacheService _cache;
         
@@ -26,13 +25,11 @@ namespace RestaurantPOS.API.Services
         public OrderService(
             ApplicationDbContext context, 
             IHubContext<RestaurantHub, IRestaurantClient> hubContext, 
-            IFirebaseService firebaseService, 
             ILogger<OrderService> logger,
             ICacheService cache)
         {
             _context = context;
             _hubContext = hubContext;
-            _firebaseService = firebaseService;
             _logger = logger;
             _cache = cache;
         }
@@ -224,30 +221,6 @@ namespace RestaurantPOS.API.Services
             await _hubContext.Clients.All.OrderCreated(order.Id);
             await _hubContext.Clients.All.TableUpdated();
 
-            // ✅ Send Firebase Notification to Kitchen (Fire and Forget)
-            _ = Task.Run(async () =>
-            {
-                try 
-                {
-                    string title = $"New Order #{order.Id}";
-                    string body = order.TableId.HasValue ? $"Table {order.TableId}" : "Takeaway";
-                    if (order.OrderItems != null && order.OrderItems.Any())
-                    {
-                        body += $" - {order.OrderItems.Count} items";
-                    }
-                    
-                    await _firebaseService.SendTopicNotificationAsync(title, body, "Kitchen", new Dictionary<string, string>
-                    {
-                        { "orderId", order.Id.ToString() },
-                        { "type", "new_order" }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to send Firebase notification for new order");
-                }
-            });
-            
             // Reload order with includes to return complete data
             return await GetOrderByIdAsync(order.Id) ?? order;
         }
@@ -309,37 +282,6 @@ namespace RestaurantPOS.API.Services
             await _hubContext.Clients.All.OrderUpdated(order.Id);
             await _hubContext.Clients.All.TableUpdated();
 
-            // ✅ Send Firebase Notification for Status Change (Fire and Forget)
-            if (oldStatus != status)
-            {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        string topic = "Waiters"; // Default to waiters
-                        string title = $"Order #{order.Id} Updated";
-                        string body = $"Status changed to {status}";
-                        
-                        if (status == "Ready") // Assuming we might add this status later
-                        {
-                            title = $"Order #{order.Id} Ready";
-                            body = $"Table {order.TableId} is ready to serve";
-                        }
-
-                        await _firebaseService.SendTopicNotificationAsync(title, body, topic, new Dictionary<string, string>
-                        {
-                            { "orderId", order.Id.ToString() },
-                            { "type", "order_update" },
-                            { "status", status }
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to send Firebase notification for order update");
-                    }
-                });
-            }
-            
             return order;
         }
 

@@ -33,7 +33,6 @@ namespace RestaurantPOS.Tests
             _orderService = new OrderService(
                 _context, 
                 mockHub.Object, 
-                new Mock<IFirebaseService>().Object, 
                 new Mock<ILogger<OrderService>>().Object,
                 new Mock<ICacheService>().Object
             );
