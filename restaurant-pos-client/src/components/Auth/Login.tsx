@@ -31,21 +31,23 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 animate-fade-in-up">
-        <div className="text-center">
+    <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+      <div className="max-w-md w-full bg-white dark:bg-slate-800 p-8 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-700 animate-fade-in-up">
+        
+        {/* Header & Logo */}
+        <div className="text-center mb-8">
           <img 
             src="/restaurant.png" 
             alt="Smart Order POS" 
-            className="mx-auto h-16 w-auto object-contain mb-2"
+            className="mx-auto h-20 w-auto object-contain mb-6 drop-shadow-sm"
           />
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Smart Order POS</h1>
-          <h2 className="mt-4 text-2xl font-semibold text-gray-800 dark:text-gray-100">Đăng nhập</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Nhập thông tin để truy cập hệ thống</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Chào mừng trở lại</h2>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Đăng nhập vào hệ thống Smart Order POS</p>
         </div>
 
+        {/* Error Message */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-md animate-shake">
+          <div className="mb-6 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg animate-shake">
             <div className="flex items-center">
               <i className="fas fa-exclamation-circle text-red-500 mr-3"></i>
               <p className="text-sm text-red-700 dark:text-red-300 font-medium">{error}</p>
@@ -53,10 +55,12 @@ const Login: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-5">
+            {/* Username Input */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Tên đăng nhập
               </label>
               <input
@@ -65,49 +69,48 @@ const Login: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Nhập tên đăng nhập"
-                className="appearance-none block w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white transition-colors"
+                className="block w-full px-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm bg-white dark:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-500"
                 required
                 autoFocus
               />
             </div>
 
+            {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Mật khẩu
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Mật khẩu
+                </label>
+                <Link to="/forgot-password" className="text-sm font-medium text-orange-600 hover:text-orange-500 dark:text-orange-400 transition-colors">
+                  Quên mật khẩu?
+                </Link>
+              </div>
               <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Nhập mật khẩu"
-                className="appearance-none block w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white transition-colors"
+                placeholder="••••••••"
+                className="block w-full px-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm bg-white dark:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-500"
                 required
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end">
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                Quên mật khẩu?
-              </Link>
-            </div>
-          </div>
-
-          <div>
+          {/* Submit Button */}
+          <div className="pt-2">
             <button
               type="submit"
               disabled={loading}
-              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${
-                loading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-md'
+              className={`w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors ${
+                loading ? 'opacity-70 cursor-not-allowed' : 'shadow-sm hover:shadow-md'
               }`}
             >
               {loading ? (
-                <>
-                  <i className="fas fa-circle-notch fa-spin mr-2"></i>
-                  Đang đăng nhập...
-                </>
+                <span className="flex items-center gap-2">
+                  <i className="fas fa-circle-notch fa-spin"></i>
+                  Đang xử lý...
+                </span>
               ) : (
                 'Đăng nhập'
               )}
@@ -115,23 +118,14 @@ const Login: React.FC = () => {
           </div>
         </form>
 
-        <div className="mt-6 text-center space-y-4 border-t border-gray-100 dark:border-slate-700 pt-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 text-center">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Chưa có tài khoản?{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+            <Link to="/register" className="font-semibold text-orange-600 hover:text-orange-500 dark:text-orange-400 transition-colors">
               Đăng ký ngay
             </Link>
           </p>
-          
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-blue-800/30">
-            <p className="font-semibold mb-2 flex items-center justify-center gap-2">
-              <i className="fas fa-info-circle"></i> Tài khoản demo:
-            </p>
-            <div className="flex flex-col gap-1 items-center font-mono">
-              <p>Username: <span className="bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-700">admin</span></p>
-              <p>Password: <span className="bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-700">Admin@123</span></p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
