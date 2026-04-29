@@ -7,7 +7,7 @@ const ThemeToggle: React.FC = () => {
 
   return (
     <button 
-      className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600"
+      className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:focus:ring-offset-slate-900 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600"
       onClick={toggleTheme}
       title={`Chuyển sang chế độ ${isDark ? 'sáng' : 'tối'}`}
       aria-pressed={isDark}
@@ -28,7 +28,7 @@ const ThemeToggle: React.FC = () => {
         }`}
       >
         <i className={`fas text-[10px] ${
-          isDark ? 'fa-moon text-blue-600' : 'fa-sun text-yellow-500'
+          isDark ? 'fa-moon text-blue-700' : 'fa-sun text-yellow-500'
         }`}></i>
       </span>
     </button>

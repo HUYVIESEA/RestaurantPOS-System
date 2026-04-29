@@ -140,7 +140,7 @@ const KitchenView: React.FC = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-900">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-orange-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
             </div>
         );
     }
@@ -148,11 +148,11 @@ const KitchenView: React.FC = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-6 font-sans text-slate-800 dark:text-slate-100">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
-                <h1 className="text-2xl md:text-3xl font-extrabold flex items-center gap-4 text-orange-600 dark:text-orange-500 tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-extrabold flex items-center gap-4 text-blue-700 dark:text-blue-600 tracking-tight">
                     <i className="fas fa-fire text-3xl"></i> KITCHEN DISPLAY
                 </h1>
                 <div className="flex items-center">
-                    <span className="px-5 py-2.5 bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 font-bold rounded-full shadow-sm text-lg border border-orange-200 dark:border-orange-800">
+                    <span className="px-5 py-2.5 bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-300 font-bold rounded-full shadow-sm text-lg border border-blue-200 dark:border-blue-900">
                         {kitchenOrders.length} Đang chờ
                     </span>
                 </div>
@@ -176,7 +176,7 @@ const KitchenView: React.FC = () => {
                                 <div className="flex flex-col">
                                     <span className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                         {order.tableNumber}
-                                        {order.isTakeaway && <i className="fas fa-shopping-bag text-blue-500 text-base"></i>}
+                                        {order.isTakeaway && <i className="fas fa-shopping-bag text-blue-600 text-base"></i>}
                                     </span>
                                     <span className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
                                         Đơn #{order.id}

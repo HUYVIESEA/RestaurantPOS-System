@@ -259,7 +259,7 @@ const OrderForm: React.FC = () => {
           <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full mx-4 border border-slate-100 dark:border-slate-700" onClick={e => e.stopPropagation()}>
             <div className="flex justify-center gap-2 mb-6">
               {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="w-2 h-8 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }}></div>
+                <div key={i} className="w-2 h-8 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }}></div>
               ))}
             </div>
             <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">{activePersona} đang nghe...</h3>
@@ -284,7 +284,7 @@ const OrderForm: React.FC = () => {
               type="button" 
               className={`flex items-center gap-2 px-4 py-2 font-semibold rounded-xl transition-all shadow-sm ${
                 isListening 
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 animate-pulse ring-2 ring-blue-400' 
+                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-500 animate-pulse ring-2 ring-blue-500' 
                 : 'bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
               }`}
               onClick={toggleListening}
@@ -322,7 +322,7 @@ const OrderForm: React.FC = () => {
               <button
                 className={`min-h-[44px] px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                   selectedCategory === null 
-                  ? 'bg-blue-600 text-white shadow-md' 
+                  ? 'bg-blue-700 text-white shadow-md' 
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
                 }`}
                 onClick={() => setSelectedCategory(null)}
@@ -334,7 +334,7 @@ const OrderForm: React.FC = () => {
                   key={cat.id}
                   className={`min-h-[44px] px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                     selectedCategory === cat.id 
-                    ? 'bg-blue-600 text-white shadow-md' 
+                    ? 'bg-blue-700 text-white shadow-md' 
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
                   }`}
                   onClick={() => setSelectedCategory(cat.id)}
@@ -355,7 +355,7 @@ const OrderForm: React.FC = () => {
                     className={`group relative flex flex-col justify-between bg-white dark:bg-slate-700 rounded-2xl p-4 border border-slate-100 dark:border-slate-600 transition-all ${
                       isOutOfStock 
                       ? 'opacity-60 cursor-not-allowed grayscale-[0.5]' 
-                      : 'cursor-pointer hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-500/30'
+                      : 'cursor-pointer hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-600/30'
                     }`}
                     onClick={() => !isOutOfStock && addToCart(product)}
                   >
@@ -370,7 +370,7 @@ const OrderForm: React.FC = () => {
                     )}
                     <div className="flex flex-col flex-grow">
                       <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1 line-clamp-2">{product.name}</h4>
-                      <p className="text-blue-600 dark:text-blue-400 font-bold mb-3">{product.price.toLocaleString('vi-VN')} đ</p>
+                      <p className="text-blue-700 dark:text-blue-500 font-bold mb-3">{product.price.toLocaleString('vi-VN')} đ</p>
                       <div className="mt-auto flex items-center justify-between">
                         {isUnlimited ? (
                           <span className="text-xs font-semibold px-2 py-1 rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">∞ Vô hạn</span>
@@ -382,7 +382,7 @@ const OrderForm: React.FC = () => {
                       </div>
                     </div>
                     {!isOutOfStock && (
-                      <button className="absolute top-2 right-2 w-11 h-11 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 rounded-full shadow-md flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-50 dark:hover:bg-slate-700">
+                      <button className="absolute top-2 right-2 w-11 h-11 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-500 rounded-full shadow-md flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-50 dark:hover:bg-slate-700">
                         +
                       </button>
                     )}
@@ -405,13 +405,13 @@ const OrderForm: React.FC = () => {
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Bàn {!isTakeaway && '*'}</label>
                 {isTakeaway ? (
-                  <div className="w-full px-4 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-xl font-medium flex items-center gap-2 border border-blue-100 dark:border-blue-800/30">
+                  <div className="w-full px-4 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-500 rounded-xl font-medium flex items-center gap-2 border border-blue-100 dark:border-blue-900/30">
                     <i className="fas fa-shopping-bag"></i> 
                     {selectedTable ? 'Đã chọn bàn Mang Về' : 'Mang về (Không cần bàn)'}
                   </div>
                 ) : (
                   <select
-                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
                     value={selectedTable || ''}
                     onChange={(e) => setSelectedTable(Number(e.target.value))}
                     required
@@ -435,7 +435,7 @@ const OrderForm: React.FC = () => {
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Tên khách hàng</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Tùy chọn"
@@ -447,7 +447,7 @@ const OrderForm: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-800/50 min-h-[300px] lg:min-h-0">
               <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-4 flex items-center justify-between">
                 Giỏ hàng
-                <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 py-1 px-3 rounded-full text-xs">{cart.length} món</span>
+                <span className="bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-500 py-1 px-3 rounded-full text-xs">{cart.length} món</span>
               </h3>
               
               {cart.length === 0 ? (
@@ -470,7 +470,7 @@ const OrderForm: React.FC = () => {
                         </button>
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-blue-600 dark:text-blue-400 font-bold text-sm">{(item.product.price * item.quantity).toLocaleString('vi-VN')} đ</p>
+                        <p className="text-blue-700 dark:text-blue-500 font-bold text-sm">{(item.product.price * item.quantity).toLocaleString('vi-VN')} đ</p>
                         <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600/50">
                           <button
                             type="button"
@@ -500,7 +500,7 @@ const OrderForm: React.FC = () => {
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Ghi chú</label>
                 <textarea
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500 resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500 resize-none"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Ghi chú cho đơn hàng..."
@@ -511,7 +511,7 @@ const OrderForm: React.FC = () => {
               {/* Total */}
               <div className="flex items-center justify-between mb-6 pt-4 border-t border-dashed border-slate-200 dark:border-slate-600">
                 <span className="text-slate-600 dark:text-slate-400 font-medium uppercase tracking-wide">Tổng cộng</span>
-                <strong className="text-2xl text-blue-600 dark:text-blue-400 font-black">{calculateTotal().toLocaleString('vi-VN')} đ</strong>
+                <strong className="text-2xl text-blue-700 dark:text-blue-500 font-black">{calculateTotal().toLocaleString('vi-VN')} đ</strong>
               </div>
 
               {/* Submit */}
@@ -520,7 +520,7 @@ const OrderForm: React.FC = () => {
                 className={`w-full py-4 px-6 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg ${
                   loading || cart.length === 0 || (!selectedTable && !isTakeaway)
                     ? 'bg-slate-200 text-slate-400 cursor-not-allowed dark:bg-slate-700/50 dark:text-slate-500 shadow-none border border-slate-300 dark:border-slate-600'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-500/25 active:scale-[0.98]'
+                    : 'bg-blue-700 text-white hover:bg-blue-800 hover:shadow-blue-600/25 active:scale-[0.98]'
                 }`}
                 disabled={loading || cart.length === 0 || (!selectedTable && !isTakeaway)}
               >

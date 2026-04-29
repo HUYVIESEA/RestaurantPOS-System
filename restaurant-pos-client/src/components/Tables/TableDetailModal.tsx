@@ -62,7 +62,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-500">
                             <i className="fas fa-chair text-xl"></i>
                         </div>
                         <div>
@@ -96,7 +96,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                                 {orders.map((order) => {
                                     const statusInfo = getStatusInfo(order.status);
                                     return (
-                                        <div key={order.id} className="flex flex-col sm:flex-row gap-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors shadow-sm hover:shadow">
+                                        <div key={order.id} className="flex flex-col sm:flex-row gap-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 hover:border-blue-300 dark:hover:border-blue-600/50 transition-colors shadow-sm hover:shadow">
                                             <div 
                                                 className="flex-1 cursor-pointer"
                                                 onClick={() => {
@@ -127,7 +127,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                                                     )}
                                                 </div>
                                                 
-                                                <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                                <div className="text-lg font-bold text-blue-700 dark:text-blue-500">
                                                     {formatCurrency(order.totalAmount)}
                                                 </div>
                                             </div>
@@ -164,7 +164,7 @@ const TableDetailModal: React.FC<TableDetailModalProps> = ({
                 {/* Footer */}
                 <div className="p-5 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
                     <button 
-                        className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-xl shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
                         onClick={() => {
                             onClose();
                             onCreateOrder();

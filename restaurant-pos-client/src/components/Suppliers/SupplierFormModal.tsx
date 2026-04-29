@@ -76,7 +76,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl my-8 overflow-hidden border border-slate-200 dark:border-slate-700" onClick={e => e.stopPropagation()}>
                 <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                     <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                        <i className={`fas fa-${supplier ? 'edit text-blue-500' : 'plus-circle text-emerald-500'}`}></i>
+                        <i className={`fas fa-${supplier ? 'edit text-blue-600' : 'plus-circle text-blue-600'}`}></i>
                         {supplier ? 'Chỉnh sửa nhà cung cấp' : 'Thêm nhà cung cấp mới'}
                     </h2>
                     <button className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" onClick={onCancel}>
@@ -97,7 +97,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="VD: Công ty TNHH ABC"
-                                className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.name ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500 focus:border-transparent'}`}
+                                className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.name ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600 focus:border-transparent'}`}
                             />
                             {errors.name && <span className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><i className="fas fa-exclamation-circle"></i> {errors.name}</span>}
                         </div>
@@ -112,7 +112,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                     value={formData.contactPerson}
                                     onChange={handleChange}
                                     placeholder="VD: Nguyễn Văn A"
-                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all"
+                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent dark:text-white transition-all"
                                 />
                             </div>
                             <div>
@@ -124,7 +124,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                     value={formData.phone}
                                     onChange={handleChange}
                                     placeholder="VD: 0901234567"
-                                    className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.phone ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500 focus:border-transparent'}`}
+                                    className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.phone ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600 focus:border-transparent'}`}
                                 />
                                 {errors.phone && <span className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><i className="fas fa-exclamation-circle"></i> {errors.phone}</span>}
                             </div>
@@ -139,7 +139,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 value={formData.email}
                                 onChange={handleChange}
                                 placeholder="VD: contact@abc.com"
-                                className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.email ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500 focus:border-transparent'}`}
+                                className={`w-full bg-slate-50 dark:bg-slate-900 border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 transition-all dark:text-white ${errors.email ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500 dark:border-red-800' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600 focus:border-transparent'}`}
                             />
                             {errors.email && <span className="text-sm text-red-500 mt-1.5 flex items-center gap-1"><i className="fas fa-exclamation-circle"></i> {errors.email}</span>}
                         </div>
@@ -153,7 +153,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 value={formData.address}
                                 onChange={handleChange}
                                 placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM"
-                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent dark:text-white transition-all"
                             />
                         </div>
 
@@ -166,7 +166,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                 onChange={handleChange}
                                 placeholder="Ghi chú thêm về nhà cung cấp..."
                                 rows={3}
-                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all resize-none"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent dark:text-white transition-all resize-none"
                             />
                         </div>
 
@@ -178,7 +178,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                                         name="isActive"
                                         checked={formData.isActive}
                                         onChange={handleChange}
-                                        className="w-5 h-5 appearance-none border-2 border-slate-300 dark:border-slate-500 rounded-md checked:bg-blue-600 checked:border-transparent outline-none transition-colors cursor-pointer group-hover:border-blue-400"
+                                        className="w-5 h-5 appearance-none border-2 border-slate-300 dark:border-slate-500 rounded-md checked:bg-blue-700 checked:border-transparent outline-none transition-colors cursor-pointer group-hover:border-blue-500"
                                     />
                                     {formData.isActive && (
                                         <i className="fas fa-check text-white text-xs absolute pointer-events-none"></i>
@@ -193,7 +193,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({ supplier, onSubmit, onCance
                         <button type="button" className="px-5 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" onClick={onCancel}>
                             Hủy bỏ
                         </button>
-                        <button type="submit" className="px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2">
+                        <button type="submit" className="px-5 py-2.5 rounded-xl font-medium bg-blue-700 text-white hover:bg-blue-800 transition-colors shadow-sm flex items-center gap-2">
                             <i className="fas fa-save"></i>
                             {supplier ? 'Cập nhật' : 'Thêm mới'}
                         </button>

@@ -118,7 +118,7 @@ const UserProfile: React.FC = () => {
     <div className="p-6 w-full space-y-6">
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
         {/* Banner/Header background */}
-        <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+        <div className="h-32 bg-blue-600"></div>
         
         <div className="px-8 pb-8 relative">
           <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6 -mt-16 mb-6">
@@ -129,7 +129,7 @@ const UserProfile: React.FC = () => {
               <div className="text-center md:text-left mt-2 md:mt-16">
                 <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{formData.fullName}</h2>
                 <p className="text-lg text-slate-500 dark:text-slate-400 mb-2">@{formData.username}</p>
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border ${formData.role === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400'}`}>
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border ${formData.role === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-900 dark:text-blue-500'}`}>
                   <i className={`fas ${formData.role === 'Admin' ? 'fa-crown' : 'fa-user'}`}></i>
                   {formData.role}
                 </span>
@@ -139,7 +139,7 @@ const UserProfile: React.FC = () => {
             {!isEditing ? (
               <div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0">
                 <button 
-                  className="flex-1 md:flex-none px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
+                  className="flex-1 md:flex-none px-4 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
                   onClick={() => setIsEditing(true)}
                 >
                   <i className="fas fa-pen-to-square"></i> Chỉnh sửa
@@ -157,7 +157,7 @@ const UserProfile: React.FC = () => {
           <form onSubmit={handleSubmit} className="mt-8">
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-700 pb-3 flex items-center gap-2">
-                <i className="fas fa-user text-indigo-500"></i> Thông tin cá nhân
+                <i className="fas fa-user text-blue-600"></i> Thông tin cá nhân
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -187,7 +187,7 @@ const UserProfile: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.email ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} ${!isEditing ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100'} focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.email ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} ${!isEditing ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100'} focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
                   />
                   {errors.email && <span className="text-sm text-rose-500 mt-1 block">{errors.email}</span>}
                 </div>
@@ -204,7 +204,7 @@ const UserProfile: React.FC = () => {
                     value={formData.fullName}
                     onChange={handleChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.fullName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} ${!isEditing ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100'} focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.fullName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} ${!isEditing ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100'} focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
                   />
                   {errors.fullName && <span className="text-sm text-rose-500 mt-1 block">{errors.fullName}</span>}
                 </div>
@@ -241,7 +241,7 @@ const UserProfile: React.FC = () => {
                     <i className="fas fa-circle-check text-slate-400"></i> Trạng thái
                   </label>
                   <div className="pt-2">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${formData.isActive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${formData.isActive ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-500' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
                       {formData.isActive ? '✅ Hoạt động' : '⛔ Khóa'}
                     </span>
                   </div>
@@ -262,7 +262,7 @@ const UserProfile: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-lg font-medium text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   disabled={saving}
                 >
                   {saving ? (

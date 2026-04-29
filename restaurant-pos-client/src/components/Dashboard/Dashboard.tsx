@@ -93,7 +93,7 @@ const Dashboard: React.FC = () => {
       <div className="w-full p-4 md:p-6 bg-slate-50 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-200 space-y-6">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <i className="fas fa-chart-pie text-indigo-500"></i> Dashboard
+            <i className="fas fa-chart-pie text-blue-600"></i> Dashboard
           </h2>
         </div>
         <SkeletonStats />
@@ -114,20 +114,20 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
         <div>
           <h2 className="text-3xl font-extrabold flex items-center gap-3">
-            <i className="fas fa-chart-pie text-indigo-500"></i> Dashboard
+            <i className="fas fa-chart-pie text-blue-600"></i> Dashboard
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1">Tổng quan hệ thống Restaurant POS</p>
         </div>
         <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold shadow-sm border ${isConnected ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800' : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/30 dark:border-rose-800'}`}>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold shadow-sm border ${isConnected ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:border-blue-900' : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-900/30 dark:border-rose-800'}`}>
             <span className="relative flex h-2.5 w-2.5">
-              {isConnected && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
-              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isConnected ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+              {isConnected && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>}
+              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isConnected ? 'bg-blue-600' : 'bg-rose-500'}`}></span>
             </span>
             {isConnected ? 'LIVE' : 'DISCONNECTED'}
           </div>
           <button 
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md transition-colors font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md transition-colors font-medium"
             onClick={fetchDashboardData}
           >
             <i className="fas fa-rotate"></i> Làm mới
@@ -141,7 +141,7 @@ const Dashboard: React.FC = () => {
         {/* Products Stat */}
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col relative overflow-hidden">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center text-xl">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-500 rounded-xl flex items-center justify-center text-xl">
               <i className="fas fa-hamburger"></i>
             </div>
             <div className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg flex items-center gap-1">
@@ -158,7 +158,7 @@ const Dashboard: React.FC = () => {
         {/* Orders Stat */}
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col relative overflow-hidden">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center text-xl">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-500 rounded-xl flex items-center justify-center text-xl">
               <i className="fas fa-shopping-basket"></i>
             </div>
             <div className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg flex items-center gap-1">
@@ -189,7 +189,7 @@ const Dashboard: React.FC = () => {
         {/* Tables Stat */}
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col relative overflow-hidden">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-xl flex items-center justify-center text-xl">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-500 rounded-xl flex items-center justify-center text-xl">
               <i className="fas fa-couch"></i>
             </div>
           </div>
@@ -243,10 +243,10 @@ const Dashboard: React.FC = () => {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
-            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
+            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
             onClick={() => navigate('/tables')}
           >
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-2xl mr-4">🍽️</div>
+            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-2xl mr-4">🍽️</div>
             <div>
               <span className="block font-bold text-lg text-slate-800 dark:text-slate-100">Đặt món</span>
               <span className="block text-sm text-slate-500 dark:text-slate-400">Từ danh sách bàn</span>
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
           </button>
           
           <button 
-            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
+            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
             onClick={() => navigate('/products')}
           >
             <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-2xl mr-4">📦</div>
@@ -265,10 +265,10 @@ const Dashboard: React.FC = () => {
           </button>
           
           <button 
-            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
+            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
             onClick={() => navigate('/orders')}
           >
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-2xl mr-4">📋</div>
+            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-2xl mr-4">📋</div>
             <div>
               <span className="block font-bold text-lg text-slate-800 dark:text-slate-100">Đơn hàng</span>
               <span className="block text-sm text-slate-500 dark:text-slate-400">Xem tất cả</span>
@@ -276,10 +276,10 @@ const Dashboard: React.FC = () => {
           </button>
           
           <button 
-            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
+            className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
             onClick={() => navigate('/analytics')}
           >
-            <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-2xl mr-4">📊</div>
+            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-2xl mr-4">📊</div>
             <div>
               <span className="block font-bold text-lg text-slate-800 dark:text-slate-100">Báo cáo</span>
               <span className="block text-sm text-slate-500 dark:text-slate-400">Phân tích dữ liệu</span>

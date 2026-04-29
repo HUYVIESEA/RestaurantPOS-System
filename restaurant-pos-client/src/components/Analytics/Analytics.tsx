@@ -97,7 +97,7 @@ const Analytics: React.FC = () => {
       return (
         <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700">
           <p className="font-medium text-slate-600 dark:text-slate-300 mb-1">{label}</p>
-          <p className="font-bold text-blue-600 dark:text-blue-400">
+          <p className="font-bold text-blue-700 dark:text-blue-500">
             {formatCurrency(payload[0].value)}
           </p>
         </div>
@@ -125,7 +125,7 @@ const Analytics: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold"><i className="fas fa-chart-area mr-2 text-indigo-500"></i> Phân tích nâng cao</h2>
+          <h2 className="text-2xl font-bold"><i className="fas fa-chart-area mr-2 text-blue-600"></i> Phân tích nâng cao</h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1">Thông tin chi tiết về hoạt động kinh doanh (Enterprise Dashboard)</p>
         </div>
         <div className="flex items-center gap-3">
@@ -146,7 +146,7 @@ const Analytics: React.FC = () => {
           <button className="px-4 py-2 bg-slate-800 text-white dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 rounded-xl transition-colors font-medium flex items-center gap-2" onClick={handleExportCSV}>
             <i className="fas fa-file-csv"></i> Xuất CSV
           </button>
-          <button className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl transition-colors font-medium flex items-center gap-2" onClick={fetchAnalytics}>
+          <button className="px-4 py-2 bg-blue-700 text-white hover:bg-blue-800 rounded-xl transition-colors font-medium flex items-center gap-2" onClick={fetchAnalytics}>
             <i className="fas fa-sync-alt"></i> Làm mới
           </button>
         </div>
@@ -155,14 +155,14 @@ const Analytics: React.FC = () => {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
-          <div className="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl shrink-0 z-10">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/10 rounded-full blur-xl"></div>
+          <div className="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-500 flex items-center justify-center text-2xl shrink-0 z-10">
             <i className="fas fa-wallet"></i>
           </div>
           <div className="z-10">
             <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider mb-1">Doanh thu {timeRange === 'week' ? 'tuần' : 'tháng'}</h3>
             <p className="text-3xl font-bold text-slate-800 dark:text-white">{formatCurrency(timeRange === 'week' ? data.weekRevenue : data.monthRevenue)}</p>
-            <div className={`text-sm mt-1 flex items-center gap-1 font-semibold ${data.revenueGrowth >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+            <div className={`text-sm mt-1 flex items-center gap-1 font-semibold ${data.revenueGrowth >= 0 ? 'text-blue-600' : 'text-red-500'}`}>
               <i className={`fas fa-arrow-${data.revenueGrowth >= 0 ? 'up' : 'down'}`}></i>
               {Math.abs(data.revenueGrowth).toFixed(1)}% so với tuần trước
             </div>
@@ -170,8 +170,8 @@ const Analytics: React.FC = () => {
         </div>
 
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
-          <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl shrink-0 z-10">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/10 rounded-full blur-xl"></div>
+          <div className="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-500 flex items-center justify-center text-2xl shrink-0 z-10">
             <i className="fas fa-clipboard-check"></i>
           </div>
           <div className="z-10">
@@ -218,7 +218,7 @@ const Analytics: React.FC = () => {
         {/* Revenue Area Chart */}
         <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 lg:col-span-2">
           <div className="mb-6">
-            <h3 className="text-xl font-bold text-slate-800 dark:text-white"><i className="fas fa-chart-area mr-2 text-indigo-500"></i> Xu hướng doanh thu</h3>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white"><i className="fas fa-chart-area mr-2 text-blue-600"></i> Xu hướng doanh thu</h3>
           </div>
           <div className="h-80 w-full min-h-[320px]">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
@@ -280,13 +280,13 @@ const Analytics: React.FC = () => {
               <div className="space-y-4">
                 {data.topProducts.map((product, index) => (
                   <div key={index} className="flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/50 hover:shadow-md transition-all">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm ${index === 0 ? 'bg-gradient-to-br from-amber-200 to-amber-400 text-amber-900' : index === 1 ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-800' : index === 2 ? 'bg-gradient-to-br from-orange-200 to-orange-400 text-orange-900' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>{index + 1}</div>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm ${index === 0 ? 'bg-blue-200 text-amber-900' : index === 1 ? 'bg-blue-200 text-slate-800' : index === 2 ? 'bg-blue-200 text-blue-900' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>{index + 1}</div>
                     <div className="flex-1">
                       <h4 className="font-bold text-slate-800 dark:text-slate-200">{product.name}</h4>
                       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{product.quantity} phần đã bán</p>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">
+                      <div className="font-bold text-blue-700 dark:text-blue-500 text-lg">
                         {formatCompactPrice(product.revenue)}
                       </div>
                     </div>
@@ -303,13 +303,13 @@ const Analytics: React.FC = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-8 rounded-2xl shadow-lg text-white flex flex-col justify-center relative overflow-hidden">
+        <div className="bg-blue-600 p-8 rounded-2xl shadow-lg text-white flex flex-col justify-center relative overflow-hidden">
           <div className="absolute right-0 top-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
           <div className="absolute left-0 bottom-0 w-48 h-48 bg-black opacity-10 rounded-full blur-2xl transform -translate-x-1/2 translate-y-1/2"></div>
           
           <div className="relative z-10">
             <h3 className="text-2xl font-bold mb-2">Thao tác nhanh</h3>
-            <p className="text-indigo-100 mb-8">Truy cập nhanh các chức năng quản lý cốt lõi</p>
+            <p className="text-blue-100 mb-8">Truy cập nhanh các chức năng quản lý cốt lõi</p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button className="flex items-center gap-4 p-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all backdrop-blur-sm group" onClick={() => navigate('/orders')}>
@@ -318,7 +318,7 @@ const Analytics: React.FC = () => {
                 </div>
                 <div className="text-left">
                   <span className="block font-bold text-lg">Đơn hàng</span>
-                  <span className="block text-sm text-indigo-200">Quản lý hóa đơn</span>
+                  <span className="block text-sm text-blue-200">Quản lý hóa đơn</span>
                 </div>
               </button>
               
@@ -328,7 +328,7 @@ const Analytics: React.FC = () => {
                 </div>
                 <div className="text-left">
                   <span className="block font-bold text-lg">Thực đơn</span>
-                  <span className="block text-sm text-indigo-200">Cập nhật món ăn</span>
+                  <span className="block text-sm text-blue-200">Cập nhật món ăn</span>
                 </div>
               </button>
               
@@ -338,7 +338,7 @@ const Analytics: React.FC = () => {
                 </div>
                 <div className="text-left">
                   <span className="block font-bold text-lg">Sơ đồ bàn</span>
-                  <span className="block text-sm text-indigo-200">Quản lý trạng thái bàn</span>
+                  <span className="block text-sm text-blue-200">Quản lý trạng thái bàn</span>
                 </div>
               </button>
             </div>

@@ -36,10 +36,10 @@ const Navbar: React.FC = () => {
       <aside className="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 border-r border-gray-800 text-white shadow-xl flex flex-col transition-transform duration-300 transform md:translate-x-0 -translate-x-full">
         <div className="h-20 flex items-center px-6 border-b border-gray-800">
           <Link to="/kitchen" className="flex items-center gap-3 group">
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/50 transition-all duration-300">
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500 shadow-lg shadow-blue-600/30 group-hover:shadow-blue-600/50 transition-all duration-300">
               <i className="fas fa-fire-burner text-white text-xl"></i>
             </div>
-            <span className="text-xl font-bold tracking-wider text-orange-500">MÀN BẾP</span>
+            <span className="text-xl font-bold tracking-wider text-blue-600">MÀN BẾP</span>
           </Link>
         </div>
         <div className="flex-1 overflow-y-auto"></div>
@@ -48,10 +48,10 @@ const Navbar: React.FC = () => {
              <ThemeToggle />
           </div>
           <button className="flex items-center gap-3 p-3 w-full rounded-xl hover:bg-gray-800 transition-colors" onClick={() => setShowUserMenu(!showUserMenu)}>
-             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center border-2 border-gray-800 shadow-sm"><i className="fas fa-user text-gray-300"></i></div>
+             <div className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center border-2 border-gray-800 shadow-sm"><i className="fas fa-user text-gray-300"></i></div>
              <div className="flex flex-col items-start text-left flex-1">
                 <span className="text-sm font-semibold text-gray-200 leading-tight truncate">{user?.fullName}</span>
-                <span className="text-xs text-orange-400 flex items-center gap-1"><i className="fas fa-hat-chef mr-1"></i>Đầu bếp</span>
+                <span className="text-xs text-blue-500 flex items-center gap-1"><i className="fas fa-hat-chef mr-1"></i>Đầu bếp</span>
              </div>
              <i className={`fas fa-chevron-up text-xs text-gray-500 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}></i>
           </button>
@@ -87,10 +87,10 @@ const Navbar: React.FC = () => {
       {/* Mobile Header (Top bar only on mobile) */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-800 z-40 flex items-center justify-between px-4 shadow-sm">
         <Link to={isAdmin ? "/" : "/orders"} className="flex items-center gap-2 group">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-red-500 shadow-md">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500 shadow-md">
             <i className="fas fa-concierge-bell text-white text-sm"></i>
           </div>
-          <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-red-500">
+          <span className="text-lg font-bold text-blue-700 dark:text-blue-500">
             Smart POS
           </span>
         </Link>
@@ -119,10 +119,10 @@ const Navbar: React.FC = () => {
         {/* App Logo */}
         <div className="h-16 md:h-20 flex items-center justify-between px-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
           <Link to={isAdmin ? "/" : "/orders"} className="flex items-center gap-3 group" onClick={() => setIsMobileOpen(false)}>
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/50 transition-all duration-300">
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500 shadow-lg shadow-blue-600/30 group-hover:shadow-blue-600/50 transition-all duration-300">
               <i className="fas fa-concierge-bell text-white text-xl"></i>
             </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-400">
+            <span className="text-xl font-bold text-blue-700 dark:text-blue-500">
               Smart Order
             </span>
           </Link>
@@ -144,11 +144,11 @@ const Navbar: React.FC = () => {
                   onClick={() => setIsMobileOpen(false)}
                   className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                     isActive(item.path) 
-                      ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400' 
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-orange-500 dark:hover:text-orange-400'
+                      ? 'bg-blue-50 dark:bg-blue-600/10 text-blue-700 dark:text-blue-500' 
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-blue-600 dark:hover:text-blue-500'
                   }`}
                 >
-                  <div className={`w-8 flex justify-center ${isActive(item.path) ? 'text-orange-500 dark:text-orange-400' : 'text-gray-400 group-hover:text-orange-500 dark:group-hover:text-orange-400'}`}>
+                  <div className={`w-8 flex justify-center ${isActive(item.path) ? 'text-blue-600 dark:text-blue-500' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500'}`}>
                     <i className={`fas ${item.icon} text-lg`}></i>
                   </div>
                   <span>{item.label}</span>
@@ -174,15 +174,15 @@ const Navbar: React.FC = () => {
               className="flex items-center gap-3 p-2 w-full rounded-xl hover:bg-white dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm transition-all"
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-sm shrink-0">
-                <i className="fas fa-user text-orange-500 dark:text-gray-300"></i>
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-sm shrink-0">
+                <i className="fas fa-user text-blue-600 dark:text-gray-300"></i>
               </div>
               <div className="flex flex-col items-start flex-1 overflow-hidden">
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-tight w-full truncate text-left">{user?.fullName || 'User'}</span>
                 <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                   <i className={`fas ${
                     user?.role === ROLES.ADMIN ? 'fa-crown text-yellow-500' : 
-                    user?.role === 'Manager' ? 'fa-user-tie text-blue-500' : 
+                    user?.role === 'Manager' ? 'fa-user-tie text-blue-600' : 
                     'fa-user text-gray-400'
                   } text-[10px]`}></i>
                   {user?.role || 'Guest'}
@@ -201,7 +201,7 @@ const Navbar: React.FC = () => {
                 
                 <Link
                   to="/profile"
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-orange-500 transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-blue-600 transition-colors"
                   onClick={() => setShowUserMenu(false)}
                 >
                   <i className="fas fa-circle-user w-5 text-center text-gray-400"></i>
@@ -209,7 +209,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link
                   to="/change-password"
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-orange-500 transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-blue-600 transition-colors"
                   onClick={() => setShowUserMenu(false)}
                 >
                   <i className="fas fa-key w-5 text-center text-gray-400"></i>

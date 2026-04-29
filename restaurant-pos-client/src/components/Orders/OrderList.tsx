@@ -189,9 +189,9 @@ const OrderList: React.FC = () => {
 
   const getStatusColorClass = (status: string, isTextOnly = false) => {
     switch (status) {
-      case 'Pending': return isTextOnly ? 'text-orange-500' : 'bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400';
+      case 'Pending': return isTextOnly ? 'text-blue-600' : 'bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-500';
       case 'Prepared': return isTextOnly ? 'text-sky-500' : 'bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400';
-      case 'Completed': return isTextOnly ? 'text-emerald-500' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400';
+      case 'Completed': return isTextOnly ? 'text-blue-600' : 'bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-500';
       case 'Cancelled': return isTextOnly ? 'text-red-500' : 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400';
       default: return isTextOnly ? 'text-slate-500' : 'bg-slate-100 text-slate-600 dark:bg-slate-500/20 dark:text-slate-400';
     }
@@ -199,11 +199,11 @@ const OrderList: React.FC = () => {
 
   const getStatusIconColor = (status: string) => {
     switch (status) {
-      case 'Pending': return 'text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10';
+      case 'Pending': return 'text-blue-600 dark:text-blue-500 bg-blue-50 dark:bg-blue-600/10';
       case 'Prepared': return 'text-sky-500 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10';
-      case 'Completed': return 'text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10';
+      case 'Completed': return 'text-blue-600 dark:text-blue-500 bg-blue-50 dark:bg-blue-600/10';
       case 'Cancelled': return 'text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
-      case 'all': return 'text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10';
+      case 'all': return 'text-blue-600 dark:text-blue-500 bg-blue-50 dark:bg-blue-600/10';
       default: return 'text-slate-500 bg-slate-50 dark:bg-slate-500/10';
     }
   };
@@ -215,7 +215,7 @@ const OrderList: React.FC = () => {
       <div 
         className={`rounded-xl p-4 flex items-center gap-4 cursor-pointer border-2 transition-all min-h-[80px] shadow-sm select-none
           ${isActive 
-            ? 'border-indigo-500 bg-indigo-50/30 dark:border-indigo-400 dark:bg-indigo-900/20' 
+            ? 'border-blue-600 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-900/20' 
             : 'border-transparent bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
           }`}
         onClick={() => setStatusFilter(type)}
@@ -236,7 +236,7 @@ const OrderList: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-              <i className="fas fa-clipboard-list text-indigo-500"></i> 
+              <i className="fas fa-clipboard-list text-blue-600"></i> 
               Quản lý Đơn hàng
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1">Theo dõi và cập nhật trạng thái đơn hàng</p>
@@ -247,7 +247,7 @@ const OrderList: React.FC = () => {
                 <button 
                     className={`p-3 rounded-lg min-w-[48px] min-h-[48px] flex items-center justify-center transition-colors focus:outline-none 
                       ${viewMode === 'list' 
-                        ? 'bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                        ? 'bg-slate-100 dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' 
                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
                     onClick={() => setViewMode('list')}
                     title="Dạng danh sách"
@@ -257,7 +257,7 @@ const OrderList: React.FC = () => {
                 <button 
                     className={`p-3 rounded-lg min-w-[48px] min-h-[48px] flex items-center justify-center transition-colors focus:outline-none 
                       ${viewMode === 'grid' 
-                        ? 'bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                        ? 'bg-slate-100 dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' 
                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
                     onClick={() => setViewMode('grid')}
                     title="Dạng lưới"
@@ -306,7 +306,7 @@ const OrderList: React.FC = () => {
                       <td className="p-4 font-mono font-medium text-slate-900 dark:text-slate-100 align-middle">#{order.id}</td>
                       <td className="p-4 align-middle">
                         {order.table ? (
-                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 font-bold whitespace-nowrap">
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-800 dark:bg-blue-600/20 dark:text-blue-300 font-bold whitespace-nowrap">
                             <i className="fas fa-chair text-sm"></i>
                             {order.table.tableNumber}
                           </div>
@@ -341,7 +341,7 @@ const OrderList: React.FC = () => {
                         <div className="flex items-center justify-end gap-2">
                           {(order.status === 'Pending' || order.status === 'Prepared') && (
                             <button 
-                              className="min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+                              className="min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-500 dark:bg-blue-600/10 dark:hover:bg-blue-600/20 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
                               onClick={() => handlePaymentClick(order)}
                               title="Thanh toán ngay"
                             >
@@ -349,7 +349,7 @@ const OrderList: React.FC = () => {
                             </button>
                           )}
                           <button 
-                            className="min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:text-indigo-400 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+                            className="min-w-[44px] min-h-[44px] p-2 rounded-xl flex items-center justify-center text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-500 dark:bg-blue-600/10 dark:hover:bg-blue-600/20 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
                             onClick={() => handleViewDetails(order.id)}
                             title="Xem chi tiết"
                           >
@@ -378,7 +378,7 @@ const OrderList: React.FC = () => {
                     <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                         <span className="font-mono font-bold text-slate-700 dark:text-slate-300">#{order.id}</span>
                         {order.table ? (
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 text-sm font-bold">
+                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 dark:bg-blue-600/20 dark:text-blue-300 text-sm font-bold">
                                 <i className="fas fa-chair text-xs"></i> {order.table.tableNumber}
                             </div>
                         ) : (
@@ -405,7 +405,7 @@ const OrderList: React.FC = () => {
                         
                         <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/50 flex items-end justify-between">
                             <span className="text-slate-500 dark:text-slate-400 text-sm">Tổng cộng:</span>
-                            <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                            <span className="text-xl font-bold text-blue-700 dark:text-blue-500">
                               {formatPrice(order.totalAmount)}
                             </span>
                         </div>
@@ -414,7 +414,7 @@ const OrderList: React.FC = () => {
                     <div className="p-4 bg-slate-50/50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-700 flex items-center gap-3">
                          <div className="flex-1">
                             <select
-                              className={`w-full min-h-[44px] px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium appearance-none cursor-pointer ${getStatusColorClass(order.status)}`}
+                              className={`w-full min-h-[44px] px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium appearance-none cursor-pointer ${getStatusColorClass(order.status)}`}
                               value={order.status}
                               onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
                             >
@@ -428,7 +428,7 @@ const OrderList: React.FC = () => {
                          <div className="flex items-center gap-2">
                             {(order.status === 'Pending' || order.status === 'Prepared') && (
                                 <button 
-                                  className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-emerald-600 bg-emerald-100 hover:bg-emerald-200 dark:text-emerald-400 dark:bg-emerald-500/20 dark:hover:bg-emerald-500/30 transition-colors"
+                                  className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-blue-700 bg-blue-100 hover:bg-blue-200 dark:text-blue-500 dark:bg-blue-600/20 dark:hover:bg-blue-600/30 transition-colors"
                                   onClick={() => handlePaymentClick(order)} 
                                   title="Thanh toán"
                                 >
@@ -436,7 +436,7 @@ const OrderList: React.FC = () => {
                                 </button>
                             )}
                             <button 
-                              className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
+                              className="min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 transition-colors shadow-sm"
                               onClick={() => handleViewDetails(order.id)}
                             >
                                 <i className="fas fa-arrow-right text-lg"></i>
@@ -484,27 +484,27 @@ const OrderList: React.FC = () => {
                 <div className="flex flex-col gap-6">
                     <div className="text-center p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700">
                         <div className="text-slate-500 dark:text-slate-400 mb-2">Đơn hàng #{payingOrder.id}</div>
-                        <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+                        <div className="text-3xl font-black text-blue-700 dark:text-blue-500">
                           {formatPrice(payingOrder.totalAmount)}
                         </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <button 
-                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-700 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all focus:outline-none min-h-[120px]"
+                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-600 hover:bg-blue-50 dark:border-slate-700 dark:hover:border-blue-600 dark:hover:bg-blue-600/10 text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-500 transition-all focus:outline-none min-h-[120px]"
                             onClick={handleCashPayment}
                         >
-                            <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xl">
+                            <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-600/20 flex items-center justify-center text-blue-700 dark:text-blue-500 text-xl">
                               <i className="fas fa-money-bill-wave"></i>
                             </div>
                             <span className="font-bold">Tiền mặt</span>
                         </button>
 
                         <button 
-                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:bg-indigo-50 dark:border-slate-700 dark:hover:border-indigo-500 dark:hover:bg-indigo-500/10 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all focus:outline-none min-h-[120px]"
+                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-600 hover:bg-blue-50 dark:border-slate-700 dark:hover:border-blue-600 dark:hover:bg-blue-600/10 text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-500 transition-all focus:outline-none min-h-[120px]"
                             onClick={() => setShowQR(true)}
                         >
-                            <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl">
+                            <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-600/20 flex items-center justify-center text-blue-700 dark:text-blue-500 text-xl">
                               <i className="fas fa-qrcode"></i>
                             </div>
                             <span className="font-bold">Chuyển khoản</span>

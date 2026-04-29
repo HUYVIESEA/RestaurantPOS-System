@@ -124,7 +124,7 @@ confirmPassword: '',
     <div className="p-6 w-full flex items-center justify-center min-h-[calc(100vh-100px)]">
       <div className="w-full bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400 text-2xl mb-4 shadow-sm">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-500 text-2xl mb-4 shadow-sm">
             <i className="fas fa-key"></i>
           </div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Đổi mật khẩu</h2>
@@ -145,7 +145,7 @@ confirmPassword: '',
                 name="oldPassword"
                 value={formData.oldPassword}
                 onChange={handleChange}
-                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.oldPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.oldPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
                 placeholder="Nhập mật khẩu hiện tại"
               />
               <button
@@ -172,7 +172,7 @@ confirmPassword: '',
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleChange}
-                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.newPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.newPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
                 placeholder="Nhập mật khẩu mới"
               />
               <button
@@ -215,7 +215,7 @@ confirmPassword: '',
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.confirmPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                className={`w-full pl-4 pr-12 py-2.5 rounded-lg border ${errors.confirmPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
                 placeholder="Nhập lại mật khẩu mới"
               />
               <button
@@ -232,23 +232,23 @@ confirmPassword: '',
           {/* Security Tips */}
           <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-100 dark:border-slate-700 mt-6">
             <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
-              <i className="fas fa-shield-alt text-indigo-500"></i> Mẹo bảo mật:
+              <i className="fas fa-shield-alt text-blue-600"></i> Mẹo bảo mật:
             </h4>
             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
               <li className="flex items-start gap-2">
-                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <i className="fas fa-check text-blue-600 mt-0.5"></i>
                 <span>Sử dụng kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt</span>
               </li>
               <li className="flex items-start gap-2">
-                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <i className="fas fa-check text-blue-600 mt-0.5"></i>
                 <span>Tránh sử dụng thông tin cá nhân dễ đoán</span>
               </li>
               <li className="flex items-start gap-2">
-                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <i className="fas fa-check text-blue-600 mt-0.5"></i>
                 <span>Không chia sẻ mật khẩu với người khác</span>
               </li>
               <li className="flex items-start gap-2">
-                <i className="fas fa-check text-emerald-500 mt-0.5"></i>
+                <i className="fas fa-check text-blue-600 mt-0.5"></i>
                 <span>Thay đổi mật khẩu định kỳ</span>
               </li>
             </ul>
@@ -266,7 +266,7 @@ confirmPassword: '',
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2.5 rounded-lg font-medium text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               disabled={loading}
             >
               {loading ? (

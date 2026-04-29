@@ -143,10 +143,10 @@ const SupplierList: React.FC = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold"><i className="fas fa-truck-loading mr-2 text-blue-600 dark:text-blue-400"></i> Quản lý Nhà cung cấp</h1>
+                    <h1 className="text-2xl font-bold"><i className="fas fa-truck-loading mr-2 text-blue-700 dark:text-blue-500"></i> Quản lý Nhà cung cấp</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">Quản lý thông tin các nhà cung cấp nguyên liệu</p>
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm transition-colors flex items-center gap-2" onClick={handleCreate}>
+                <button className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm transition-colors flex items-center gap-2" onClick={handleCreate}>
                     <i className="fas fa-plus-circle"></i>
                     Thêm nhà cung cấp
                 </button>
@@ -155,14 +155,14 @@ const SupplierList: React.FC = () => {
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 text-2xl shrink-0"><i className="fas fa-building"></i></div>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-500 text-2xl shrink-0"><i className="fas fa-building"></i></div>
                     <div>
                         <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Tổng số</span>
                         <span className="block text-2xl font-bold">{stats.total}</span>
                     </div>
                 </div>
                 <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 text-2xl shrink-0"><i className="fas fa-circle-check"></i></div>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-500 text-2xl shrink-0"><i className="fas fa-circle-check"></i></div>
                     <div>
                         <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Đang hoạt động</span>
                         <span className="block text-2xl font-bold">{stats.active}</span>
@@ -184,7 +184,7 @@ const SupplierList: React.FC = () => {
                     <input
                         type="text"
                         placeholder="Tìm kiếm nhà cung cấp..."
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-white transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -266,21 +266,21 @@ const SupplierList: React.FC = () => {
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${supplier.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50' : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}>
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${supplier.isActive ? 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-500 dark:border-blue-900/50' : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}>
                                                 {supplier.isActive ? 'Hoạt động' : 'Ngừng'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-end items-center gap-2">
                                                 <button 
-                                                    className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 transition-colors"
+                                                    className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-500 dark:hover:bg-blue-900/40 transition-colors"
                                                     onClick={() => handleEdit(supplier)}
                                                     title="Chỉnh sửa"
                                                 >
                                                     <i className="fas fa-pen-to-square"></i>
                                                 </button>
                                                 <button 
-                                                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${supplier.isActive ? 'text-amber-600 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/40' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40'}`}
+                                                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${supplier.isActive ? 'text-amber-600 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/40' : 'text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-500 dark:hover:bg-blue-900/40'}`}
                                                     onClick={() => handleToggleStatus(supplier)}
                                                     title={supplier.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'}
                                                 >

@@ -59,7 +59,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ placement = 'bottom
       case 'success': return 'text-green-500 bg-green-50 dark:bg-green-500/10';
       case 'error': return 'text-red-500 bg-red-50 dark:bg-red-500/10';
       case 'warning': return 'text-yellow-500 bg-yellow-50 dark:bg-yellow-500/10';
-      case 'info': return 'text-blue-500 bg-blue-50 dark:bg-blue-500/10';
+      case 'info': return 'text-blue-600 bg-blue-50 dark:bg-blue-600/10';
       default: return 'text-gray-500 bg-gray-50 dark:bg-gray-500/10';
     }
   };
@@ -77,7 +77,7 @@ const getPlacementClasses = () => {
   return (
     <div className="relative" ref={panelRef}>
       <button 
-        className="p-2 text-gray-500 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400 rounded-xl hover:bg-orange-50 dark:hover:bg-gray-800 transition-colors relative group"
+        className="p-2 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors relative group"
         onClick={() => setShowPanel(!showPanel)}
         title="Thông báo"
       >
@@ -93,10 +93,10 @@ const getPlacementClasses = () => {
         <div className={`${getPlacementClasses()} w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-xl shadow-2xl shadow-black/10 dark:shadow-black/50 border border-gray-100 dark:border-slate-700 z-[9999] overflow-hidden`}>
           <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800/80 border-b border-gray-100 dark:border-slate-700">
             <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-              <i className="fas fa-bell text-blue-500"></i> Thông báo
+              <i className="fas fa-bell text-blue-600"></i> Thông báo
               <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} title={isConnected ? 'Đã kết nối' : 'Mất kết nối'}></span>
               {unreadCount > 0 && (
-                <span className="text-xs font-normal text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-normal text-blue-700 dark:text-blue-500 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-full">
                   {unreadCount} mới
                 </span>
               )}
@@ -104,7 +104,7 @@ const getPlacementClasses = () => {
             <div className="flex items-center gap-1">
               {unreadCount > 0 && (
                 <button 
-                  className="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 rounded-md transition-colors" 
+                  className="p-1.5 text-gray-500 hover:text-blue-700 dark:text-gray-400 dark:hover:text-blue-500 rounded-md transition-colors" 
                   onClick={markAllAsRead} 
                   title="Đánh dấu đã đọc"
                 >
@@ -151,7 +151,7 @@ const getPlacementClasses = () => {
                     onClick={() => handleNotificationClick(notification)}
                   >
                     {!notification.read && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 group-hover:h-8 bg-blue-500 rounded-r transition-all duration-300 ease-out"></span>
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 group-hover:h-8 bg-blue-600 rounded-r transition-all duration-300 ease-out"></span>
                     )}
                     
                     <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${getTypeStyles(notification.type)}`}>
@@ -189,7 +189,7 @@ const getPlacementClasses = () => {
           {notifications.length > 0 && (
             <div className="p-2 bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-700 rounded-b-xl">
               <button 
-                className="w-full py-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                className="w-full py-2 text-sm font-medium text-blue-700 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                 onClick={() => setShowPanel(false)}
               >
                 Xem tất cả thông báo

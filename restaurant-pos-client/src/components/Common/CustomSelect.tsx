@@ -62,7 +62,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         <div className={`relative ${className}`} ref={containerRef}>
             {/* Trigger Button */}
             <div 
-                className={`flex items-center justify-between w-full px-4 py-2.5 bg-white dark:bg-gray-800 border rounded-lg cursor-pointer transition-all duration-200 hover:border-orange-500 hover:ring-2 hover:ring-orange-500/20 ${isOpen ? 'border-orange-500 ring-2 ring-orange-500/20 dark:border-orange-500' : 'border-gray-300 dark:border-gray-700'}`} 
+                className={`flex items-center justify-between w-full px-4 py-2.5 bg-white dark:bg-gray-800 border rounded-lg cursor-pointer transition-all duration-200 hover:border-blue-600 hover:ring-2 hover:ring-blue-600/20 ${isOpen ? 'border-blue-600 ring-2 ring-blue-600/20 dark:border-blue-600' : 'border-gray-300 dark:border-gray-700'}`} 
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {getDisplayLabel()}
@@ -75,10 +75,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                     {options.map((option) => (
                         <div 
                             key={option.value} 
-                            className={`flex items-center px-4 py-3 cursor-pointer transition-colors duration-150 gap-3 hover:bg-orange-50 dark:hover:bg-gray-700 ${value === option.value ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-500 font-medium' : 'text-gray-700 dark:text-gray-200'}`}
+                            className={`flex items-center px-4 py-3 cursor-pointer transition-colors duration-150 gap-3 hover:bg-blue-50 dark:hover:bg-gray-700 ${value === option.value ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-600 font-medium' : 'text-gray-700 dark:text-gray-200'}`}
                             onClick={() => handleSelect(option.value)}
                         >
-                            {option.icon && <i className={`${option.icon} ${value === option.value ? 'text-orange-500' : 'text-gray-400 dark:text-gray-500'}`}></i>}
+                            {option.icon && <i className={`${option.icon} ${value === option.value ? 'text-blue-600' : 'text-gray-400 dark:text-gray-500'}`}></i>}
                             {option.label}
                         </div>
                     ))}

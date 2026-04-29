@@ -211,7 +211,7 @@ const UserList: React.FC = () => {
             <p className="text-slate-600 dark:text-slate-300 mb-2">Bạn không có quyền truy cập trang quản lý người dùng.</p>
             <p className="text-slate-600 dark:text-slate-300 mb-6">Chỉ có <strong className="text-slate-800 dark:text-slate-100">Admin</strong> mới có thể quản lý người dùng.</p>
             <button 
-              className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition-colors font-medium shadow-sm w-full" 
+              className="px-4 py-2 bg-blue-700 text-white hover:bg-blue-800 rounded-lg transition-colors font-medium shadow-sm w-full" 
               onClick={() => navigate('/')}
             >
               ← Quay về trang chủ
@@ -229,11 +229,11 @@ const UserList: React.FC = () => {
             <div className="flex flex-wrap gap-3">
                <div className="bg-slate-50 dark:bg-slate-700/50 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-2">
                   <span className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Tổng nhân viên</span>
-                  <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{stats.total}</span>
+                  <span className="text-lg font-bold text-blue-700 dark:text-blue-500">{stats.total}</span>
                </div>
                <div className="bg-slate-50 dark:bg-slate-700/50 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-2">
                   <span className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Đang hoạt động</span>
-                  <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{stats.active}</span>
+                  <span className="text-lg font-bold text-blue-700 dark:text-blue-500">{stats.active}</span>
                </div>
                <div className="bg-slate-50 dark:bg-slate-700/50 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-2">
                   <span className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Admin</span>
@@ -242,7 +242,7 @@ const UserList: React.FC = () => {
             </div>
           </div>
           
-          <button className="whitespace-nowrap px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium shadow-sm flex items-center gap-2" onClick={() => navigate('/users/new')}>
+          <button className="whitespace-nowrap px-4 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg transition-colors font-medium shadow-sm flex items-center gap-2" onClick={() => navigate('/users/new')}>
             <i className="fas fa-user-plus"></i> THÊM NHÂN VIÊN
           </button>
         </div>
@@ -263,7 +263,7 @@ const UserList: React.FC = () => {
                 👑 Admin
               </button>
               <button 
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${roleFilter === 'Staff' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400'}`}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${roleFilter === 'Staff' ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' : 'text-slate-500 hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-500'}`}
                 onClick={() => setRoleFilter('Staff')}
               >
                 👤 Staff
@@ -275,7 +275,7 @@ const UserList: React.FC = () => {
               <input 
                 type="text" 
                 placeholder="Tìm nhân viên..." 
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 placeholder-slate-400"
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 dark:text-slate-200 placeholder-slate-400"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -286,29 +286,29 @@ const UserList: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredUsers.map(user => (
             <div key={user.id} className={`relative bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden transition-all hover:shadow-md ${!user.isActive ? 'opacity-75 grayscale-[0.3]' : ''}`}>
-              <div className={`h-2 w-full ${user.role === 'Admin' ? 'bg-amber-400' : 'bg-blue-400'}`}></div>
+              <div className={`h-2 w-full ${user.role === 'Admin' ? 'bg-amber-400' : 'bg-blue-500'}`}></div>
               <div className="p-5 flex flex-col h-full">
                 <div className="flex items-start gap-4 mb-4">
-                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white shadow-sm ${user.role === 'Admin' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : 'bg-gradient-to-br from-blue-400 to-indigo-500'}`}>
+                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white shadow-sm ${user.role === 'Admin' ? 'bg-blue-500' : 'bg-blue-500'}`}>
                       {user.fullName.charAt(0).toUpperCase()}
                    </div>
                    <div className="flex-1 min-w-0">
                       <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 truncate flex items-center gap-2">
                         {user.fullName}
-                        {user.id === currentUserId && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400">You</span>}
+                        {user.id === currentUserId && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-500">You</span>}
                       </h3>
                       <div className="flex flex-col gap-0.5 mt-1 text-sm">
                         <span className="text-slate-500 dark:text-slate-400 font-medium">@{user.username}</span>
                         <span className="text-slate-400 dark:text-slate-500 truncate" title={user.email}>{user.email}</span>
                       </div>
                    </div>
-                   <div className={`px-2 py-1 rounded text-xs font-semibold border ${user.role === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400'}`}>
+                   <div className={`px-2 py-1 rounded text-xs font-semibold border ${user.role === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-900 dark:text-blue-500'}`}>
                       {user.role === 'Admin' ? '👑 Admin' : '👤 Staff'}
                    </div>
                 </div>
                 
                 <div className="flex justify-between items-center py-3 border-y border-slate-100 dark:border-slate-700 mb-4 text-sm">
-                   <span className={`flex items-center gap-1.5 font-medium ${user.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+                   <span className={`flex items-center gap-1.5 font-medium ${user.isActive ? 'text-blue-700 dark:text-blue-500' : 'text-rose-500 dark:text-rose-400'}`}>
                       <i className={`fas fa-${user.isActive ? 'check-circle' : 'ban'}`}></i>
                       {user.isActive ? 'Đang hoạt động' : 'Đã khóa'}
                    </span>
@@ -327,7 +327,7 @@ const UserList: React.FC = () => {
                   </button>
                   
                   <button 
-                    className="flex-1 py-1.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-indigo-600 dark:text-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 py-1.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-blue-700 dark:text-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleChangeRoleClick(user.id, user.fullName, user.role)}
                     disabled={user.id === currentUserId}
                     title="Đổi vai trò"
@@ -344,7 +344,7 @@ const UserList: React.FC = () => {
                   </button>
                   
                   <button 
-                    className={`flex-1 py-1.5 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${user.isActive ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 dark:text-rose-400' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400'}`}
+                    className={`flex-1 py-1.5 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${user.isActive ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 dark:text-rose-400' : 'bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-500'}`}
                     onClick={() => handleToggleStatusClick(user.id, user.fullName, user.isActive)}
                     disabled={user.id === currentUserId}
                     title={user.isActive ? 'Khóa tài khoản' : 'Kích hoạt tài khoản'}
@@ -376,7 +376,7 @@ const UserList: React.FC = () => {
              <p className="text-slate-500 dark:text-slate-400 mb-6">{searchTerm ? `Không có kết quả cho "${searchTerm}"` : 'Chưa có nhân viên nào trong danh sách'}</p>
              {!searchTerm && (
               <button 
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors" 
+                className="px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-medium transition-colors" 
                 onClick={() => navigate('/users/new')}
               >
                 + Thêm nhân viên mới

@@ -30,7 +30,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       case 'warning':
         return <i className="fas fa-triangle-exclamation text-yellow-500 dark:text-yellow-400"></i>;
       case 'info':
-        return <i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>;
+        return <i className="fas fa-info-circle text-blue-600 dark:text-blue-500"></i>;
       case 'success':
         return <i className="fas fa-circle-check text-green-500 dark:text-green-400"></i>;
       default:
@@ -45,11 +45,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       case 'warning':
         return 'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500';
       case 'info':
-        return 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500';
+        return 'bg-blue-700 hover:bg-blue-800 text-white focus:ring-blue-600';
       case 'success':
         return 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500';
       default:
-        return 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500';
+        return 'bg-blue-700 hover:bg-blue-800 text-white focus:ring-blue-600';
     }
   };
 

@@ -158,7 +158,7 @@ const Reports: React.FC = () => {
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Today Revenue */}
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-5 shadow-lg text-white">
+          <div className="bg-blue-600 rounded-xl p-5 shadow-lg text-white">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-blue-50">Doanh Thu Hôm Nay</h3>
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">💰</div>
@@ -166,7 +166,7 @@ const Reports: React.FC = () => {
             <div className="text-2xl lg:text-3xl font-bold mb-2">{formatPrice(salesSummary.todayRevenue)}</div>
             <div className="text-sm font-medium">
               {salesSummary.todayRevenue >= salesSummary.yesterdayRevenue ? (
-                <span className="text-emerald-300 bg-emerald-900/30 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                <span className="text-blue-300 bg-blue-900/30 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
                   <i className="fas fa-arrow-up text-xs"></i> {formatPrice(salesSummary.todayRevenue - salesSummary.yesterdayRevenue)}
                 </span>
               ) : (
@@ -182,7 +182,7 @@ const Reports: React.FC = () => {
           <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-slate-500 dark:text-slate-400">Doanh Thu Tuần Này</h3>
-              <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center text-xl">📅</div>
+              <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl">📅</div>
             </div>
             <div className="text-2xl font-bold text-slate-800 dark:text-white mb-2">{formatPrice(salesSummary.weekRevenue)}</div>
             <div className="text-sm text-slate-500 dark:text-slate-400">{salesSummary.weekOrders} đơn hàng</div>
@@ -221,7 +221,7 @@ const Reports: React.FC = () => {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-4 shrink-0 ${
                     index === 0 ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
                     index === 1 ? 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300' :
-                    index === 2 ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
+                    index === 2 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-500' :
                     'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                   }`}>
                     #{index + 1}
@@ -253,7 +253,7 @@ const Reports: React.FC = () => {
                   </div>
                   <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-blue-500 rounded-full transition-all duration-500 group-hover:bg-blue-600" 
+                      className="h-full bg-blue-600 rounded-full transition-all duration-500 group-hover:bg-blue-700" 
                       style={{ width: `${category.revenuePercentage}%` }}
                     />
                   </div>
@@ -286,7 +286,7 @@ const Reports: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
             <h3 className="text-slate-500 dark:text-slate-400 font-medium mb-1">Tổng Doanh Thu</h3>
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatPrice(revenueReport.totalRevenue)}</div>
+            <div className="text-2xl font-bold text-blue-700 dark:text-blue-500">{formatPrice(revenueReport.totalRevenue)}</div>
           </div>
           <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
             <h3 className="text-slate-500 dark:text-slate-400 font-medium mb-1">Tổng Đơn Hàng</h3>
@@ -294,14 +294,14 @@ const Reports: React.FC = () => {
           </div>
           <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
             <h3 className="text-slate-500 dark:text-slate-400 font-medium mb-1">Giá Trị Trung Bình</h3>
-            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatPrice(revenueReport.averageOrderValue)}</div>
+            <div className="text-2xl font-bold text-blue-700 dark:text-blue-500">{formatPrice(revenueReport.averageOrderValue)}</div>
           </div>
         </div>
 
         {/* Revenue Chart */}
         <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
           <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-            <i className="fas fa-chart-simple text-blue-500"></i>
+            <i className="fas fa-chart-simple text-blue-600"></i>
             Biểu Đồ Doanh Thu Theo Ngày
           </h3>
           <RevenueChart data={chartData} />
@@ -323,7 +323,7 @@ const Reports: React.FC = () => {
                   <tr key={day.date} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                     <td className="p-3 text-slate-800 dark:text-slate-200">{new Date(day.date).toLocaleDateString('vi-VN')}</td>
                     <td className="p-3 text-slate-800 dark:text-slate-200 text-center">{day.orderCount}</td>
-                    <td className="p-3 text-right font-semibold text-blue-600 dark:text-blue-400">{formatPrice(day.revenue)}</td>
+                    <td className="p-3 text-right font-semibold text-blue-700 dark:text-blue-500">{formatPrice(day.revenue)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -376,7 +376,7 @@ const Reports: React.FC = () => {
                       <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                         index === 0 ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
                         index === 1 ? 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300' :
-                        index === 2 ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
+                        index === 2 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-500' :
                         'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                       }`}>
                         {index + 1}
@@ -385,7 +385,7 @@ const Reports: React.FC = () => {
                     <td className="p-3 font-medium text-slate-800 dark:text-slate-200">{product.productName}</td>
                     <td className="p-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell text-sm">{product.categoryName}</td>
                     <td className="p-3 text-center font-semibold text-slate-800 dark:text-slate-200">{product.totalQuantitySold}</td>
-                    <td className="p-3 text-right font-bold text-emerald-600 dark:text-emerald-400">{formatPrice(product.totalRevenue)}</td>
+                    <td className="p-3 text-right font-bold text-blue-700 dark:text-blue-500">{formatPrice(product.totalRevenue)}</td>
                     <td className="p-3 text-right text-slate-600 dark:text-slate-400 hidden md:table-cell text-sm">{formatPrice(product.averagePrice)}</td>
                     <td className="p-3 text-center text-slate-600 dark:text-slate-400 hidden lg:table-cell text-sm">{product.orderCount}</td>
                   </tr>
@@ -405,15 +405,15 @@ const Reports: React.FC = () => {
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
-            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center text-xl mx-auto mb-2">📦</div>
+            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl mx-auto mb-2">📦</div>
             <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Tổng Đơn Hàng</h3>
             <div className="text-2xl font-bold text-slate-800 dark:text-white">{orderStats.totalOrders}</div>
           </div>
           <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
-            <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center text-xl mx-auto mb-2">✅</div>
+            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl mx-auto mb-2">✅</div>
             <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Hoàn Thành</h3>
-            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{orderStats.completedOrders}</div>
-            <div className="text-xs font-medium text-emerald-500 mt-1">{orderStats.completionRate.toFixed(1)}%</div>
+            <div className="text-2xl font-bold text-blue-700 dark:text-blue-500">{orderStats.completedOrders}</div>
+            <div className="text-xs font-medium text-blue-600 mt-1">{orderStats.completionRate.toFixed(1)}%</div>
           </div>
           <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
             <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center text-xl mx-auto mb-2">⏳</div>
@@ -436,7 +436,7 @@ const Reports: React.FC = () => {
         {/* Order Status Chart */}
         <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
           <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-            <i className="fas fa-chart-pie text-emerald-500"></i>
+            <i className="fas fa-chart-pie text-blue-600"></i>
             Phân Bổ Trạng Thái Đơn Hàng
           </h3>
           <OrderStatusChart 
@@ -470,11 +470,11 @@ const Reports: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500 dark:text-slate-400">Doanh thu:</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatPrice(table.totalRevenue)}</span>
+                  <span className="font-bold text-blue-700 dark:text-blue-500">{formatPrice(table.totalRevenue)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500 dark:text-slate-400">Giá trị TB:</span>
-                  <span className="font-semibold text-blue-600 dark:text-blue-400">{formatPrice(table.averageOrderValue)}</span>
+                  <span className="font-semibold text-blue-700 dark:text-blue-500">{formatPrice(table.averageOrderValue)}</span>
                 </div>
               </div>
             </div>
@@ -504,7 +504,7 @@ const Reports: React.FC = () => {
           <button onClick={() => handleExport('PDF')} className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50 rounded-lg font-medium transition-colors text-sm">
             <i className="fas fa-file-invoice"></i> Xuất PDF
           </button>
-          <button onClick={() => handleExport('Excel')} className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 rounded-lg font-medium transition-colors text-sm">
+          <button onClick={() => handleExport('Excel')} className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-500 dark:hover:bg-blue-900/50 rounded-lg font-medium transition-colors text-sm">
             <i className="fas fa-file-excel"></i> Xuất Excel
           </button>
         </div>
@@ -512,31 +512,31 @@ const Reports: React.FC = () => {
 
       <div className="flex flex-wrap gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
         <button
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'summary' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'summary' ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           onClick={() => setActiveTab('summary')}
         >
           <i className="fas fa-chart-pie"></i> <span className="hidden sm:inline">Tổng Quan</span>
         </button>
         <button
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'revenue' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'revenue' ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           onClick={() => setActiveTab('revenue')}
         >
           <i className="fas fa-money-bill-wave"></i> <span className="hidden sm:inline">Doanh Thu</span>
         </button>
         <button
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'products' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'products' ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           onClick={() => setActiveTab('products')}
         >
           <i className="fas fa-shopping-bag"></i> <span className="hidden sm:inline">thực đơn</span>
         </button>
         <button
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'orders' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'orders' ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           onClick={() => setActiveTab('orders')}
         >
           <i className="fas fa-receipt"></i> <span className="hidden sm:inline">Đơn Hàng</span>
         </button>
         <button
-          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'tables' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+          className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'tables' ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
           onClick={() => setActiveTab('tables')}
         >
           <i className="fas fa-table"></i> <span className="hidden sm:inline">Bàn</span>
@@ -551,7 +551,7 @@ const Reports: React.FC = () => {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="flex-1 sm:flex-none px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-800 dark:text-white"
+              className="flex-1 sm:flex-none px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white"
             />
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -560,7 +560,7 @@ const Reports: React.FC = () => {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="flex-1 sm:flex-none px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-800 dark:text-white"
+              className="flex-1 sm:flex-none px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-white"
             />
           </div>
         </div>

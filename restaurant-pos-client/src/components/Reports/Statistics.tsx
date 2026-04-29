@@ -9,7 +9,7 @@ const Statistics: React.FC = () => {
     <div className="bg-slate-50 dark:bg-slate-900 min-h-screen p-4 md:p-8 space-y-6">
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3 mb-2">
-          <i className="fas fa-chart-simple text-blue-500"></i> Thống kê & Báo cáo
+          <i className="fas fa-chart-simple text-blue-600"></i> Thống kê & Báo cáo
         </h1>
         <p className="text-slate-500 dark:text-slate-400">Theo dõi hiệu quả kinh doanh và xuất báo cáo chi tiết</p>
       </div>
@@ -18,7 +18,7 @@ const Statistics: React.FC = () => {
         <button 
           className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
             activeTab === 'analytics' 
-              ? 'bg-blue-500 text-white shadow-md' 
+              ? 'bg-blue-600 text-white shadow-md' 
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50'
           }`}
           onClick={() => setActiveTab('analytics')}
@@ -28,7 +28,7 @@ const Statistics: React.FC = () => {
         <button 
           className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
             activeTab === 'reports' 
-              ? 'bg-blue-500 text-white shadow-md' 
+              ? 'bg-blue-600 text-white shadow-md' 
               : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50'
           }`}
           onClick={() => setActiveTab('reports')}

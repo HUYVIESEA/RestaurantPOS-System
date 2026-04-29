@@ -18,8 +18,8 @@ const ReturnTableDialog: React.FC<ReturnTableDialogProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
-        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 border-b border-blue-100 dark:border-blue-800">
-          <h3 className="text-lg font-bold text-blue-800 dark:text-blue-300 m-0">💰 Trả bàn {tableName}</h3>
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 border-b border-blue-100 dark:border-blue-900">
+          <h3 className="text-lg font-bold text-blue-900 dark:text-blue-300 m-0">💰 Trả bàn {tableName}</h3>
         </div>
 
         <div className="p-6 space-y-6">
@@ -35,7 +35,7 @@ const ReturnTableDialog: React.FC<ReturnTableDialogProps> = ({
             </div>
             <div className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-600 mt-3 text-lg font-bold text-gray-700 dark:text-gray-300">
               <span>Tổng tiền:</span>
-              <strong className="text-blue-600 dark:text-blue-400">{totalAmount.toLocaleString('vi-VN')} đ</strong>
+              <strong className="text-blue-700 dark:text-blue-500">{totalAmount.toLocaleString('vi-VN')} đ</strong>
             </div>
           </div>
 
@@ -62,7 +62,7 @@ const ReturnTableDialog: React.FC<ReturnTableDialogProps> = ({
             Chỉ trả bàn
           </button>
           <button 
-            className="py-3 px-4 rounded-xl font-semibold transition-colors flex-1 text-center touch-manipulation bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20"
+            className="py-3 px-4 rounded-xl font-semibold transition-colors flex-1 text-center touch-manipulation bg-blue-700 hover:bg-blue-800 text-white shadow-md shadow-blue-600/20"
             onClick={() => onConfirm(true)}
           >
             ✅ Hoàn thành & Trả bàn

@@ -69,7 +69,7 @@ const Login: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Nhập tên đăng nhập"
-                className="block w-full px-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm bg-white dark:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-500"
+                className="block w-full px-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 sm:text-sm bg-white dark:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-500"
                 required
                 autoFocus
               />
@@ -81,7 +81,7 @@ const Login: React.FC = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Mật khẩu
                 </label>
-                <Link to="/forgot-password" className="text-sm font-medium text-orange-600 hover:text-orange-500 dark:text-orange-400 transition-colors">
+                <Link to="/forgot-password" className="text-sm font-medium text-blue-700 hover:text-blue-600 dark:text-blue-500 transition-colors">
                   Quên mật khẩu?
                 </Link>
               </div>
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="block w-full px-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 sm:text-sm bg-white dark:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-500"
+                className="block w-full px-4 py-3.5 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 sm:text-sm bg-white dark:bg-slate-700/50 transition-all hover:border-slate-300 dark:hover:border-slate-500"
                 required
               />
             </div>
@@ -102,7 +102,7 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors ${
+              className={`w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors ${
                 loading ? 'opacity-70 cursor-not-allowed' : 'shadow-sm hover:shadow-md'
               }`}
             >
@@ -122,7 +122,7 @@ const Login: React.FC = () => {
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 text-center">
           <p className="text-sm text-slate-600 dark:text-slate-400">
             Chưa có tài khoản?{' '}
-            <Link to="/register" className="font-semibold text-orange-600 hover:text-orange-500 dark:text-orange-400 transition-colors">
+            <Link to="/register" className="font-semibold text-blue-700 hover:text-blue-600 dark:text-blue-500 transition-colors">
               Đăng ký ngay
             </Link>
           </p>

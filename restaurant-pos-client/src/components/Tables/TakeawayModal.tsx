@@ -64,7 +64,7 @@ const TakeawayModal: React.FC<TakeawayModalProps> = ({
       >
         <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-white dark:bg-slate-800 z-10">
           <div className="flex items-center gap-3">
-            <i className="fas fa-shopping-bag text-blue-600 dark:text-blue-400 text-2xl"></i>
+            <i className="fas fa-shopping-bag text-blue-700 dark:text-blue-500 text-2xl"></i>
             <h3 className="text-gray-900 dark:text-white text-lg sm:text-xl font-bold m-0">
               Đơn hàng Mang về đang phục vụ
             </h3>
@@ -91,13 +91,13 @@ const TakeawayModal: React.FC<TakeawayModalProps> = ({
                 {orders.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl cursor-pointer transition-all border-2 border-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-500 dark:hover:border-blue-400 hover:translate-x-1"
+                    className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl cursor-pointer transition-all border-2 border-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-600 dark:hover:border-blue-500 hover:translate-x-1"
                     onClick={() => {
                       onClose();
                       onSelectOrder(order);
                     }}
                   >
-                    <div className="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-sm">
+                    <div className="w-12 h-12 bg-blue-700 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-sm">
                       <i className="fas fa-receipt"></i>
                     </div>
                     <div className="flex-1 flex flex-col gap-1 overflow-hidden">
@@ -116,7 +116,7 @@ const TakeawayModal: React.FC<TakeawayModalProps> = ({
                         })}
                       </span>
                     </div>
-                    <div className="font-bold text-blue-600 dark:text-blue-400 text-base whitespace-nowrap ml-2">
+                    <div className="font-bold text-blue-700 dark:text-blue-500 text-base whitespace-nowrap ml-2">
                       {formatCurrency(order.totalAmount)}
                     </div>
                   </div>
@@ -128,7 +128,7 @@ const TakeawayModal: React.FC<TakeawayModalProps> = ({
 
         <div className="p-5 sm:p-6 border-t border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 z-10">
           <button
-            className="w-full p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/30 active:translate-y-0 active:shadow-none"
+            className="w-full p-4 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-700/30 active:translate-y-0 active:shadow-none"
             onClick={() => {
               onClose();
               onCreateNew();

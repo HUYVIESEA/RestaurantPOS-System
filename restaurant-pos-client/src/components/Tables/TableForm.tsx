@@ -132,7 +132,7 @@ const TableForm: React.FC = () => {
     <div className="w-full p-4 sm:p-6 lg:p-8">
       <div className="flex justify-between items-center mb-6 sm:mb-8">
      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{isEditMode ? 'Cập nhật bàn' : 'Thêm bàn mới'}</h2>
-  <button onClick={() => navigate('/tables')} className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors touch-manipulation">
+  <button onClick={() => navigate('/tables')} className="text-blue-700 dark:text-blue-500 hover:text-blue-900 dark:hover:text-blue-300 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors touch-manipulation">
           ← Quay lại
         </button>
       </div>
@@ -152,7 +152,7 @@ const TableForm: React.FC = () => {
   required
      placeholder="VD: B01, B02..."
        maxLength={20}
-       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
      />
           </div>
 
@@ -167,7 +167,7 @@ const TableForm: React.FC = () => {
         required
               placeholder="Số người"
       inputMode="numeric"
-      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
           />
  {formData.capacity && (
    <small className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -189,7 +189,7 @@ const TableForm: React.FC = () => {
        value={formData.floor}
       onChange={handleChange}
       required
-      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
     >
      {allFloorOptions.map(floor => (
 <option key={floor} value={floor}>
@@ -200,7 +200,7 @@ const TableForm: React.FC = () => {
  </select>
         <button
                 type="button"
-            className="mt-2 text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 hover:text-blue-800 dark:hover:text-blue-300 py-2 touch-manipulation"
+            className="mt-2 text-sm text-blue-700 dark:text-blue-500 font-medium flex items-center gap-1 hover:text-blue-900 dark:hover:text-blue-300 py-2 touch-manipulation"
         onClick={() => setShowCustomFloor(true)}
     >
          ➕ Thêm tầng mới
@@ -215,7 +215,7 @@ const TableForm: React.FC = () => {
     placeholder="Nhập tên tầng mới (VD: Tầng 3, Khu VIP...)"
       maxLength={50}
                 autoFocus
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
               />
            <div className="flex items-center justify-between mt-2">
      <button
@@ -238,7 +238,7 @@ const TableForm: React.FC = () => {
 
         {/* ✅ Show existing floors count */}
         {existingFloors.length > 0 && !showCustomFloor && (
-  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800/50 mt-2">
+  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-900/50 mt-2">
    <small className="text-sm text-gray-700 dark:text-gray-300">
       📊 Hiện có <strong className="font-bold">{existingFloors.length} tầng</strong>: {existingFloors.join(', ')}
        </small>
@@ -252,7 +252,7 @@ type="checkbox"
               name="isAvailable"
           checked={formData.isAvailable}
  onChange={handleChange}
- className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+ className="w-5 h-5 text-blue-700 rounded border-gray-300 focus:ring-blue-600 dark:border-gray-600 dark:bg-gray-700"
    />
      <span className="text-gray-800 dark:text-white font-medium">Bàn đang trống</span>
           </label>
@@ -262,7 +262,7 @@ type="checkbox"
           <button type="button" onClick={() => navigate('/tables')} className="py-3 px-6 rounded-xl font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex-1 text-center touch-manipulation">
             Hủy
     </button>
-   <button type="submit" disabled={loading} className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-1 text-center touch-manipulation">
+   <button type="submit" disabled={loading} className="py-3 px-6 rounded-xl font-semibold text-white bg-blue-700 hover:bg-blue-800 shadow-md shadow-blue-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-1 text-center touch-manipulation">
  {loading ? 'Đang xử lý...' : (isEditMode ? 'Cập nhật' : 'Thêm mới')}
           </button>
         </div>

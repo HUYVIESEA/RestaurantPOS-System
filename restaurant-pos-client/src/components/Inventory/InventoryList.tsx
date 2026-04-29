@@ -119,7 +119,7 @@ const InventoryList: React.FC = () => {
     <div className="p-6 min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
         <div>
-            <h2 className="text-2xl font-bold"><i className="fas fa-boxes mr-2 text-blue-600 dark:text-blue-400"></i> Quản Lý Kho</h2>
+            <h2 className="text-2xl font-bold"><i className="fas fa-boxes mr-2 text-blue-700 dark:text-blue-500"></i> Quản Lý Kho</h2>
             <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Theo dõi và điều chỉnh số lượng tồn kho</p>
         </div>
         
@@ -139,7 +139,7 @@ const InventoryList: React.FC = () => {
                 </div>
             </div>
             
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2.5 rounded-xl shadow-sm transition-colors whitespace-nowrap" onClick={() => navigate('/products/new')}>
+            <button className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-4 py-2.5 rounded-xl shadow-sm transition-colors whitespace-nowrap" onClick={() => navigate('/products/new')}>
                 <i className="fas fa-circle-plus mr-1.5"></i> Thêm sản phẩm
             </button>
         </div>
@@ -150,7 +150,7 @@ const InventoryList: React.FC = () => {
             <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
             <input 
                 type="text" 
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent dark:text-white transition-all"
                 placeholder="Tìm kiếm sản phẩm theo tên..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -214,7 +214,7 @@ const InventoryList: React.FC = () => {
                                     {product.category?.name || 'Không có'}
                                 </span>
                             </td>
-                            <td className="px-6 py-4 font-semibold text-blue-600 dark:text-blue-400">
+                            <td className="px-6 py-4 font-semibold text-blue-700 dark:text-blue-500">
                                 {formatCurrency(product.price)}
                             </td>
                             <td className="px-6 py-4 text-center">
@@ -240,7 +240,7 @@ const InventoryList: React.FC = () => {
                                         Sắp hết
                                     </span>
                                 ) : (
-                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
                                         Còn hàng
                                     </span>
                                 )}
@@ -248,7 +248,7 @@ const InventoryList: React.FC = () => {
                             <td className="px-6 py-4">
                                 <div className="flex items-center justify-end gap-2">
                                     <button 
-                                        className="text-xs font-medium px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 rounded-lg transition-colors"
+                                        className="text-xs font-medium px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-500 dark:hover:bg-blue-900/40 rounded-lg transition-colors"
                                         onClick={() => openEditModal(product)}
                                         title="Cập nhật số lượng"
                                     >
@@ -280,7 +280,7 @@ const InventoryList: React.FC = () => {
                 <i className="fas fa-search text-5xl text-slate-300 dark:text-slate-600 mb-4"></i>
                 <p className="text-slate-500 dark:text-slate-400 mb-4">Không tìm thấy sản phẩm nào phù hợp</p>
                 <button 
-                    className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-blue-700 text-white rounded-xl font-medium hover:bg-blue-800 transition-colors"
                     onClick={() => { setSearchTerm(''); setFilterStatus('all'); setSelectedCategory(null); }}
                 >
                     Xóa bộ lọc
@@ -293,7 +293,7 @@ const InventoryList: React.FC = () => {
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setEditingProduct(null)}>
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-700" onClick={e => e.stopPropagation()}>
                 <div className="p-6 border-b border-slate-100 dark:border-slate-700">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100"><i className="fas fa-boxes text-blue-600 mr-2"></i> Cập nhật kho</h3>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100"><i className="fas fa-boxes text-blue-700 mr-2"></i> Cập nhật kho</h3>
                 </div>
                 
                 <div className="p-6">
@@ -305,14 +305,14 @@ const InventoryList: React.FC = () => {
                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Số lượng mới</label>
                         <input 
                             type="number" 
-                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-white transition-all text-lg font-medium"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent dark:text-white transition-all text-lg font-medium"
                             value={editQuantity} 
                             onChange={e => setEditQuantity(e.target.value)}
                             autoFocus
                             placeholder="Nhập số lượng..."
                         />
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-3 flex items-center bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg border border-blue-100 dark:border-blue-900/50">
-                            <i className="fas fa-info-circle text-blue-500 mr-2"></i>
+                            <i className="fas fa-info-circle text-blue-600 mr-2"></i>
                             <span>Nhập <strong>-1</strong> để thiết lập kho <strong>không giới hạn</strong></span>
                         </p>
                     </div>
@@ -320,7 +320,7 @@ const InventoryList: React.FC = () => {
 
                 <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
                     <button className="px-5 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" onClick={() => setEditingProduct(null)}>Đóng</button>
-                    <button className="px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm" onClick={saveQuantity}>Lưu thay đổi</button>
+                    <button className="px-5 py-2.5 rounded-xl font-medium bg-blue-700 text-white hover:bg-blue-800 transition-colors shadow-sm" onClick={saveQuantity}>Lưu thay đổi</button>
                 </div>
             </div>
         </div>

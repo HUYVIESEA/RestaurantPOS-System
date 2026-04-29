@@ -41,8 +41,8 @@ const Loading: React.FC<LoadingProps> = ({
       <div className="flex flex-col items-center gap-6 animate-fade-in-up">
         
         {/* Animated Logo/Icon with Ripple effect */}
-        <div className={`relative flex items-center justify-center text-blue-700 dark:text-blue-400 animate-pulse ${iconSizes[size]}`}>
-           <div className="absolute inset-0 bg-gradient-to-br from-blue-700/10 to-blue-500/10 rounded-full animate-ping"></div>
+        <div className={`relative flex items-center justify-center text-blue-800 dark:text-blue-500 animate-pulse ${iconSizes[size]}`}>
+           <div className="absolute inset-0 bg-gradient-to-br from-blue-800/10 to-blue-600/10 rounded-full animate-ping"></div>
            <i className="fas fa-store relative z-10"></i>
         </div>
         
@@ -55,7 +55,7 @@ const Loading: React.FC<LoadingProps> = ({
         
         {/* Message */}
         {message && (
-          <p className={`m-0 font-semibold text-center text-blue-700 dark:text-blue-400 animate-pulse ${textSizes[size]}`}>
+          <p className={`m-0 font-semibold text-center text-blue-800 dark:text-blue-500 animate-pulse ${textSizes[size]}`}>
             {message}
           </p>
         )}

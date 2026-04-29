@@ -46,7 +46,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
       <div className="fixed bottom-0 left-0 right-0 md:left-64 bg-white dark:bg-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)] border-t border-slate-200 dark:border-slate-700 z-40 p-4 transition-transform duration-300">
         <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center min-w-[2rem] h-8 px-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400 rounded-full font-bold text-sm">
+            <span className="flex items-center justify-center min-w-[2rem] h-8 px-2 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-500 rounded-full font-bold text-sm">
               {selectedUsers.length}
             </span>
             <span className="text-slate-600 dark:text-slate-300 font-medium">người dùng được chọn</span>
@@ -82,7 +82,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
             {/* Status Change */}
             <div className="relative">
               <button
-                className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-500 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                 onClick={() => setShowStatusMenu(!showStatusMenu)}
               >
                 🔒 Thay đổi trạng thái
@@ -90,7 +90,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
               {showStatusMenu && (
                 <div className="absolute bottom-full left-0 md:left-auto md:right-0 mb-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden py-1 z-50">
                   <button 
-                    className="w-full text-left px-4 py-2 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                    className="w-full text-left px-4 py-2 text-sm text-blue-700 dark:text-blue-500 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                     onClick={() => handleBulkStatusChange(true)}
                   >
                     ✅ Kích hoạt tất cả
@@ -209,7 +209,7 @@ export const SelectAllCheckbox: React.FC<SelectAllCheckboxProps> = ({
             if (el) el.indeterminate = isIndeterminate;
           }}
           onChange={() => isAllSelected ? onClearAll() : onSelectAll()}
-          className="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 dark:checked:bg-indigo-500 transition-colors cursor-pointer"
+          className="w-4 h-4 text-blue-700 bg-white border-slate-300 rounded focus:ring-blue-600 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 dark:checked:bg-blue-600 transition-colors cursor-pointer"
         />
       </div>
       <label className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
@@ -249,7 +249,7 @@ export const UserRowCheckbox: React.FC<UserRowCheckboxProps> = ({
           onChange={() => onToggle(user)}
           disabled={disabled}
           title={disabled ? 'Không thể chọn tài khoản của bạn' : undefined}
-          className={`w-4 h-4 rounded border-slate-300 focus:ring-indigo-500 focus:ring-2 transition-colors cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : 'text-indigo-600 bg-white dark:bg-slate-700 dark:border-slate-600 dark:checked:bg-indigo-500'}`}
+          className={`w-4 h-4 rounded border-slate-300 focus:ring-blue-600 focus:ring-2 transition-colors cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : 'text-blue-700 bg-white dark:bg-slate-700 dark:border-slate-600 dark:checked:bg-blue-600'}`}
         />
       </div>
     </td>

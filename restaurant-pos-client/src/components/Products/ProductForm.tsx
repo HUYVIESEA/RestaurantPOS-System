@@ -202,7 +202,7 @@ const ProductForm: React.FC = () => {
           <div className="flex-1 p-6 md:p-8 space-y-6">
             <div>
                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                 <i className="fas fa-info-circle text-blue-500"></i> Thông tin chung
+                 <i className="fas fa-info-circle text-blue-600"></i> Thông tin chung
                </h3>
                
                <div className="space-y-5">
@@ -217,7 +217,7 @@ const ProductForm: React.FC = () => {
                       required
                       placeholder="Nhập tên món ăn..."
                       maxLength={100}
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white"
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all dark:text-white"
                     />
                   </div>
 
@@ -230,7 +230,7 @@ const ProductForm: React.FC = () => {
                       onChange={handleChange}
                       rows={4}
                       placeholder="Thành phần, hương vị,..."
-                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white resize-y"
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all dark:text-white resize-y"
                     />
                   </div>
                </div>
@@ -238,7 +238,7 @@ const ProductForm: React.FC = () => {
 
             <div className="pt-6 border-t border-slate-100 dark:border-slate-700">
                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                 <i className="fas fa-tag text-blue-500"></i> Giá & Kho
+                 <i className="fas fa-tag text-blue-600"></i> Giá & Kho
                </h3>
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
@@ -253,10 +253,10 @@ const ProductForm: React.FC = () => {
                      required
                      placeholder="0"
                      inputMode="numeric"
-                     className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white font-medium"
+                     className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all dark:text-white font-medium"
                    />
                    {formData.price && (
-                     <div className="mt-2 text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 w-max px-3 py-1 rounded-lg">
+                     <div className="mt-2 text-sm font-bold text-blue-700 dark:text-blue-500 flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 w-max px-3 py-1 rounded-lg">
                        <i className="fas fa-coins"></i> {formatCurrency(formData.price)}
                      </div>
                    )}
@@ -270,7 +270,7 @@ const ProductForm: React.FC = () => {
                      value={formData.categoryId}
                      onChange={handleChange}
                      required
-                     className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white font-medium appearance-none"
+                     className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all dark:text-white font-medium appearance-none"
                    >
                      <option value={0}>-- Chọn danh mục --</option>
                      {categories.map(cat => (
@@ -292,7 +292,7 @@ const ProductForm: React.FC = () => {
                          min="0"
                          placeholder={isUnlimitedStock ? "Vô hạn" : "0"}
                          disabled={isUnlimitedStock}
-                         className="w-full sm:w-48 p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all dark:text-white disabled:opacity-50 disabled:bg-slate-100 dark:disabled:bg-slate-800"
+                         className="w-full sm:w-48 p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all dark:text-white disabled:opacity-50 disabled:bg-slate-100 dark:disabled:bg-slate-800"
                        />
                        <label className="flex items-center gap-2 cursor-pointer select-none text-slate-700 dark:text-slate-300 font-medium bg-slate-50 dark:bg-slate-900 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
                            <input
@@ -300,7 +300,7 @@ const ProductForm: React.FC = () => {
                                name="isUnlimitedStock"
                                checked={isUnlimitedStock}
                                onChange={handleChange}
-                               className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600"
+                               className="w-5 h-5 rounded text-blue-700 focus:ring-blue-600 dark:bg-slate-800 dark:border-slate-600"
                            />
                            <span>Không giới hạn</span>
                        </label>
@@ -313,7 +313,7 @@ const ProductForm: React.FC = () => {
           <div className="w-full lg:w-[400px] p-6 md:p-8 bg-slate-50/50 dark:bg-slate-900/50 space-y-6 flex-shrink-0">
             <div>
                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                 <i className="fas fa-image text-blue-500"></i> Hình ảnh
+                 <i className="fas fa-image text-blue-600"></i> Hình ảnh
                </h3>
                
                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-4 shadow-sm">
@@ -334,7 +334,7 @@ const ProductForm: React.FC = () => {
                  </div>
                  
                  <div className="flex gap-2">
-                     <label className="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-medium py-2.5 rounded-xl cursor-pointer transition-colors border border-blue-200 dark:border-blue-800 flex items-center justify-center gap-2">
+                     <label className="flex-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-500 font-medium py-2.5 rounded-xl cursor-pointer transition-colors border border-blue-200 dark:border-blue-900 flex items-center justify-center gap-2">
                          <i className="fas fa-upload"></i> {formData.imageUrl ? 'Thay ảnh' : 'Chọn ảnh'}
                          <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
                      </label>
@@ -348,7 +348,7 @@ const ProductForm: React.FC = () => {
                  <div>
                      <input
                        type="url"
-                       className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all dark:text-white text-sm"
+                       className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/50 transition-all dark:text-white text-sm"
                        placeholder="Hoặc nhập URL ảnh..."
                        name="imageUrl"
                        value={formData.imageUrl}
@@ -360,7 +360,7 @@ const ProductForm: React.FC = () => {
 
             <div>
                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                 <i className="fas fa-cog text-blue-500"></i> Thiết lập
+                 <i className="fas fa-cog text-blue-600"></i> Thiết lập
                </h3>
                
                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
@@ -371,11 +371,11 @@ const ProductForm: React.FC = () => {
                                name="isAvailable"
                                checked={formData.isAvailable}
                                onChange={handleChange}
-                               className="w-5 h-5 rounded text-blue-600 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600"
+                               className="w-5 h-5 rounded text-blue-700 focus:ring-blue-600 dark:bg-slate-800 dark:border-slate-600"
                            />
                        </div>
                        <div>
-                           <div className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Đang kinh doanh</div>
+                           <div className="font-bold text-slate-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-500 transition-colors">Đang kinh doanh</div>
                            <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Hiển thị món này trên thực đơn bán hàng</div>
                        </div>
                    </label>
@@ -383,7 +383,7 @@ const ProductForm: React.FC = () => {
             </div>
 
             <div className="pt-6 border-t border-slate-200 dark:border-slate-700 flex flex-col gap-3">
-              <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold shadow-sm transition-colors flex justify-center items-center gap-2 text-lg">
+              <button type="submit" disabled={loading} className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-xl font-bold shadow-sm transition-colors flex justify-center items-center gap-2 text-lg">
                 {loading ? (
                   <><i className="fas fa-spinner fa-spin"></i> Đang xử lý...</>
                 ) : (

@@ -81,7 +81,7 @@ const CategoryForm: React.FC = () => {
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-slate-700 transition-colors">
         <div className="p-6 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-800/50">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <i className={`fas ${isEditMode ? 'fa-pen-to-square-to-square' : 'fa-circle-plus'} text-blue-500`}></i>
+            <i className={`fas ${isEditMode ? 'fa-pen-to-square-to-square' : 'fa-circle-plus'} text-blue-600`}></i>
             {isEditMode ? 'Cập nhật danh mục' : 'Thêm danh mục mới'}
           </h2>
           <button 
@@ -115,7 +115,7 @@ const CategoryForm: React.FC = () => {
                 maxLength={50}
                 placeholder="Nhập tên danh mục (VD: Đồ ăn, Đồ uống...)"
                 autoFocus
-                className="w-full pl-4 pr-16 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white transition-all outline-none"
+                className="w-full pl-4 pr-16 py-2.5 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 dark:text-white transition-all outline-none"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-gray-500">
                 {formData.name.length}/50
@@ -136,7 +136,7 @@ const CategoryForm: React.FC = () => {
                 rows={4}
                 maxLength={200}
                 placeholder="Nhập mô tả cho danh mục (tùy chọn)"
-                className="w-full pl-4 pr-4 pb-8 pt-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white transition-all outline-none resize-none"
+                className="w-full pl-4 pr-4 pb-8 pt-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 dark:text-white transition-all outline-none resize-none"
               />
               <span className="absolute right-4 bottom-3 text-xs text-gray-400 dark:text-gray-500">
                 {formData.description.length}/200
@@ -146,10 +146,10 @@ const CategoryForm: React.FC = () => {
 
           <div className="bg-gray-50 dark:bg-slate-800/80 rounded-xl p-5 border border-gray-200 dark:border-slate-700">
             <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
-              <i className="fas fa-eye text-blue-500"></i> Xem trước
+              <i className="fas fa-eye text-blue-600"></i> Xem trước
             </h4>
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-500 rounded-xl flex items-center justify-center shrink-0">
                  <i className="fas fa-utensils text-xl"></i>
               </div>
               <div className="flex-1 min-w-0">
@@ -174,7 +174,7 @@ const CategoryForm: React.FC = () => {
             <button 
               type="submit" 
               disabled={loading} 
-              className="px-6 py-2.5 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center gap-2"
+              className="px-6 py-2.5 rounded-xl font-medium text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-70 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center gap-2"
             >
               {loading ? (
                 <><i className="fas fa-spinner fa-spin"></i> Đang xử lý...</>

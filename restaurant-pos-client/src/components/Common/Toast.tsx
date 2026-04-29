@@ -26,7 +26,7 @@ const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose, durat
   const typeStyles = {
     success: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300',
     error: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300',
-    info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300',
+    info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-900 text-blue-900 dark:text-blue-300',
     warning: 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300',
   };
 
@@ -40,7 +40,7 @@ const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose, durat
   const iconColor = {
     success: 'text-green-500 dark:text-green-400',
     error: 'text-red-500 dark:text-red-400',
-    info: 'text-blue-500 dark:text-blue-400',
+    info: 'text-blue-600 dark:text-blue-500',
     warning: 'text-yellow-500 dark:text-yellow-400',
   };
 

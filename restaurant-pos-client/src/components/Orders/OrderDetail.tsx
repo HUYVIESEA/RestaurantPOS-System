@@ -236,7 +236,7 @@ const OrderDetail: React.FC = () => {
                     </p>
                     <div className="space-y-3">
                         <button 
-                            className="w-full min-h-[56px] flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-colors shadow-sm"
+                            className="w-full min-h-[56px] flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors shadow-sm"
                             onClick={handleCashPayment}
                         >
                             <i className="fas fa-money-bill-wave text-xl"></i>
@@ -244,7 +244,7 @@ const OrderDetail: React.FC = () => {
                         </button>
 
                         <button 
-                            className="w-full min-h-[56px] flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-semibold transition-colors shadow-sm"
+                            className="w-full min-h-[56px] flex items-center justify-center gap-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold transition-colors shadow-sm"
                             onClick={() => setShowQR(true)}
                         >
                             <i className="fas fa-qrcode text-xl"></i>
@@ -281,7 +281,7 @@ const OrderDetail: React.FC = () => {
             </span>
             <span className={`px-3 py-1 rounded-lg ${
               order.status === 'Pending' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' :
-              order.status === 'Completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300' :
+              order.status === 'Completed' ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-300' :
               'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300'
             }`}>
               {order.status}
@@ -308,7 +308,7 @@ const OrderDetail: React.FC = () => {
         </div>
         <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50 lg:col-span-1 sm:col-span-2">
           <label className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-1 block">Tổng tiền</label>
-          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{order.totalAmount.toLocaleString('vi-VN')} đ</p>
+          <p className="text-2xl font-bold text-blue-700 dark:text-blue-500">{order.totalAmount.toLocaleString('vi-VN')} đ</p>
         </div>
         {order.notes && (
           <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-2xl border border-amber-100 dark:border-amber-800/30 sm:col-span-2 lg:col-span-3">
@@ -350,14 +350,14 @@ const OrderDetail: React.FC = () => {
               {order.orderItems?.map(item => (
                 <tr 
                   key={item.id} 
-                  className={`transition-colors ${selectedItems.has(item.id) ? 'bg-indigo-50/50 dark:bg-indigo-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-700/20'}`}
+                  className={`transition-colors ${selectedItems.has(item.id) ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-700/20'}`}
                 >
                   {order.status === 'Pending' && (
                     <td className="p-4 text-center align-middle">
                       <div className="flex items-center justify-center">
                         <input
                           type="checkbox"
-                          className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 cursor-pointer"
+                          className="w-5 h-5 rounded border-slate-300 text-blue-700 focus:ring-blue-600 dark:border-slate-600 dark:bg-slate-700 cursor-pointer"
                           checked={selectedItems.has(item.id)}
                           onChange={() => handleToggleItem(item.id)}
                         />
@@ -421,7 +421,7 @@ const OrderDetail: React.FC = () => {
                 <td colSpan={order.status === 'Pending' ? (window.innerWidth < 640 ? 3 : 4) : (window.innerWidth < 640 ? 2 : 3)} className="p-5 text-right font-semibold text-slate-700 dark:text-slate-300 text-lg">
                   Tổng cộng:
                 </td>
-                <td className="p-5 text-right font-bold text-indigo-600 dark:text-indigo-400 text-xl">
+                <td className="p-5 text-right font-bold text-blue-700 dark:text-blue-500 text-xl">
                   {order.totalAmount.toLocaleString('vi-VN')} đ
                 </td>
                 {order.status === 'Pending' && <td></td>}
@@ -434,7 +434,7 @@ const OrderDetail: React.FC = () => {
       {/* Help Texts */}
       <div className="space-y-3">
         {order.status === 'Pending' && (
-          <div className="p-4 rounded-xl bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 text-sm">
+          <div className="p-4 rounded-xl bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 text-sm">
             💡 <strong>Lưu ý:</strong> Chỉ có thể hủy món khi đơn hàng đang ở trạng thái "Đang xử lý"
           </div>
         )}
@@ -446,7 +446,7 @@ const OrderDetail: React.FC = () => {
         )}
 
         {order.status === 'Prepared' && (
-          <div className="p-4 rounded-xl bg-emerald-50 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300 font-medium">
+          <div className="p-4 rounded-xl bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 font-medium">
             ✅ Món ăn đã nấu xong. Sẵn sàng thanh toán!
           </div>
         )}
@@ -463,7 +463,7 @@ const OrderDetail: React.FC = () => {
               <span>➕</span> Thêm món
             </button>
             <button
-              className="flex-1 sm:flex-none min-h-[50px] px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-emerald-500/20 flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-none min-h-[50px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-blue-600/20 flex items-center justify-center gap-2"
               onClick={() => setShowPaymentDialog(true)}
             >
               <span>💳</span> Thanh toán
@@ -473,7 +473,7 @@ const OrderDetail: React.FC = () => {
         
         {order.status === 'Prepared' && (
           <button
-            className="w-full sm:max-w-md min-h-[56px] text-lg px-8 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors shadow-md shadow-emerald-500/30 flex items-center justify-center gap-2 mx-auto"
+            className="w-full sm:max-w-md min-h-[56px] text-lg px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-colors shadow-md shadow-blue-600/30 flex items-center justify-center gap-2 mx-auto"
             onClick={() => setShowPaymentDialog(true)}
           >
             <span>💳</span> Thanh toán ngay

@@ -53,7 +53,7 @@ const VietQRView: React.FC<VietQRViewProps> = ({ amount, description, onSuccess,
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-sm min-h-[400px]">
-        <i className="fas fa-spinner fa-spin text-4xl text-blue-500 mb-4"></i>
+        <i className="fas fa-spinner fa-spin text-4xl text-blue-600 mb-4"></i>
         <p className="text-slate-600 dark:text-slate-300 font-medium">Đang tạo mã QR...</p>
       </div>
     );
@@ -107,7 +107,7 @@ const VietQRView: React.FC<VietQRViewProps> = ({ amount, description, onSuccess,
           </div>
           <div className="flex justify-between items-start gap-4 pt-2 border-t border-slate-200 dark:border-slate-700">
             <span className="text-slate-500 dark:text-slate-400 whitespace-nowrap">Số tiền:</span>
-            <strong className="text-blue-600 dark:text-blue-400 text-lg text-right break-words">{amount.toLocaleString('vi-VN')} đ</strong>
+            <strong className="text-blue-700 dark:text-blue-500 text-lg text-right break-words">{amount.toLocaleString('vi-VN')} đ</strong>
           </div>
           <div className="flex justify-between items-start gap-4">
             <span className="text-slate-500 dark:text-slate-400 whitespace-nowrap">Nội dung:</span>
@@ -122,7 +122,7 @@ const VietQRView: React.FC<VietQRViewProps> = ({ amount, description, onSuccess,
 
         <div className="flex flex-col w-full gap-3">
           <button 
-            className="w-full py-4 px-6 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white rounded-xl font-semibold transition-colors focus:outline-none focus:ring-4 focus:ring-emerald-500/20 flex items-center justify-center gap-2"
+            className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl font-semibold transition-colors focus:outline-none focus:ring-4 focus:ring-blue-600/20 flex items-center justify-center gap-2"
             onClick={onSuccess}
           >
             <i className="fas fa-circle-check text-lg"></i> Đã thanh toán

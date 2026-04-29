@@ -170,7 +170,7 @@ const UserForm: React.FC = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className={`w-full px-4 py-2 rounded-lg border ${errors.username ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-800`}
+              className={`w-full px-4 py-2 rounded-lg border ${errors.username ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-800`}
               disabled={isEditMode}
               placeholder="johndoe"
             />
@@ -188,7 +188,7 @@ const UserForm: React.FC = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-2 rounded-lg border ${errors.email ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+              className={`w-full px-4 py-2 rounded-lg border ${errors.email ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
               placeholder="user@example.com"
             />
             {errors.email && <span className="text-sm text-rose-500 mt-1 block">{errors.email}</span>}
@@ -205,7 +205,7 @@ const UserForm: React.FC = () => {
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              className={`w-full px-4 py-2 rounded-lg border ${errors.fullName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+              className={`w-full px-4 py-2 rounded-lg border ${errors.fullName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
               placeholder="Nguyễn Văn A"
             />
             {errors.fullName && <span className="text-sm text-rose-500 mt-1 block">{errors.fullName}</span>}
@@ -221,7 +221,7 @@ const UserForm: React.FC = () => {
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors appearance-none"
+              className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors appearance-none"
             >
               <option value="Staff">👤 Staff</option>
               <option value="Admin">👑 Admin</option>
@@ -241,7 +241,7 @@ const UserForm: React.FC = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 rounded-lg border ${errors.password ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                  className={`w-full px-4 py-2 rounded-lg border ${errors.password ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
                   placeholder="••••••••"
                 />
                 {errors.password ? (
@@ -261,7 +261,7 @@ const UserForm: React.FC = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 rounded-lg border ${errors.confirmPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-indigo-500'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
+                  className={`w-full px-4 py-2 rounded-lg border ${errors.confirmPassword ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:ring-blue-600'} bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors`}
                   placeholder="••••••••"
                 />
                 {errors.confirmPassword && (
@@ -283,7 +283,7 @@ const UserForm: React.FC = () => {
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2.5 rounded-lg font-medium text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               disabled={loading}
             >
               {loading ? 'Đang lưu...' : isEditMode ? '💾 Cập nhật' : '✓ Tạo người dùng'}

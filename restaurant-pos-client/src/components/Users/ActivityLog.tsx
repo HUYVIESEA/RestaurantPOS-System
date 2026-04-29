@@ -151,7 +151,7 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
       <div className="flex justify-between items-center pb-2 border-b dark:border-slate-700">
         <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">📋 Nhật ký hoạt động</h3>
         <button 
-          className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:text-indigo-400 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors flex items-center gap-2" 
+          className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-500 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors flex items-center gap-2" 
           onClick={fetchActivityLogs}
         >
           🔄 Làm mới
@@ -186,7 +186,7 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
                     <div className="mt-2 flex items-center gap-2 text-xs font-mono bg-slate-50 dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-700">
                       <span className="text-rose-500 dark:text-rose-400 line-through">{log.oldValue}</span>
                       <span className="text-slate-400">→</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{log.newValue}</span>
+                      <span className="text-blue-700 dark:text-blue-500 font-semibold">{log.newValue}</span>
                     </div>
                   )}
                 </div>
@@ -198,7 +198,7 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
 
       {logs.length >= limit && (
         <div className="pt-2">
-          <button className="w-full py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 hover:bg-slate-100 dark:bg-slate-700/50 dark:hover:bg-slate-700 rounded-lg transition-colors">
+          <button className="w-full py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-500 bg-slate-50 hover:bg-slate-100 dark:bg-slate-700/50 dark:hover:bg-slate-700 rounded-lg transition-colors">
             Xem tất cả hoạt động →
           </button>
         </div>

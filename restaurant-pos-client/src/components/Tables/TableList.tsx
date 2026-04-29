@@ -158,7 +158,7 @@ const TableList: React.FC = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                        <i className="fas fa-th text-blue-600 dark:text-blue-400"></i>
+                        <i className="fas fa-th text-blue-600 dark:text-blue-500"></i>
                         Sơ đồ bàn
                     </h2>
                     <span className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 block">
@@ -198,7 +198,7 @@ const TableList: React.FC = () => {
                             key={floor}
                             className={`min-h-[44px] px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-colors ${
                                 selectedFloor === floor 
-                                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' 
+                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' 
                                     : 'bg-white text-slate-600 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                             }`}
                             onClick={() => setSelectedFloor(floor)}
@@ -214,7 +214,7 @@ const TableList: React.FC = () => {
                         placeholder="Tìm bàn..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                     />
                 </div>
             </div>
@@ -223,12 +223,12 @@ const TableList: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
                 {filteredTables.map(table => {
                     const statusColor = table.isAvailable 
-                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:border-emerald-300 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50' 
+                        ? 'bg-blue-50 text-blue-700 border-blue-100 hover:border-blue-300 dark:bg-blue-900/20 dark:text-blue-500 dark:border-blue-900/50' 
                         : (table.isMerged 
                             ? 'bg-purple-50 text-purple-600 border-purple-100 hover:border-purple-300 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800/50' 
                             : 'bg-rose-50 text-rose-600 border-rose-100 hover:border-rose-300 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800/50');
                     
-                    const dotColor = table.isAvailable ? 'bg-emerald-500' : (table.isMerged ? 'bg-purple-500' : 'bg-rose-500');
+                    const dotColor = table.isAvailable ? 'bg-blue-600' : (table.isMerged ? 'bg-purple-500' : 'bg-rose-500');
 
                     return (
                         <div
@@ -259,7 +259,7 @@ const TableList: React.FC = () => {
             {/* Legend Map below grid like the image */}
             <div className="mt-6 flex items-center justify-center sm:justify-start gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
                 <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500"></span> Trống
+                    <span className="w-3 h-3 rounded-full bg-blue-600"></span> Trống
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-rose-500"></span> Có khách
