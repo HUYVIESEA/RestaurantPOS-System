@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
-import { tableService } from '../../services/tableService';
 import { Order } from '../../types';
 import { formatPrice } from '../../utils/priceUtils';
 import { useToast } from '../../contexts/ToastContext';
@@ -157,15 +156,6 @@ const OrderList: React.FC = () => {
     try {
       await orderService.updateStatus(payingOrder.id, 'Completed');
       
-      // Release table
-      if (payingOrder.tableId) {
-          try {
-              await tableService.updateAvailability(payingOrder.tableId, true);
-          } catch (tableErr) {
-              console.error('Failed to release table:', tableErr);
-          }
-      }
-
       setOrders(orders.map(o => o.id === payingOrder.id ? { ...o, status: 'Completed' } : o));
       showToast(`✅ Thanh toán thành công đơn hàng #${payingOrder.id}`, 'success');
       setPayingOrder(null);

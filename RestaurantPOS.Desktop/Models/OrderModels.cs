@@ -50,6 +50,13 @@ namespace RestaurantPOS.Desktop.Models
         public string? Note { get; set; }
     }
 
+    public class UpdateOrderItemRequest
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
+        public string? Note { get; set; }
+    }
+
     public class CompleteOrderRequest
     {
         public decimal ReceivedAmount { get; set; }

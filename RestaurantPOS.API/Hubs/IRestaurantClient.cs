@@ -5,7 +5,7 @@ namespace RestaurantPOS.API.Hubs
         Task OrderCreated(int orderId);
         Task OrderUpdated(int orderId);
         Task OrderCompleted(int orderId);
-        Task TableUpdated();
+        Task TableUpdated(int tableId);
         Task DevicesUpdated();
         Task ReceiveMessage(string user, string message);
         Task ReceiveNotification(string message);

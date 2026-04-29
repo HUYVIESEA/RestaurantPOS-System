@@ -57,16 +57,16 @@ const CategoryList: React.FC = () => {
         <div className="flex-1">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">QUẢN LÝ DANH MỤC</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-4">Tổ chức và quản lý các nhóm thực đơn của nhà hàng</p>
-          <div className="flex gap-3 flex-wrap">
-             <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
-                <span>Tổng danh mục</span>
-                <span className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded-md">{categories.length}</span>
-             </div>
-             <div className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
-                <span>Đang sử dụng</span>
-                <span className="bg-green-100 dark:bg-green-800 px-2 py-0.5 rounded-md">{categories.filter(c => c.products && c.products.length > 0).length}</span>
-             </div>
-          </div>
+<div className="flex gap-3 flex-wrap">
+              <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
+                 <span>Tổng danh mục</span>
+                 <span className="bg-blue-100 dark:bg-blue-800 px-2 py-0.5 rounded-md">{categories.length}</span>
+              </div>
+              <div className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
+                 <span>Đang hoạt động</span>
+                 <span className="bg-green-100 dark:bg-green-800 px-2 py-0.5 rounded-md">{categories.filter(c => c.id > 0).length}</span>
+              </div>
+           </div>
         </div>
         
         {permissions.categories.canCreate && (
@@ -104,10 +104,10 @@ const CategoryList: React.FC = () => {
                   <h3 className="text-lg font-bold text-gray-800 dark:text-white truncate" title={category.name}>{category.name}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 min-h-[40px]">{category.description || 'Chưa có mô tả'}</p>
                   
-                  <div className="mt-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-slate-700/50 w-fit px-3 py-1.5 rounded-lg">
-                     <i className="fas fa-box-open text-gray-400"></i>
-                     <span className="font-medium">{category.products?.length || 0} sản phẩm</span>
-                  </div>
+<div className="mt-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-slate-700/50 w-fit px-3 py-1.5 rounded-lg">
+                      <i className="fas fa-box-open text-gray-400"></i>
+                      <span className="font-medium">Sẵn sàng</span>
+                   </div>
                 </div>
               </div>
             </div>

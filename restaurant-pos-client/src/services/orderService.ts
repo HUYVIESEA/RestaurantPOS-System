@@ -30,7 +30,8 @@ export const orderService = {
   },
 
   updateStatus: async (id: number, status: string): Promise<void> => {
-    await apiClient.patch(`/Orders/${id}/Status`, JSON.stringify(status));
+    // Backend expects UpdateOrderStatusRequest DTO: { status: string }
+    await apiClient.patch(`/Orders/${id}/Status`, { status });
   },
 
   // ✅ NEW: Add item to existing order

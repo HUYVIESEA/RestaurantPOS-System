@@ -6,10 +6,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useSignalR } from '../../contexts/SignalRContext';
 
-const NotificationBell: React.FC = () => {
+interface NotificationBellProps {
+  placement?: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left';
+}
+
+const NotificationBell: React.FC<NotificationBellProps> = ({ placement = 'bottom-right' }) => {
   const navigate = useNavigate();
   const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification, clearAll } = useNotifications();
+  const { isConnected } = useSignalR();
   const [showPanel, setShowPanel] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -58,27 +64,37 @@ const NotificationBell: React.FC = () => {
     }
   };
 
+const getPlacementClasses = () => {
+    switch (placement) {
+      case 'bottom-right': return 'absolute top-full right-0 mt-3 origin-top-right';
+      case 'top-right': return 'absolute bottom-full right-0 mb-3 origin-bottom-right';
+      case 'bottom-left': return 'absolute top-full left-0 mt-3 origin-top-left';
+      case 'top-left': return 'absolute bottom-full left-0 mb-3 origin-bottom-left';
+      default: return 'absolute top-full right-0 mt-3 origin-top-right';
+    }
+  };
+
   return (
-    <div className="relative inline-block" ref={panelRef}>
-      <button
-        className="relative p-2 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 rounded-full"
+    <div className="relative" ref={panelRef}>
+      <button 
+        className="p-2 text-gray-500 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400 rounded-xl hover:bg-orange-50 dark:hover:bg-gray-800 transition-colors relative group"
         onClick={() => setShowPanel(!showPanel)}
-        aria-label="Notifications"
-        aria-expanded={showPanel}
+        title="Thông báo"
       >
         <i className="fas fa-bell text-xl"></i>
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900 shadow-sm transform scale-100 animate-pulse">
-            {unreadCount > 99 ? '99+' : unreadCount}
+          <span className="absolute top-0 right-0 text-xs font-bold text-white bg-red-500 rounded-full w-4 h-4 flex items-center justify-center">
+            {unreadCount}
           </span>
         )}
       </button>
 
       {showPanel && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 z-50 overflow-hidden transform origin-top-right transition-all animate-scale-in">
+        <div className={`${getPlacementClasses()} w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-xl shadow-2xl shadow-black/10 dark:shadow-black/50 border border-gray-100 dark:border-slate-700 z-[9999] overflow-hidden`}>
           <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-slate-800/80 border-b border-gray-100 dark:border-slate-700">
             <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
               <i className="fas fa-bell text-blue-500"></i> Thông báo
+              <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} title={isConnected ? 'Đã kết nối' : 'Mất kết nối'}></span>
               {unreadCount > 0 && (
                 <span className="text-xs font-normal text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-full">
                   {unreadCount} mới
@@ -88,7 +104,7 @@ const NotificationBell: React.FC = () => {
             <div className="flex items-center gap-1">
               {unreadCount > 0 && (
                 <button 
-                  className="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 rounded-md transition-colors tooltip-trigger" 
+                  className="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 rounded-md transition-colors" 
                   onClick={markAllAsRead} 
                   title="Đánh dấu đã đọc"
                 >
@@ -97,7 +113,7 @@ const NotificationBell: React.FC = () => {
               )}
               {notifications.length > 0 && (
                 <button 
-                  className="p-1.5 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 rounded-md transition-colors tooltip-trigger" 
+                  className="p-1.5 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 rounded-md transition-colors" 
                   onClick={clearAll} 
                   title="Xóa tất cả"
                 >
@@ -105,7 +121,7 @@ const NotificationBell: React.FC = () => {
                 </button>
               )}
               <button 
-                className="p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white rounded-md transition-colors tooltip-trigger" 
+                className="p-1.5 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white rounded-md transition-colors" 
                 onClick={() => setShowPanel(false)} 
                 title="Đóng"
               >
@@ -114,7 +130,7 @@ const NotificationBell: React.FC = () => {
             </div>
           </div>
 
-          <div className="max-h-[400px] overflow-y-auto scrollbar-thin">
+          <div className="max-h-[400px] overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
                 <div className="w-16 h-16 mb-3 rounded-full bg-gray-50 dark:bg-slate-800/50 flex items-center justify-center border border-gray-100 dark:border-slate-700">
@@ -171,7 +187,7 @@ const NotificationBell: React.FC = () => {
           </div>
           
           {notifications.length > 0 && (
-            <div className="p-2 bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-700">
+            <div className="p-2 bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-700 rounded-b-xl">
               <button 
                 className="w-full py-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                 onClick={() => setShowPanel(false)}

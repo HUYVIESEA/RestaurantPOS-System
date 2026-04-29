@@ -101,6 +101,28 @@ namespace RestaurantPOS.Desktop.Services
             }
         }
 
+        public async Task<Order?> UpdateOrderItemsAsync(int orderId, List<UpdateOrderItemRequest> items)
+        {
+            try
+            {
+                SetToken();
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                var response = await _httpClient.PutAsJsonAsync($"{Constants.ApiBaseUrl}/Orders/{orderId}/Items", items);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<Order>(options);
+                }
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<Order?> UpdateItemQuantityAsync(int orderId, int itemId, int quantity)
         {
             try

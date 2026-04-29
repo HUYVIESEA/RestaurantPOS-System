@@ -220,8 +220,8 @@ const Analytics: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-xl font-bold text-slate-800 dark:text-white"><i className="fas fa-chart-area mr-2 text-indigo-500"></i> Xu hướng doanh thu</h3>
           </div>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-80 w-full min-h-[320px]">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -250,8 +250,8 @@ const Analytics: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-xl font-bold text-slate-800 dark:text-white"><i className="fas fa-clock mr-2 text-purple-500"></i> Giờ cao điểm</h3>
           </div>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-80 w-full min-h-[320px]">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={peakHoursData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />

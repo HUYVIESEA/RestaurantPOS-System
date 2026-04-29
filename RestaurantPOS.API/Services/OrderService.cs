@@ -159,6 +159,7 @@ namespace RestaurantPOS.API.Services
             }
             
             // Always invalidate recent orders list (paginated caches)
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10000");
             keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:50");
             keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:20");
             keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10");
@@ -219,7 +220,7 @@ namespace RestaurantPOS.API.Services
             
             // Broadcast new order via SignalR
             await _hubContext.Clients.All.OrderCreated(order.Id);
-            await _hubContext.Clients.All.TableUpdated();
+            await _hubContext.Clients.All.TableUpdated(order.TableId ?? 0);
 
             // Reload order with includes to return complete data
             return await GetOrderByIdAsync(order.Id) ?? order;
@@ -240,18 +241,18 @@ namespace RestaurantPOS.API.Services
             // Invalidate caches
             await InvalidateOrderCacheAsync(order.Id, order.TableId);
 
-            // ✅ NEW: Auto-free table when order is Completed or Cancelled
+            // ✅ Auto-free table when order is Completed or Cancelled
             if ((status == "Completed" || status == "Cancelled") && order.TableId.HasValue)
             {
-                // Check if there are any other pending orders for this table
-                var otherPendingOrders = await _context.Orders
+                // Check if there are ANY other active orders for this table
+                var otherActiveOrders = await _context.Orders
                     .Where(o => o.TableId == order.TableId && 
                                 o.Id != id && 
-                                o.Status == "Pending")
+                                o.Status != "Completed" && o.Status != "Cancelled")
                     .AnyAsync();
 
-                // Only free table if no other pending orders exist
-                if (!otherPendingOrders)
+                // Only free table if NO other active orders exist
+                if (!otherActiveOrders)
                 {
                     var table = await _context.Tables.FindAsync(order.TableId.Value);
                     if (table != null)
@@ -280,7 +281,7 @@ namespace RestaurantPOS.API.Services
             
             // Broadcast update via SignalR
             await _hubContext.Clients.All.OrderUpdated(order.Id);
-            await _hubContext.Clients.All.TableUpdated();
+            await _hubContext.Clients.All.TableUpdated(order.TableId ?? 0);
 
             return order;
         }
@@ -387,6 +388,115 @@ namespace RestaurantPOS.API.Services
             return await GetOrderByIdAsync(orderId);
         }
 
+        // ✅ NEW: Bulk update items for an order
+        public async Task<Order?> UpdateOrderItemsAsync(int orderId, List<UpdateOrderItemRequest> items)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .Include(o => o.Table)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null || order.Status != "Pending")
+                return null;
+
+            // Get product prices
+            var productIds = items.Select(i => i.ProductId).Distinct().ToList();
+            var products = await _context.Products
+                .Where(p => productIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id);
+
+            // Remove items not in the new list
+            var currentItems = order.OrderItems?.ToList() ?? new List<OrderItem>();
+            foreach (var currentItem in currentItems)
+            {
+                // We can't match strictly by ID because new items don't have IDs. 
+                // So we match by ProductId and Note. Wait, the client sends the entire list of items.
+                // Let's clear and re-add for simplicity, or match if needed.
+                _context.OrderItems.Remove(currentItem);
+            }
+
+            decimal newTotal = 0;
+            var newOrderItems = new List<OrderItem>();
+
+            foreach (var item in items)
+            {
+                if (products.TryGetValue(item.ProductId, out var product))
+                {
+                    // Check if we can merge identical items
+                    var existing = newOrderItems.FirstOrDefault(oi => oi.ProductId == item.ProductId && oi.Notes == item.Note);
+                    if (existing != null)
+                    {
+                        existing.Quantity += item.Quantity;
+                        newTotal += existing.UnitPrice * item.Quantity;
+                    }
+                    else
+                    {
+                        var newItem = new OrderItem
+                        {
+                            OrderId = orderId,
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity,
+                            UnitPrice = product.Price,
+                            Notes = item.Note
+                        };
+                        newOrderItems.Add(newItem);
+                        _context.OrderItems.Add(newItem);
+                        newTotal += newItem.UnitPrice * newItem.Quantity;
+                    }
+                }
+            }
+
+            order.TotalAmount = newTotal;
+
+            if (newOrderItems.Count == 0)
+            {
+                order.Status = "Cancelled";
+                
+                // Free table if this was the only pending order
+                if (order.TableId.HasValue)
+                {
+                    var otherPendingOrders = await _context.Orders
+                        .Where(o => o.TableId == order.TableId && 
+                                    o.Id != orderId && 
+                                    o.Status == "Pending")
+                        .AnyAsync();
+
+                    if (!otherPendingOrders)
+                    {
+                        var table = await _context.Tables.FindAsync(order.TableId.Value);
+                        if (table != null)
+                        {
+                            if (table.IsMerged && table.MergedGroupId.HasValue)
+                            {
+                                var groupTables = await _context.Tables
+                                    .Where(t => t.MergedGroupId == table.MergedGroupId)
+                                    .ToListAsync();
+                                foreach (var t in groupTables)
+                                {
+                                    t.IsAvailable = true;
+                                    t.OccupiedAt = null;
+                                }
+                            }
+                            else
+                            {
+                                table.IsAvailable = true;
+                                table.OccupiedAt = null;
+                            }
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            
+            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            
+            await _hubContext.Clients.All.OrderUpdated(orderId);
+            await _hubContext.Clients.All.TableUpdated(order.TableId ?? 0);
+            
+            return await GetOrderByIdAsync(orderId);
+        }
+
         // ✅ Remove item from order
         public async Task<Order?> RemoveItemFromOrderAsync(int orderId, int itemId)
         {
@@ -419,7 +529,7 @@ namespace RestaurantPOS.API.Services
          var otherPendingOrders = await _context.Orders
          .Where(o => o.TableId == order.TableId && 
          o.Id != orderId && 
-         o.Status == "Pending")
+         o.Status != "Completed" && o.Status != "Cancelled")
           .AnyAsync();
 
      if (!otherPendingOrders)
@@ -454,7 +564,7 @@ namespace RestaurantPOS.API.Services
         await InvalidateOrderCacheAsync(order.Id, order.TableId);
         
         await _hubContext.Clients.All.OrderUpdated(orderId);
-        await _hubContext.Clients.All.TableUpdated();
+        await _hubContext.Clients.All.TableUpdated(order.TableId ?? 0);
         return await GetOrderByIdAsync(orderId);
     }
 
@@ -537,6 +647,13 @@ namespace RestaurantPOS.API.Services
             if (order == null)
                 return null;
 
+            // Prevent completing an already completed/cancelled order
+            if (order.Status == "Completed" || order.Status == "Cancelled")
+            {
+                _logger.LogWarning("Attempted to complete order {OrderId} with status {Status}", orderId, order.Status);
+                return null;
+            }
+
             // Validate payment amount
             if (receivedAmount < (double)order.TotalAmount)
                 return null;
@@ -548,16 +665,16 @@ namespace RestaurantPOS.API.Services
             order.PaidAmount = (decimal)receivedAmount;
             order.CompletedAt = DateTime.UtcNow;
 
-            // Free table if this was the only pending order
+            // Free table if this was the only active order
             if (order.TableId.HasValue)
             {
-                var otherPendingOrders = await _context.Orders
+                var otherActiveOrders = await _context.Orders
                     .Where(o => o.TableId == order.TableId &&
                                 o.Id != orderId &&
-                                o.Status == "Pending")
+                                o.Status != "Completed" && o.Status != "Cancelled")
                     .AnyAsync();
 
-                if (!otherPendingOrders)
+                if (!otherActiveOrders)
                 {
                     var table = await _context.Tables.FindAsync(order.TableId.Value);
                     if (table != null)
@@ -597,7 +714,7 @@ namespace RestaurantPOS.API.Services
 
             // Broadcast completion
             await _hubContext.Clients.All.OrderCompleted(order.Id);
-            await _hubContext.Clients.All.TableUpdated();
+            await _hubContext.Clients.All.TableUpdated(order.TableId ?? 0);
 
             return await GetOrderByIdAsync(orderId);
         }

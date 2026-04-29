@@ -70,7 +70,7 @@ public class TableService : ITableService
         if (table == null) return false;
 
         var hasPendingOrders = await _context.Orders
-            .AnyAsync(o => o.TableId == id && (o.Status == "Pending" || o.Status == "Processing"));
+            .AnyAsync(o => o.TableId == id && o.Status != "Completed" && o.Status != "Cancelled");
 
         if (hasPendingOrders)
             throw new InvalidOperationException("Không thể trả bàn khi còn đơn hàng chưa hoàn thành");
@@ -137,7 +137,7 @@ public class TableService : ITableService
         if (tables.Count == 0) return false;
 
         var hasPendingOrders = await _context.Orders
-            .AnyAsync(o => o.OrderGroupId == groupId && o.Status == "Pending");
+            .AnyAsync(o => o.OrderGroupId == groupId && o.Status != "Completed" && o.Status != "Cancelled");
 
         if (hasPendingOrders)
             throw new InvalidOperationException("Không thể tách bàn khi còn đơn hàng đang xử lý");

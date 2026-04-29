@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
-import { tableService } from '../../services/tableService';
 import { Order, OrderItem } from '../../types';
 import { useToast } from '../../contexts/ToastContext';
 import AddItemDialog from './AddItemDialog';
@@ -183,15 +182,7 @@ const OrderDetail: React.FC = () => {
     try {
       await orderService.updateStatus(order!.id, 'Completed');
       
-      if (order!.tableId) {
-          try {
-              await tableService.updateAvailability(order!.tableId, true);
-          } catch (tableErr) {
-              console.error('Failed to release table:', tableErr);
-          }
-      }
-
-      showSuccess(`✅ Thanh toán thành công!\nBàn ${order!.table?.tableNumber} đã được trả.`);
+      showSuccess(`✅ Thanh toán thành công!\nĐơn hàng #${order!.id} đã được thanh toán.`);
       navigate('/tables');
     } catch (err) {
       console.error('Error completing payment:', err);

@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
           </span>
         </Link>
         <div className="flex items-center gap-3">
-          <NotificationBell />
+          <NotificationBell placement="bottom-right" />
           <button 
             className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             onClick={() => setIsMobileOpen(true)}
@@ -160,13 +160,13 @@ const Navbar: React.FC = () => {
 
         {/* Footer Actions */}
         <div className="p-4 border-t border-gray-100 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-slate-900/50">
-          <div className="flex items-center justify-between mb-4 px-2 hidden md:flex">
-             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tiện ích</span>
-             <div className="flex items-center gap-3">
-               <NotificationBell />
-               <ThemeToggle />
-             </div>
-          </div>
+<div className="flex items-center justify-between mb-4 px-2 hidden md:flex">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tiện ích</span>
+              <div className="flex items-center gap-3">
+                <NotificationBell placement="top-left" />
+                <ThemeToggle />
+              </div>
+           </div>
           
           {/* User Profile Menu */}
           <div className="relative">

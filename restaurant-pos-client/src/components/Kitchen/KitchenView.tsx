@@ -76,16 +76,16 @@ const KitchenView: React.FC = () => {
             }
         };
 
-        connection.on('ordercreated', handleOrderCreated);
-        connection.on('orderupdated', handleOrderUpdated);
-        connection.on('ordercompleted', (orderId: number) => {
+        connection.on('OrderCreated', handleOrderCreated);
+        connection.on('OrderUpdated', handleOrderUpdated);
+        connection.on('OrderCompleted', (orderId: number) => {
             setKitchenOrders(prev => prev.filter(o => o.id !== orderId));
         });
 
         return () => {
-            connection.off('ordercreated', handleOrderCreated);
-            connection.off('orderupdated', handleOrderUpdated);
-            connection.off('ordercompleted');
+            connection.off('OrderCreated', handleOrderCreated);
+            connection.off('OrderUpdated', handleOrderUpdated);
+            connection.off('OrderCompleted');
         }
     }, [connection, showToast]);
 
@@ -94,7 +94,7 @@ const KitchenView: React.FC = () => {
             const allOrders = await orderService.getAll();
             // Filter only Pending or Processing orders
             const pending = allOrders
-                .filter(o => o.status === 'Pending')
+                .filter(o => o.status === 'Pending' || o.status === 'Processing')
                 .map(mapToKitchenOrder)
                 .sort((a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime()); // Oldest first
             

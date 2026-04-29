@@ -17,11 +17,11 @@ namespace RestaurantPOS.API.Controllers
 
         public OrdersController(IOrderService orderService, IHubContext<RestaurantHub, IRestaurantClient> hubContext)
         {
-    _orderService = orderService;
+            _orderService = orderService;
             _hubContext = hubContext;
-     }
+        }
 
-// GET: api/Orders
+        // GET: api/Orders
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")] // All staff can view orders
         public async Task<ActionResult<PagedResult<Order>>> GetOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
@@ -30,182 +30,201 @@ namespace RestaurantPOS.API.Controllers
             return Ok(result);
         }
 
-   // GET: api/Orders/5
+        // GET: api/Orders/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
-  var order = await _orderService.GetOrderByIdAsync(id);
+            var order = await _orderService.GetOrderByIdAsync(id);
 
- if (order == null)
-     {
-    return NotFound();
+            if (order == null)
+            {
+                return NotFound();
             }
 
-         return Ok(order);
-    }
+            return Ok(order);
+        }
 
-      // GET: api/Orders/Table/5
+        // GET: api/Orders/Table/5
         [HttpGet("Table/{tableId}")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByTable(int tableId)
         {
             var orders = await _orderService.GetOrdersByTableAsync(tableId);
- return Ok(orders);
-}
+            return Ok(orders);
+        }
 
         // POST: api/Orders
-  [HttpPost]
-   public async Task<ActionResult<Order>> CreateOrder(Order order)
-      {
-     var createdOrder = await _orderService.CreateOrderAsync(order);
-            
-            // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.OrderCreated(createdOrder.Id);
-            
-        return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.Id }, createdOrder);
+        [HttpPost]
+        public async Task<ActionResult<Order>> CreateOrder(Order order)
+        {
+            // The service already handles the SignalR broadcast
+            var createdOrder = await _orderService.CreateOrderAsync(order);
+            return CreatedAtAction(nameof(GetOrder), new { id = createdOrder.Id }, createdOrder);
         }
 
-    // PATCH: api/Orders/5/Status
-    [HttpPatch("{id}/Status")]
-   public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] string status)
+        // PATCH: api/Orders/5/Status
+        [HttpPatch("{id}/Status")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusRequest request)
         {
-      var updatedOrder = await _orderService.UpdateOrderStatusAsync(id, status);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-    if (updatedOrder == null)
-   {
-        return NotFound();
-    }
+            var updatedOrder = await _orderService.UpdateOrderStatusAsync(id, request.Status);
 
-            // ✅ Broadcast to all clients
-            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
-
-       return NoContent();
-        }
-
-    // POST: api/Orders/5/Items - Add item to existing order
-      [HttpPost("{id}/Items")]
-      public async Task<ActionResult<Order>> AddItemToOrder(int id, [FromBody] OrderItem item)
-        {
-      var updatedOrder = await _orderService.AddItemToOrderAsync(id, item);
-
-  if (updatedOrder == null)
-      {
-  return NotFound();
-    }
+            if (updatedOrder == null)
+            {
+                return NotFound();
+            }
 
             // ✅ Broadcast to all clients
             await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
-  return Ok(updatedOrder);
+            return NoContent();
         }
 
-    // PATCH: api/Orders/5/Items/7 - Update item quantity
-        [HttpPatch("{orderId}/Items/{itemId}")]
-        public async Task<ActionResult<Order>> UpdateItemQuantity(int orderId, int itemId, [FromBody] int quantity)
+        // POST: api/Orders/5/Items - Add item to existing order
+        [HttpPost("{id}/Items")]
+        public async Task<ActionResult<Order>> AddItemToOrder(int id, [FromBody] OrderItem item)
         {
-    var updatedOrder = await _orderService.UpdateItemQuantityAsync(orderId, itemId, quantity);
+            var updatedOrder = await _orderService.AddItemToOrderAsync(id, item);
 
-  if (updatedOrder == null)
-     {
-       return NotFound();
-       }
+            if (updatedOrder == null)
+            {
+                return NotFound();
+            }
 
             // ✅ Broadcast to all clients
             await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
-   return Ok(updatedOrder);
+            return Ok(updatedOrder);
         }
 
-    // PATCH: api/Orders/5/Items/7/Note - Update item note
-    [HttpPatch("{orderId}/Items/{itemId}/Note")]
-    public async Task<ActionResult<Order>> UpdateItemNote(int orderId, int itemId, [FromBody] string note)
-    {
-        var updatedOrder = await _orderService.UpdateItemNoteAsync(orderId, itemId, note);
-
-        if (updatedOrder == null)
+        // PATCH: api/Orders/5/Items/10 - Update item quantity
+        [HttpPatch("{id}/Items/{itemId}")]
+        public async Task<ActionResult<Order>> UpdateOrderItemQuantity(int id, int itemId, [FromBody] int quantity)
         {
-            return NotFound();
-        }
+            var updatedOrder = await _orderService.UpdateItemQuantityAsync(id, itemId, quantity);
 
-        // ✅ Broadcast to all clients
-        await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
-
-        return Ok(updatedOrder);
-    }
-
-    // DELETE: api/Orders/5/Items/7 - Remove item from order
-    [HttpDelete("{orderId}/Items/{itemId}")]
-        public async Task<ActionResult<Order>> RemoveItemFromOrder(int orderId, int itemId)
-   {
-      var updatedOrder = await _orderService.RemoveItemFromOrderAsync(orderId, itemId);
-
-   if (updatedOrder == null)
-{
-        return NotFound();
-       }
+            if (updatedOrder == null)
+            {
+                return NotFound();
+            }
 
             // ✅ Broadcast to all clients
             await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
-   return Ok(updatedOrder);
+            return Ok(updatedOrder);
         }
 
-    // ✅ NEW: PUT: api/Orders/5/Complete - Complete order and process payment
-    [HttpPut("{id}/Complete")]
-    public async Task<ActionResult<Order>> CompleteOrder(int id, [FromBody] CompleteOrderRequest request)
-    {
-        var completedOrder = await _orderService.CompleteOrderAsync(id, request.ReceivedAmount, request.PaymentMethod);
-
-        if (completedOrder == null)
+        // DELETE: api/Orders/5/Items/10 - Remove item from order
+        [HttpDelete("{id}/Items/{itemId}")]
+        public async Task<ActionResult<Order>> RemoveOrderItem(int id, int itemId)
         {
-            return NotFound("Không tìm thấy đơn hàng");
+            var updatedOrder = await _orderService.RemoveItemFromOrderAsync(id, itemId);
+
+            if (updatedOrder == null)
+            {
+                return NotFound();
+            }
+
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
+
+            return Ok(updatedOrder);
         }
 
-        // ✅ Broadcast to all clients (send orderId for consistency)
-        await _hubContext.Clients.All.OrderCompleted(completedOrder.Id);
+        // PUT: api/Orders/5/Items - Bulk update all items in an order
+        [HttpPut("{id}/Items")]
+        public async Task<ActionResult<Order>> UpdateOrderItems(int id, [FromBody] List<UpdateOrderItemRequest> items)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return BadRequest("Order items cannot be empty.");
+            }
 
-        return Ok(completedOrder);
-    }
+            var updatedOrder = await _orderService.UpdateOrderItemsAsync(id, items);
 
-    // ✅ NEW: POST: api/Orders/5/Split - Split order into two orders
-    [HttpPost("{id}/Split")]
-    public async Task<ActionResult<SplitOrderResponse>> SplitOrder(int id, [FromBody] SplitOrderRequest request)
-    {
-       if (request.ItemIds == null || request.ItemIds.Count == 0)
-    {
-        return BadRequest("Vui lòng chọn ít nhất 1 món để tách");
-     }
+            if (updatedOrder == null)
+            {
+                return NotFound("Order not found or cannot be modified.");
+            }
 
-     var result = await _orderService.SplitOrderAsync(id, request.ItemIds);
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
 
- if (result == null)
-      {
-      return NotFound("Không tìm thấy đơn hàng");
-}
+            return Ok(updatedOrder);
+        }
 
-      return Ok(result);
-      }
+        // ✅ NEW: PUT: api/Orders/5/Complete - Complete order and process payment
+        [HttpPut("{id}/Complete")]
+        public async Task<ActionResult<Order>> CompleteOrder(int id, [FromBody] CompleteOrderRequest request)
+        {
+            var completedOrder = await _orderService.CompleteOrderAsync(id, request.ReceivedAmount, request.PaymentMethod);
+
+            if (completedOrder == null)
+            {
+                return NotFound("Không tìm thấy đơn hàng");
+            }
+
+            // ✅ Broadcast to all clients (send orderId for consistency)
+            await _hubContext.Clients.All.OrderCompleted(completedOrder.Id);
+
+            return Ok(completedOrder);
+        }
+
+        // ✅ NEW: POST: api/Orders/5/Split - Split order into two orders
+        [HttpPost("{id}/Split")]
+        public async Task<ActionResult<SplitOrderResponse>> SplitOrder(int id, [FromBody] SplitOrderRequest request)
+        {
+            if (request.ItemIds == null || request.ItemIds.Count == 0)
+            {
+                return BadRequest("Vui lòng chọn ít nhất 1 món để tách");
+            }
+
+            var result = await _orderService.SplitOrderAsync(id, request.ItemIds);
+
+            if (result == null)
+            {
+                return NotFound("Không tìm thấy đơn hàng");
+            }
+
+            return Ok(result);
+        }
 
         // DELETE: api/Orders/5
-     [HttpDelete("{id}")]
+        [HttpDelete("{id}")]
         [Authorize(Roles = "Admin,Manager")] // Only Admin and Manager can delete orders
- public async Task<IActionResult> DeleteOrder(int id)
- {
-    var result = await _orderService.DeleteOrderAsync(id);
+        public async Task<IActionResult> DeleteOrder(int id)
+        {
+            var result = await _orderService.DeleteOrderAsync(id);
 
-  if (!result)
-{
-    return NotFound();
-  }
+            if (!result)
+            {
+                return NotFound();
+            }
 
-return NoContent();
+            return NoContent();
+        }
     }
-    }
 
-// ✅ NEW: DTOs for complete order
+    // ✅ NEW: DTOs for complete order
     public class CompleteOrderRequest
     {
         public double ReceivedAmount { get; set; }
         public string PaymentMethod { get; set; } = "Cash";
+    }
+
+    public class UpdateOrderStatusRequest
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
+        public string Status { get; set; } = string.Empty;
+    }
+
+    public class UpdateNoteRequest
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("note")]
+        public string Note { get; set; } = string.Empty;
     }
 
     // ✅ NEW: DTOs for split order
@@ -217,6 +236,6 @@ return NoContent();
     public class SplitOrderResponse
     {
         public Order OriginalOrder { get; set; } = null!;
-    public Order NewOrder { get; set; } = null!;
+        public Order NewOrder { get; set; } = null!;
     }
 }

@@ -692,8 +692,7 @@ namespace RestaurantPOS.Desktop.ViewModels
             IsTableSelectionMode = false;
             IsLoading = true;
 
-            // Optional: Small delay to let the dialog close animation finish smoothly before heavy lifting
-            await Task.Delay(300);
+
 
             try
             {
@@ -1058,8 +1057,6 @@ namespace RestaurantPOS.Desktop.ViewModels
                         SelectedTable.UpdateDuration();
                     }
 
-                    // Small delay to allow backend/DB to propagate changes before LoadData refreshes
-                    await Task.Delay(500);
 
                     ExecuteBackToTables(null); 
                 }
@@ -1070,58 +1067,30 @@ namespace RestaurantPOS.Desktop.ViewModels
             }
             else
             {
-                // Update existing order
-                bool allSuccess = true;
-                int updatesCount = 0;
-
-                // 1. Handle New Items
-                var newItems = CartItems.Where(c => c.IsNew).ToList();
-                foreach (var item in newItems)
+                // Update existing order via bulk API to avoid O(N) slow calls
+                var itemsToSync = CartItems.Select(c => new UpdateOrderItemRequest
                 {
-                    var updatedOrder = await _orderService.AddItemToOrderAsync(_currentOrder.Id, item.Product.Id, item.Quantity, item.Note);
-                    if (updatedOrder == null) allSuccess = false;
-                    else updatesCount++;
-                }
+                    ProductId = c.Product.Id,
+                    Quantity = c.Quantity,
+                    Note = c.Note
+                }).ToList();
 
-                // 2. Handle Updated Items (Quantity Changed)
-                // 2. Handle Updated Items (Quantity or Note)
-                var existingItems = CartItems.Where(c => !c.IsNew).ToList();
-                foreach (var item in existingItems)
-                {
-                    if (item.OrderItemId.HasValue)
-                    {
-                        // Check Quantity Change
-                        if (item.Quantity != item.OriginalQuantity && _currentOrder != null)
-                        {
-                            var updatedOrder = await _orderService.UpdateItemQuantityAsync(_currentOrder.Id, item.OrderItemId.Value, item.Quantity);
-                            if (updatedOrder == null) allSuccess = false;
-                            else updatesCount++;
-                        }
+                var updatedOrder = await _orderService.UpdateOrderItemsAsync(_currentOrder.Id, itemsToSync);
 
-                        // Check Note Change
-                        var originalItem = _currentOrder?.OrderItems.FirstOrDefault(oi => oi.Id == item.OrderItemId);
-                        if (originalItem != null && originalItem.Note != item.Note && _currentOrder != null)
-                        {
-                             var updatedOrder = await _orderService.UpdateItemNoteAsync(_currentOrder.Id, item.OrderItemId.Value, item.Note ?? "");
-                             if (updatedOrder == null) allSuccess = false;
-                             else updatesCount++;
-                        }
-                    }
-                }
-
-                if (updatesCount > 0 && allSuccess)
+                if (updatedOrder != null)
                 {
-                     ShowNotification($"Đã cập nhật {updatesCount} món!", NotificationType.Success);
-                     ExecuteBackToTables(null);
-                }
-                else if (updatesCount > 0 && !allSuccess)
-                {
-                    ShowNotification("Một số món không cập nhật được!", NotificationType.Warning);
-                    ExecuteSelectTable(SelectedTable);
+                    CurrentOrder = updatedOrder;
+                    ShowNotification($"Đã cập nhật món thành công!", NotificationType.Success);
+                    
+                    // Mark all as not new
+                    foreach (var item in CartItems) item.IsNew = false;
+                    
+                    ExecuteBackToTables(null);
                 }
                 else
                 {
-                     ShowNotification("Không có thay đổi nào để lưu!", NotificationType.Info);
+                    ShowNotification("Một số món không cập nhật được hoặc có lỗi xảy ra!", NotificationType.Warning);
+                    ExecuteSelectTable(SelectedTable);
                 }
             }
             IsLoading = false;
@@ -1178,17 +1147,7 @@ namespace RestaurantPOS.Desktop.ViewModels
                         CurrentOrder = null;
                         OnPropertyChanged(nameof(TotalAmount));
                         
-                        // Optimistic Update: Free the table immediately
-                        if (SelectedTable != null)
-                        {
-                            SelectedTable.IsAvailable = true;
-                            SelectedTable.OccupiedAt = null;
-                        }
-
-                        // Delay slightly to allow backend sync
-                        await Task.Delay(500);
-
-                        // Force refresh tables to update color status immediately
+                        // API handles table release automatically - just refresh
                         ExecuteBackToTables(null);
                     }
                     else

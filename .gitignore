@@ -231,7 +231,8 @@ key_gen.txt
 .idea/
 .vscode/
 .opencoderc
-
+.agent/
+.github/
 # Build artifacts & dependencies
 node_modules/
 bin/

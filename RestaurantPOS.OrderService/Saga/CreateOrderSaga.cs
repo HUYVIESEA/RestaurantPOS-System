@@ -34,15 +34,25 @@ public class ReserveStockStep : ISagaStep<CreateOrderSagaContext>
 
     public async Task ExecuteAsync(CreateOrderSagaContext context)
     {
-        foreach (var item in context.Order.Items)
+        // Run stock checks in parallel to avoid N+1 slow HTTP requests
+        var stockTasks = context.Order.Items.Select(async item => 
         {
             var available = await _productClient.CheckStockAsync(item.ProductId, item.Quantity, context.CorrelationId);
             if (!available)
                 throw new InvalidOperationException($"Product {item.ProductId} unavailable");
+            
+            return item.ProductId;
+        });
 
-            context.ReservedProductIds.Add(item.ProductId);
+        var reservedIds = await Task.WhenAll(stockTasks);
+
+        foreach (var id in reservedIds)
+        {
+            context.ReservedProductIds.Add(id);
+            var item = context.Order.Items.First(i => i.ProductId == id);
             _logger.LogInformation("Reserved stock for product {ProductId}, qty {Qty}", item.ProductId, item.Quantity);
         }
+        
         context.StockReserved = true;
     }
 

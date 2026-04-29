@@ -29,12 +29,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-      return parsed.map((n: any) => ({
+        return parsed.map((n: any) => ({
           ...n,
           timestamp: new Date(n.timestamp)
         }));
       } catch {
-      return [];
+        return [];
       }
     }
     return [];
