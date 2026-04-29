@@ -48,7 +48,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./restaurant-pos-client
-          file: restaurant-pos-client/Dockerfile
           push: true
           tags: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }},ghcr.io/${{ github.repository }}/frontend:latest
           cache-from: type=gha

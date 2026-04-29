@@ -45,7 +45,7 @@ jobs:
         run: dotnet build RestaurantPOS.API/RestaurantPOS.API.csproj --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test RestaurantPOS.Tests/RestaurantPOS.Tests.csproj --no-build --configuration Release --verbosity normal --logger trx --results-directory TestResults
+        run: dotnet test RestaurantPOS.Tests/RestaurantPOS.Tests.csproj --configuration Release --verbosity normal --logger trx --results-directory TestResults
 
       - name: Upload test results
         if: always()
@@ -114,7 +114,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./restaurant-pos-client
-          file: restaurant-pos-client/Dockerfile
           push: false
           tags: restaurant-pos-frontend:latest
           cache-from: type=gha
