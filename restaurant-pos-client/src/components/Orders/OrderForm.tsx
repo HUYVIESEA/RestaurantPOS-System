@@ -89,7 +89,7 @@ const OrderForm: React.FC = () => {
               let spokenItems: string[] = [];
 
               parsedItems.forEach(({ product, quantity }) => {
-                   const isUnlimited = product.stockQuantity !== undefined && product.stockQuantity < 0;
+                   // const isUnlimited = product.stockQuantity !== undefined && product.stockQuantity < 0;
                    const modIds = '';
                    const cartId = `${product.id}-0-${modIds}`;
                    const existingIndex = newCart.findIndex(i => i.cartId === cartId);

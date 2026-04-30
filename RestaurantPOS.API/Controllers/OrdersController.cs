@@ -24,9 +24,9 @@ namespace RestaurantPOS.API.Controllers
         // GET: api/Orders
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")] // All staff can view orders
-        public async Task<ActionResult<PagedResult<Order>>> GetOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<PagedResult<Order>>> GetOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? status = null)
         {
-            var result = await _orderService.GetOrdersAsync(page, pageSize);
+            var result = await _orderService.GetOrdersAsync(page, pageSize, status);
             return Ok(result);
         }
 

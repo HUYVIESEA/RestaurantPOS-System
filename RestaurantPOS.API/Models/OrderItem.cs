@@ -29,13 +29,39 @@ namespace RestaurantPOS.API.Models
         // F&B Enhancements
         public int? VariantId { get; set; }
 
-        public string? ModifierItemIdsJson { get; set; }
+        private string? _modifierItemIdsJson;
+        
+        [System.Text.Json.Serialization.JsonIgnore]
+        public string? ModifierItemIdsJson 
+        { 
+            get => _modifierItemIdsJson;
+            set 
+            {
+                _modifierItemIdsJson = value;
+                _modifierItemIds = null; // Invalidate cached list
+            }
+        }
+
+        private List<int>? _modifierItemIds;
 
         [NotMapped]
         public List<int>? ModifierItemIds
         {
-            get => string.IsNullOrEmpty(ModifierItemIdsJson) ? new List<int>() : JsonSerializer.Deserialize<List<int>>(ModifierItemIdsJson);
-            set => ModifierItemIdsJson = value == null ? null : JsonSerializer.Serialize(value);
+            get 
+            {
+                if (_modifierItemIds == null)
+                {
+                    _modifierItemIds = string.IsNullOrEmpty(ModifierItemIdsJson) 
+                        ? new List<int>() 
+                        : JsonSerializer.Deserialize<List<int>>(ModifierItemIdsJson);
+                }
+                return _modifierItemIds;
+            }
+            set 
+            {
+                _modifierItemIds = value;
+                _modifierItemIdsJson = value == null ? null : JsonSerializer.Serialize(value);
+            }
         }
     }
 }

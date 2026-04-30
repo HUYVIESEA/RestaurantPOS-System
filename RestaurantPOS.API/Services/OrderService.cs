@@ -45,9 +45,9 @@ namespace RestaurantPOS.API.Services
                 .ToListAsync();
         }
 
-        public async Task<PagedResult<Order>> GetOrdersAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<Order>> GetOrdersAsync(int pageNumber, int pageSize, string? status = null)
         {
-            var cacheKey = $"{CACHE_KEY_RECENT_ORDERS}{pageNumber}:{pageSize}";
+            var cacheKey = $"{CACHE_KEY_RECENT_ORDERS}{pageNumber}:{pageSize}:{status ?? "all"}";
             
             // Try cache first
             var cached = await _cache.GetAsync<PagedResult<Order>>(cacheKey);
@@ -60,6 +60,12 @@ namespace RestaurantPOS.API.Services
             // Cache miss - query database
             var query = _context.Orders
                 .AsNoTracking();
+
+            if (!string.IsNullOrEmpty(status))
+            {
+                var statuses = status.Split(',');
+                query = query.Where(o => statuses.Contains(o.Status));
+            }
 
             var totalItems = await query.CountAsync();
 
@@ -159,10 +165,15 @@ namespace RestaurantPOS.API.Services
             }
             
             // Always invalidate recent orders list (paginated caches)
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10000");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:50");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:20");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10");
+            // We should use a wildcard or tag to invalidate all order lists, but since we use simple keys:
+            // This is a naive clear for common patterns. In production, use Redis Tags.
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10000:all");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10000:Pending,Processing");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:1000:all");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:1000:Pending,Processing");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:50:all");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:20:all");
+            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10:all");
             
             foreach (var key in keysToRemove)
             {
@@ -194,7 +205,23 @@ namespace RestaurantPOS.API.Services
                 {
                     if (products.TryGetValue(item.ProductId, out var product))
                     {
-                        item.UnitPrice = product.Price; // SECURITY: Use DB price, not client price
+                        decimal unitPrice = product.Price;
+                        if (item.VariantId.HasValue && product.Variants != null)
+                        {
+                            var variant = product.Variants.FirstOrDefault(v => v.Id == item.VariantId.Value);
+                            if (variant != null) unitPrice += variant.PriceDelta;
+                        }
+                        if (item.ModifierItemIds != null && item.ModifierItemIds.Any() && product.Modifiers != null)
+                        {
+                            var allMods = product.Modifiers.SelectMany(m => m.Items);
+                            foreach (var modId in item.ModifierItemIds)
+                            {
+                                var mod = allMods.FirstOrDefault(m => m.Id == modId);
+                                if (mod != null) unitPrice += mod.PriceDelta;
+                            }
+                        }
+
+                        item.UnitPrice = unitPrice; // SECURITY: Use DB calculated price
                         total += item.UnitPrice * item.Quantity;
                     }
                 }
@@ -297,7 +324,9 @@ namespace RestaurantPOS.API.Services
                 return null;
 
             // Get product to set unit price
-            var product = await _context.Products.FindAsync(item.ProductId);
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == item.ProductId);
+                
             if (product == null)
                 return null;
 
@@ -315,9 +344,24 @@ namespace RestaurantPOS.API.Services
             }
             else
             {
-                // Create new order item
+                decimal unitPrice = product.Price;
+                if (item.VariantId.HasValue && product.Variants != null)
+                {
+                    var variant = product.Variants.FirstOrDefault(v => v.Id == item.VariantId.Value);
+                    if (variant != null) unitPrice += variant.PriceDelta;
+                }
+                if (item.ModifierItemIds != null && item.ModifierItemIds.Any() && product.Modifiers != null)
+                {
+                    var allMods = product.Modifiers.SelectMany(m => m.Items);
+                    foreach (var modId in item.ModifierItemIds)
+                    {
+                        var mod = allMods.FirstOrDefault(m => m.Id == modId);
+                        if (mod != null) unitPrice += mod.PriceDelta;
+                    }
+                }
+
                 item.OrderId = orderId;
-                item.UnitPrice = product.Price;
+                item.UnitPrice = unitPrice;
                 _context.OrderItems.Add(item);
                 order.TotalAmount += item.UnitPrice * item.Quantity;
             }
@@ -409,9 +453,6 @@ namespace RestaurantPOS.API.Services
             var currentItems = order.OrderItems?.ToList() ?? new List<OrderItem>();
             foreach (var currentItem in currentItems)
             {
-                // We can't match strictly by ID because new items don't have IDs. 
-                // So we match by ProductId and Note. Wait, the client sends the entire list of items.
-                // Let's clear and re-add for simplicity, or match if needed.
                 _context.OrderItems.Remove(currentItem);
             }
 
@@ -422,7 +463,9 @@ namespace RestaurantPOS.API.Services
             {
                 if (products.TryGetValue(item.ProductId, out var product))
                 {
-                    // Check if we can merge identical items
+                    // Check if we can merge identical items.
+                    // Wait, UpdateOrderItemRequest does not have VariantId or ModifierItemIds?
+                    // Let's assume it's just basic items for now since we haven't updated UpdateOrderItemRequest to support variants in bulk update
                     var existing = newOrderItems.FirstOrDefault(oi => oi.ProductId == item.ProductId && oi.Notes == item.Note);
                     if (existing != null)
                     {
@@ -436,7 +479,7 @@ namespace RestaurantPOS.API.Services
                             OrderId = orderId,
                             ProductId = item.ProductId,
                             Quantity = item.Quantity,
-                            UnitPrice = product.Price,
+                            UnitPrice = product.Price, // Bulk update doesn't support variants yet, so use base price
                             Notes = item.Note
                         };
                         newOrderItems.Add(newItem);

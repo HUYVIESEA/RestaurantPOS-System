@@ -5,7 +5,7 @@ namespace RestaurantPOS.API.Services
 public interface IOrderService
     {
         Task<IEnumerable<Order>> GetAllOrdersAsync();
-        Task<PagedResult<Order>> GetOrdersAsync(int pageNumber, int pageSize); // ✅ NEW: Pagination support
+        Task<PagedResult<Order>> GetOrdersAsync(int pageNumber, int pageSize, string? status = null); // ✅ NEW: Pagination support & Status filter
         Task<Order?> GetOrderByIdAsync(int id);
         Task<IEnumerable<Order>> GetOrdersByTableAsync(int tableId);
      Task<Order> CreateOrderAsync(Order order);

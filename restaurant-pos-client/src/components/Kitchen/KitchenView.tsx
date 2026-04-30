@@ -91,8 +91,8 @@ const KitchenView: React.FC = () => {
 
     const fetchPendingOrders = async () => {
         try {
-            const allOrders = await orderService.getAll();
-            // Filter only Pending or Processing orders
+            const allOrders = await orderService.getAll('Pending,Processing');
+            // Filter only Pending or Processing orders (mostly redundant now, but safe)
             const pending = allOrders
                 .filter(o => o.status === 'Pending' || o.status === 'Processing')
                 .map(mapToKitchenOrder)

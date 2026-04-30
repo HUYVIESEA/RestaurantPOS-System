@@ -30,7 +30,7 @@ const ProductOptionsModal: React.FC<ProductOptionsModalProps> = ({ product, isOp
 
   if (!isOpen) return null;
 
-  const handleModifierToggle = (item: ModifierItem, modGroupId: number) => {
+  const handleModifierToggle = (item: ModifierItem) => {
     const isSelected = selectedModifiers.some(m => m.id === item.id);
     if (isSelected) {
       setSelectedModifiers(selectedModifiers.filter(m => m.id !== item.id));
@@ -109,7 +109,7 @@ const ProductOptionsModal: React.FC<ProductOptionsModalProps> = ({ product, isOp
                         <input 
                           type="checkbox" 
                           checked={isSelected}
-                          onChange={() => handleModifierToggle(item, modGroup.id)}
+                          onChange={() => handleModifierToggle(item)}
                           className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                         />
                         <span className="font-medium text-slate-800 dark:text-slate-200">{item.name}</span>

@@ -2,10 +2,13 @@ import apiClient from './api';
 import { Order, OrderItem, PagedResult } from '../types';
 
 export const orderService = {
-  getAll: async (): Promise<Order[]> => {
+  getAll: async (status?: string): Promise<Order[]> => {
     // Analytics needs ALL orders to calculate revenue, growth, etc.
     // The backend endpoint is paged, so we request a large page size.
-    const response = await apiClient.get<PagedResult<Order>>('/Orders?page=1&pageSize=10000');
+    const url = status 
+      ? `/Orders?page=1&pageSize=1000&status=${status}` 
+      : '/Orders?page=1&pageSize=1000';
+    const response = await apiClient.get<PagedResult<Order>>(url);
     // Normalize response: check if it's paged
     if (response.data && 'items' in response.data) {
        return response.data.items;
@@ -32,6 +35,15 @@ export const orderService = {
   updateStatus: async (id: number, status: string): Promise<void> => {
     // Backend expects UpdateOrderStatusRequest DTO: { status: string }
     await apiClient.patch(`/Orders/${id}/Status`, { status });
+  },
+
+  // ✅ NEW: Complete order and process payment
+  completeOrder: async (id: number, receivedAmount: number, paymentMethod: string): Promise<Order> => {
+    const response = await apiClient.put<Order>(`/Orders/${id}/Complete`, {
+      receivedAmount,
+      paymentMethod
+    });
+    return response.data;
   },
 
   // ✅ NEW: Add item to existing order

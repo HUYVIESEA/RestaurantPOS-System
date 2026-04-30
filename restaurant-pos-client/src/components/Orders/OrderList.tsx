@@ -150,11 +150,11 @@ const OrderList: React.FC = () => {
     setShowQR(false); // Reset to method selection
   };
 
-  const handlePaymentComplete = async () => {
+  const handlePaymentComplete = async (paymentMethod: string = 'Cash') => {
     if (!payingOrder) return;
 
     try {
-      await orderService.updateStatus(payingOrder.id, 'Completed');
+      await orderService.completeOrder(payingOrder.id, payingOrder.totalAmount, paymentMethod);
       
       setOrders(orders.map(o => o.id === payingOrder.id ? { ...o, status: 'Completed' } : o));
       showToast(`<i class="fa-solid fa-check-circle mr-1"></i> Thanh toán thành công đơn hàng #${payingOrder.id}`, 'success');
@@ -169,7 +169,7 @@ const OrderList: React.FC = () => {
   const handleCashPayment = () => {
     if (!payingOrder) return;
     if (window.confirm(`Xác nhận thanh toán tiền mặt cho đơn #${payingOrder.id}?\n\nTổng tiền: ${formatPrice(payingOrder.totalAmount)}`)) {
-        handlePaymentComplete();
+        handlePaymentComplete('Cash');
     }
   };
 
@@ -477,7 +477,7 @@ const OrderList: React.FC = () => {
                 <VietQRView 
                     amount={payingOrder.totalAmount}
                     description={`Thanh toan don ${payingOrder.id}`}
-                    onSuccess={handlePaymentComplete}
+                    onSuccess={() => handlePaymentComplete('Bank Transfer')}
                     onCancel={() => setShowQR(false)}
                 />
             ) : (
