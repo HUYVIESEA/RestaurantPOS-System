@@ -59,7 +59,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                 className="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 dark:text-amber-400 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                 onClick={() => setShowRoleMenu(!showRoleMenu)}
               >
-                🔄 Đổi vai trò
+                <i className="fa-solid fa-rotate mr-2"></i> Đổi vai trò
               </button>
               {showRoleMenu && (
                 <div className="absolute bottom-full left-0 md:left-auto md:right-0 mb-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden py-1 z-50">
@@ -67,13 +67,13 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                     className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                     onClick={() => handleBulkRoleChange('Admin')}
                   >
-                    👑 Đổi thành Admin
+                    <i className="fa-solid fa-crown mr-2"></i> Đổi thành Admin
                   </button>
                   <button 
                     className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                     onClick={() => handleBulkRoleChange('Staff')}
                   >
-                    👤 Đổi thành Staff
+                    <i className="fa-solid fa-user mr-2"></i> Đổi thành Staff
                   </button>
                 </div>
               )}
@@ -85,7 +85,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                 className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-500 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                 onClick={() => setShowStatusMenu(!showStatusMenu)}
               >
-                🔒 Thay đổi trạng thái
+                <i className="fa-solid fa-lock mr-2"></i> Thay đổi trạng thái
               </button>
               {showStatusMenu && (
                 <div className="absolute bottom-full left-0 md:left-auto md:right-0 mb-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden py-1 z-50">
@@ -93,13 +93,13 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                     className="w-full text-left px-4 py-2 text-sm text-blue-700 dark:text-blue-500 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                     onClick={() => handleBulkStatusChange(true)}
                   >
-                    ✅ Kích hoạt tất cả
+                    <i className="fa-solid fa-check mr-2"></i> Kích hoạt tất cả
                   </button>
                   <button 
                     className="w-full text-left px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                     onClick={() => handleBulkStatusChange(false)}
                   >
-                    ⛔ Vô hiệu hóa tất cả
+                    <i className="fa-solid fa-ban mr-2"></i> Vô hiệu hóa tất cả
                   </button>
                 </div>
               )}
@@ -110,7 +110,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
               className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 dark:text-rose-400 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               onClick={() => setShowConfirm(true)}
             >
-              🗑️ Xóa ({selectedUsers.length})
+              <i className="fa-solid fa-trash-can mr-2"></i> Xóa ({selectedUsers.length})
             </button>
 
             {/* Clear Selection */}
@@ -130,7 +130,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
             <div className="bg-rose-50 dark:bg-rose-900/30 p-4 border-b border-rose-100 dark:border-rose-800/50">
               <h3 className="text-lg font-bold text-rose-700 dark:text-rose-400 flex items-center gap-2">
-                ⚠️ Xác nhận hành động
+                <i className="fa-solid fa-triangle-exclamation text-rose-500 mr-2"></i> Xác nhận hành động
               </h3>
             </div>
             
@@ -154,7 +154,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
               </div>
               
               <p className="text-rose-600 dark:text-rose-400 text-sm font-medium pt-2">
-                ⚠️ Hành động này không thể hoàn tác!
+                <i className="fa-solid fa-triangle-exclamation text-rose-500 mr-1"></i> Hành động này không thể hoàn tác!
               </p>
             </div>
             

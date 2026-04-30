@@ -206,7 +206,7 @@ const UserList: React.FC = () => {
       fallback={
         <div className="flex items-center justify-center min-h-[400px] p-6">
           <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg max-w-md w-full text-center border border-slate-200 dark:border-slate-700">
-            <div className="text-5xl mb-4">🔒</div>
+            <div className="text-5xl mb-4"><i className="fa-solid fa-lock text-slate-400"></i></div>
             <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Không có quyền truy cập</h2>
             <p className="text-slate-600 dark:text-slate-300 mb-2">Bạn không có quyền truy cập trang quản lý người dùng.</p>
             <p className="text-slate-600 dark:text-slate-300 mb-6">Chỉ có <strong className="text-slate-800 dark:text-slate-100">Admin</strong> mới có thể quản lý người dùng.</p>
@@ -260,13 +260,13 @@ const UserList: React.FC = () => {
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${roleFilter === 'Admin' ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm' : 'text-slate-500 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400'}`}
                 onClick={() => setRoleFilter('Admin')}
               >
-                👑 Admin
+                <><i className="fa-solid fa-crown mr-1"></i> Admin</>
               </button>
               <button 
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${roleFilter === 'Staff' ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-500 shadow-sm' : 'text-slate-500 hover:text-blue-700 dark:text-slate-400 dark:hover:text-blue-500'}`}
                 onClick={() => setRoleFilter('Staff')}
               >
-                👤 Staff
+                <><i className="fa-solid fa-user mr-1"></i> Staff</>
               </button>
            </div>
            
@@ -303,7 +303,7 @@ const UserList: React.FC = () => {
                       </div>
                    </div>
                    <div className={`px-2 py-1 rounded text-xs font-semibold border ${user.role === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-900 dark:text-blue-500'}`}>
-                      {user.role === 'Admin' ? '👑 Admin' : '👤 Staff'}
+                      {user.role === 'Admin' ? <><i className="fa-solid fa-crown mr-1"></i> Admin</> : <><i className="fa-solid fa-user mr-1"></i> Staff</>}
                    </div>
                 </div>
                 

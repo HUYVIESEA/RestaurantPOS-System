@@ -92,13 +92,13 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
 
   const getActionIcon = (action: ActivityLogEntry['action']) => {
     switch (action) {
-      case 'create': return '➕';
-      case 'update': return '✏️';
-      case 'delete': return '🗑️';
-      case 'role_change': return '🔄';
-      case 'status_change': return '🔒';
-      case 'password_reset': return '🔑';
-      default: return '📝';
+      case 'create': return <i className="fa-solid fa-plus text-green-500"></i>;
+      case 'update': return <i className="fa-solid fa-pen text-blue-500"></i>;
+      case 'delete': return <i className="fa-solid fa-trash-can text-red-500"></i>;
+      case 'role_change': return <i className="fa-solid fa-rotate text-amber-500"></i>;
+      case 'status_change': return <i className="fa-solid fa-lock text-purple-500"></i>;
+      case 'password_reset': return <i className="fa-solid fa-key text-yellow-500"></i>;
+      default: return <i className="fa-solid fa-file-lines text-slate-500"></i>;
     }
   };
 
@@ -139,7 +139,7 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
   //   return (
   //     <div className="activity-log">
   //       <div className="activity-log-header">
-  //         <h3>📋 Nhật ký hoạt động</h3>
+  //         <h3><i className="fa-solid fa-list mr-2"></i> Nhật ký hoạt động</h3>
   //       </div>
   //       <Loading message="Đang tải nhật ký..." size="small" />
   //     </div>
@@ -149,12 +149,12 @@ export const ActivityLog: React.FC<ActivityLogProps> = ({ userId, limit = 10 }) 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 space-y-4">
       <div className="flex justify-between items-center pb-2 border-b dark:border-slate-700">
-        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">📋 Nhật ký hoạt động</h3>
+        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100"><i className="fa-solid fa-list mr-2"></i> Nhật ký hoạt động</h3>
         <button 
           className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-500 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors flex items-center gap-2" 
           onClick={fetchActivityLogs}
         >
-          🔄 Làm mới
+          <i className="fa-solid fa-rotate mr-2"></i> Làm mới
         </button>
       </div>
 

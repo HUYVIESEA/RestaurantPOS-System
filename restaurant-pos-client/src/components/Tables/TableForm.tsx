@@ -16,9 +16,8 @@ const TableForm: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [existingFloors, setExistingFloors] = useState<string[]>([]); // ✅ Dynamic floors
-  const [showCustomFloor, setShowCustomFloor] = useState(false); // ✅ Custom floor input
-  const [customFloorName, setCustomFloorName] = useState('');
+  const [existingFloors, setExistingFloors] = useState<string[]>([]);
+  const [isFloorDropdownOpen, setIsFloorDropdownOpen] = useState(false);
 
   // ✅ Suggested floor names
   const suggestedFloors = [
@@ -71,10 +70,8 @@ const TableForm: React.FC = () => {
       return;
     }
 
-    // ✅ Use custom floor name if provided
-    const finalFloor = showCustomFloor && customFloorName.trim() 
-    ? customFloorName.trim() 
-      : formData.floor;
+    // ✅ Use the current floor input
+    const finalFloor = formData.floor.trim();
 
     if (!finalFloor) {
       setError('Vui lòng chọn hoặc nhập tên tầng');
@@ -177,67 +174,73 @@ const TableForm: React.FC = () => {
           </div>
         </div>
 
-   {/* ✅ Enhanced Floor Selection */}
-      <div className="flex flex-col gap-2">
+   {/* ✅ Custom Combobox for Floor Selection */}
+      <div className="flex flex-col gap-2 relative">
           <label htmlFor="floor" className="text-sm font-medium text-gray-700 dark:text-gray-300">Tầng / Khu vực *</label>
-      
- {!showCustomFloor ? (
-<>
-   <select
-   id="floor"
-      name="floor"
-       value={formData.floor}
-      onChange={handleChange}
-      required
-      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
-    >
-     {allFloorOptions.map(floor => (
-<option key={floor} value={floor}>
-   {floor}
-  {existingFloors.includes(floor) ? ' (đang sử dụng)' : ''}
-</option>
-        ))}
- </select>
-        <button
-                type="button"
-            className="mt-2 text-sm text-blue-700 dark:text-blue-500 font-medium flex items-center gap-1 hover:text-blue-900 dark:hover:text-blue-300 py-2 touch-manipulation"
-        onClick={() => setShowCustomFloor(true)}
-    >
-         ➕ Thêm tầng mới
-           </button>
-     </>
-          ) : (
-   <>
-  <input
-                type="text"
-      value={customFloorName}
-        onChange={(e) => setCustomFloorName(e.target.value)}
-    placeholder="Nhập tên tầng mới (VD: Tầng 3, Khu VIP...)"
-      maxLength={50}
-                autoFocus
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
-              />
-           <div className="flex items-center justify-between mt-2">
-     <button
-  type="button"
-    className="text-sm text-red-500 hover:text-red-700 py-1 px-2 rounded touch-manipulation"
-        onClick={() => {
-               setShowCustomFloor(false);
-  setCustomFloorName('');
-       }}
-         >
-        ✗ Hủy
-        </button>
-                <small className="text-xs text-gray-500 dark:text-gray-400">
-          💡 Tầng mới sẽ tự động xuất hiện trong danh sách
-          </small>
-              </div>
-        </>
+          <div className="relative">
+            <input
+              type="text"
+              id="floor"
+              name="floor"
+              value={formData.floor}
+              onChange={handleChange}
+              onFocus={() => setIsFloorDropdownOpen(true)}
+              onBlur={() => setTimeout(() => setIsFloorDropdownOpen(false), 200)}
+              required
+              placeholder="Chọn hoặc nhập khu vực mới (VD: Tầng 3...)"
+              maxLength={50}
+              className="w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all"
+              autoComplete="off"
+            />
+            <div 
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer p-2 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg"
+              onMouseDown={(e) => {
+                e.preventDefault(); // Giữ focus cho input
+                setIsFloorDropdownOpen(!isFloorDropdownOpen);
+              }}
+            >
+              <i className={`fas fa-chevron-${isFloorDropdownOpen ? 'up' : 'down'} text-sm`}></i>
+            </div>
+          </div>
+          
+          {isFloorDropdownOpen && (
+            <div className="absolute top-[84px] left-0 right-0 z-50 mt-1 max-h-60 overflow-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl">
+              {allFloorOptions
+                .filter(floor => 
+                  !formData.floor || 
+                  allFloorOptions.includes(formData.floor) || // Nếu đã chọn/có sẵn tên hoàn chỉnh thì hiện tất cả
+                  floor.toLowerCase().includes(formData.floor.toLowerCase())
+                )
+                .map(floor => (
+                <div 
+                  key={floor} 
+                  className={`px-4 py-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer text-gray-800 dark:text-gray-200 transition-colors ${formData.floor === floor ? 'bg-blue-50 dark:bg-gray-700 font-medium text-blue-700 dark:text-blue-400' : ''}`}
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, floor }));
+                    setIsFloorDropdownOpen(false);
+                  }}
+                >
+                  {floor} {existingFloors.includes(floor) && <span className="text-xs text-blue-600 dark:text-blue-400 ml-2">(đang dùng)</span>}
+                </div>
+              ))}
+              {formData.floor && !allFloorOptions.includes(formData.floor) && (
+                <div 
+                  className="px-4 py-3 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 italic font-medium cursor-pointer"
+                  onClick={() => setIsFloorDropdownOpen(false)}
+                >
+                  <i className="fas fa-plus-circle mr-2"></i>
+                  Tạo khu vực mới: "{formData.floor}"
+                </div>
+              )}
+            </div>
           )}
+          <small className="text-xs text-gray-500 dark:text-gray-400">
+             <i className="fa-solid fa-lightbulb text-yellow-500 mr-1"></i> Bạn có thể bấm mũi tên để chọn, hoặc gõ trực tiếp tên khu vực mới vào ô.
+          </small>
         </div>
 
         {/* ✅ Show existing floors count */}
-        {existingFloors.length > 0 && !showCustomFloor && (
+        {existingFloors.length > 0 && (
   <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-900/50 mt-2">
    <small className="text-sm text-gray-700 dark:text-gray-300">
       📊 Hiện có <strong className="font-bold">{existingFloors.length} tầng</strong>: {existingFloors.join(', ')}

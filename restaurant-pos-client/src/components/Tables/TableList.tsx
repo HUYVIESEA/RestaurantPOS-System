@@ -7,9 +7,11 @@ import { TABLE_MESSAGES } from '../../constants/messages';
 import TakeawayModal from './TakeawayModal';
 import TableDetailModal from './TableDetailModal';
 import { useSignalR } from '../../contexts/SignalRContext';
+import { usePermissions } from '../../hooks/usePermissions';
 
 const TableList: React.FC = () => {
     const navigate = useNavigate();
+    const permissions = usePermissions();
     const { showToast } = useToast();
     const [tables, setTables] = useState<Table[]>([]);
     const [selectedTable, setSelectedTable] = useState<Table | null>(null);
@@ -166,6 +168,15 @@ const TableList: React.FC = () => {
                     </span>
                 </div>
                 <div className="flex items-center gap-4">
+                    {permissions.tables.canCreate && (
+                        <button 
+                            className="flex-1 md:flex-none min-h-[44px] px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2"
+                            onClick={() => navigate('/tables/new')}
+                        >
+                            <i className="fas fa-plus"></i>
+                            Thêm bàn
+                        </button>
+                    )}
                     <button 
                         className="flex-1 md:flex-none min-h-[44px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2"
                         onClick={handleTakeawayClick}
@@ -230,26 +241,72 @@ const TableList: React.FC = () => {
                     
                     const dotColor = table.isAvailable ? 'bg-blue-600' : (table.isMerged ? 'bg-purple-500' : 'bg-rose-500');
 
+                    // Logic tính số lượng ghế (hiển thị đối xứng trên/dưới)
+                    const capacity = table.capacity || 4;
+                    const topChairs = Math.ceil(capacity / 2);
+                    const bottomChairs = Math.floor(capacity / 2);
+
+                    // Thay đổi hình dáng bàn (Tròn cho <=2 người, Vuông/Chữ nhật cho >=4 người)
+                    const isRound = capacity <= 2;
+                    const tableShapeClass = isRound ? 'rounded-full w-14 h-14' : 'rounded-xl w-20 h-14';
+
                     return (
                         <div
                             key={table.id}
-                            className={`relative group flex flex-col items-center justify-center p-4 h-24 rounded-xl cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-md border ${statusColor}`}
+                            className={`relative group flex flex-col items-center justify-center p-2 h-32 rounded-xl cursor-pointer transition-all transform hover:-translate-y-1 hover:shadow-md border ${statusColor}`}
                             onClick={() => handleTableClick(table)}
                         >
-                            <span className="text-lg font-bold">
-                                {table.tableNumber}
-                            </span>
+                            {/* Khu vực trung tâm: Bàn và Ghế */}
+                            <div className="relative flex items-center justify-center w-full mt-2">
+                                {/* Ghế phía trên */}
+                                <div className="absolute -top-2.5 left-0 right-0 flex justify-center gap-1.5">
+                                    {Array.from({length: Math.min(topChairs, 4)}).map((_, i) => (
+                                        <div key={`top-${i}`} className={`w-4 h-2.5 rounded-t-md opacity-80 ${dotColor}`}></div>
+                                    ))}
+                                </div>
+
+                                {/* Mặt bàn */}
+                                <div className={`relative flex items-center justify-center border-2 border-current shadow-sm bg-white/60 dark:bg-slate-800/60 z-10 ${tableShapeClass}`}>
+                                    <span className="text-base font-bold text-slate-800 dark:text-slate-100">
+                                        {table.tableNumber}
+                                    </span>
+                                </div>
+
+                                {/* Ghế phía dưới */}
+                                <div className="absolute -bottom-2.5 left-0 right-0 flex justify-center gap-1.5">
+                                    {Array.from({length: Math.min(bottomChairs, 4)}).map((_, i) => (
+                                        <div key={`bottom-${i}`} className={`w-4 h-2.5 rounded-b-md opacity-80 ${dotColor}`}></div>
+                                    ))}
+                                </div>
+                            </div>
                             
-                            <div className="mt-2 flex justify-center">
-                                <span className={`w-3 h-3 rounded-full ${dotColor} shadow-sm`}></span>
+                            {/* Sức chứa hiển thị như badge nhỏ phía dưới */}
+                            <div className="mt-5 flex items-center gap-1.5 bg-white/80 dark:bg-slate-800/80 px-2 py-0.5 rounded-full text-[10px] font-semibold text-slate-600 dark:text-slate-300 shadow-sm border border-slate-100 dark:border-slate-700">
+                                <i className="fas fa-user-friends opacity-70"></i>
+                                <span>{capacity}</span>
                             </div>
 
                             {!table.isAvailable && table.occupiedAt && (
-                                <div className="absolute -top-2 -right-2">
+                                <div className="absolute -top-2 -right-2 z-20">
                                     <div className="bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-rose-100 dark:border-rose-800 flex items-center gap-1">
+                                        <i className="far fa-clock"></i>
                                         {calculateDuration(table.occupiedAt)}
                                     </div>
                                 </div>
+                            )}
+
+                            {/* Edit Button for Admin/Manager */}
+                            {permissions.tables.canEdit && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/tables/edit/${table.id}`);
+                                    }}
+                                    className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all rounded-lg hover:bg-white/50 dark:hover:bg-slate-800/50"
+                                    title="Sửa bàn"
+                                >
+                                    <i className="fas fa-pen-to-square text-xs"></i>
+                                </button>
                             )}
                         </div>
                     );

@@ -38,16 +38,18 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-  const handleAddItem = async (productId: number, quantity: number, notes: string) => {
+  const handleAddItem = async (productId: number, quantity: number, notes: string, variantId?: number, modifierItemIds?: number[]) => {
     try {
       await orderService.addItem(parseInt(id!), {
         productId,
         quantity,
         notes: notes || undefined,
+        variantId,
+        modifierItemIds
       });
       setShowAddDialog(false);
       await fetchOrderDetail();
-      showSuccess(`✅ Đã thêm món thành công!\nSố lượng: ${quantity}`);
+      showSuccess(`<i class="fa-solid fa-check-circle mr-1"></i> Đã thêm món thành công!\nSố lượng: ${quantity}`);
     } catch (err) {
       console.error('Error adding item:', err);
       showError('Không thể thêm món');
@@ -182,7 +184,7 @@ const OrderDetail: React.FC = () => {
     try {
       await orderService.updateStatus(order!.id, 'Completed');
       
-      showSuccess(`✅ Thanh toán thành công!\nĐơn hàng #${order!.id} đã được thanh toán.`);
+      showSuccess(`<i class="fa-solid fa-check-circle mr-1"></i> Thanh toán thành công!\nĐơn hàng #${order!.id} đã được thanh toán.`);
       navigate('/tables');
     } catch (err) {
       console.error('Error completing payment:', err);
@@ -225,8 +227,12 @@ const OrderDetail: React.FC = () => {
       {showPaymentDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => { setShowPaymentDialog(false); setShowQR(false); }}>
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">
-              {showQR ? 'Thanh toán VietQR' : 'Chọn hình thức thanh toán'}
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6 text-center">
+              {showQR ? (
+                  <><i className="fa-solid fa-qrcode mr-2 text-blue-600"></i>Thanh toán VietQR</>
+              ) : (
+                  <><i className="fa-solid fa-credit-card mr-2 text-blue-600"></i>Chọn hình thức thanh toán</>
+              )}
             </h3>
             
             {!showQR ? (
@@ -292,7 +298,7 @@ const OrderDetail: React.FC = () => {
           className="min-h-[44px] px-5 bg-white hover:bg-slate-50 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-xl font-medium transition-colors shadow-sm flex items-center gap-2" 
           onClick={() => navigate('/tables')}
         >
-          <span>&larr;</span> Quay lại
+          <i className="fa-solid fa-arrow-left"></i> Quay lại
         </button>
       </div>
 
@@ -329,7 +335,7 @@ const OrderDetail: React.FC = () => {
               className="min-h-[44px] px-4 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors shadow-sm flex items-center gap-2"
               onClick={handleCancelSelected}
             >
-              🗑️ Hủy {selectedItems.size} món đã chọn
+              <i className="fa-solid fa-trash-can"></i> Hủy {selectedItems.size} món đã chọn
             </button>
           )}
         </div>
@@ -366,7 +372,23 @@ const OrderDetail: React.FC = () => {
                   )}
                   <td className="p-4 align-middle">
                     <div className="font-medium text-slate-800 dark:text-slate-200">{item.product?.name}</div>
-                    {item.notes && <div className="text-sm text-slate-500 dark:text-slate-400 mt-1 italic">({item.notes})</div>}
+                    {(item.variantId || (item.modifierItemIds && item.modifierItemIds.length > 0)) && (
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-col gap-0.5">
+                        {item.variantId && item.product?.variants && (
+                          <span>Size: {item.product.variants.find(v => v.id === item.variantId)?.name || 'N/A'}</span>
+                        )}
+                        {item.modifierItemIds && item.modifierItemIds.length > 0 && item.product?.modifiers && (
+                          <span>+ {
+                            item.product.modifiers
+                              .flatMap(mg => mg.items)
+                              .filter(m => item.modifierItemIds!.includes(m.id))
+                              .map(m => m.name)
+                              .join(', ')
+                          }</span>
+                        )}
+                      </div>
+                    )}
+                    {item.notes && <div className="text-xs text-amber-600 dark:text-amber-500 mt-1 italic">"{item.notes}"</div>}
                     <div className="sm:hidden text-sm text-slate-500 dark:text-slate-400 mt-1">{item.unitPrice.toLocaleString('vi-VN')} đ</div>
                   </td>
                   <td className="p-4 hidden sm:table-cell align-middle text-slate-600 dark:text-slate-300">
@@ -434,20 +456,23 @@ const OrderDetail: React.FC = () => {
       {/* Help Texts */}
       <div className="space-y-3">
         {order.status === 'Pending' && (
-          <div className="p-4 rounded-xl bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 text-sm">
-            💡 <strong>Lưu ý:</strong> Chỉ có thể hủy món khi đơn hàng đang ở trạng thái "Đang xử lý"
+          <div className="p-4 rounded-xl bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 text-sm flex items-start gap-2">
+            <i className="fa-solid fa-lightbulb mt-0.5"></i>
+            <div>
+               <strong>Lưu ý:</strong> Chỉ có thể hủy món khi đơn hàng đang ở trạng thái "Đang xử lý"
+            </div>
           </div>
         )}
 
         {order.status !== 'Pending' && order.status !== 'Prepared' && (
-          <div className="p-4 rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 text-sm">
-            ℹ️ Đơn hàng đã {order.status === 'Completed' ? 'thanh toán' : 'bị hủy'}. Không thể chỉnh sửa.
+          <div className="p-4 rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 text-sm flex items-center gap-2">
+            <i className="fa-solid fa-circle-info"></i> Đơn hàng đã {order.status === 'Completed' ? 'thanh toán' : 'bị hủy'}. Không thể chỉnh sửa.
           </div>
         )}
 
         {order.status === 'Prepared' && (
-          <div className="p-4 rounded-xl bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 font-medium">
-            ✅ Món ăn đã nấu xong. Sẵn sàng thanh toán!
+          <div className="p-4 rounded-xl bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300 font-medium flex items-center gap-2">
+            <i className="fa-solid fa-circle-check text-green-500"></i> Món ăn đã nấu xong. Sẵn sàng thanh toán!
           </div>
         )}
       </div>
@@ -460,13 +485,13 @@ const OrderDetail: React.FC = () => {
               className="flex-1 sm:flex-none min-h-[50px] px-6 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-amber-500/20 flex items-center justify-center gap-2"
               onClick={() => setShowAddDialog(true)}
             >
-              <span>➕</span> Thêm món
+              <i className="fa-solid fa-plus"></i> Thêm món
             </button>
             <button
               className="flex-1 sm:flex-none min-h-[50px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-blue-600/20 flex items-center justify-center gap-2"
               onClick={() => setShowPaymentDialog(true)}
             >
-              <span>💳</span> Thanh toán
+              <i className="fa-solid fa-credit-card"></i> Thanh toán
             </button>
           </>
         )}
@@ -476,7 +501,7 @@ const OrderDetail: React.FC = () => {
             className="w-full sm:max-w-md min-h-[56px] text-lg px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-colors shadow-md shadow-blue-600/30 flex items-center justify-center gap-2 mx-auto"
             onClick={() => setShowPaymentDialog(true)}
           >
-            <span>💳</span> Thanh toán ngay
+            <i className="fa-solid fa-credit-card"></i> Thanh toán ngay
           </button>
         )}
       </div>

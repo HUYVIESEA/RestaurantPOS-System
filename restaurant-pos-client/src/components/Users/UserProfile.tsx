@@ -242,7 +242,7 @@ const UserProfile: React.FC = () => {
                   </label>
                   <div className="pt-2">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${formData.isActive ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-500' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
-                      {formData.isActive ? '✅ Hoạt động' : '⛔ Khóa'}
+                      {formData.isActive ? <><i className="fa-solid fa-check-circle text-green-500 mr-1"></i> Hoạt động</> : <><i className="fa-solid fa-ban text-red-500 mr-1"></i> Khóa</>}
                     </span>
                   </div>
                 </div>

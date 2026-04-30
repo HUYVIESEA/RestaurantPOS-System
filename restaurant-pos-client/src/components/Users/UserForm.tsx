@@ -148,7 +148,7 @@ const UserForm: React.FC = () => {
   return (
     <div className="w-full p-4 md:p-6 bg-slate-50 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-200">
       <div className="flex justify-between items-center mb-6 pb-4 border-b dark:border-slate-700">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{isEditMode ? '✏️ Sửa người dùng' : '➕ Thêm người dùng mới'}</h2>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{isEditMode ? <><i className="fa-solid fa-pen mr-2"></i> Sửa người dùng</> : <><i className="fa-solid fa-plus mr-2"></i> Thêm người dùng mới</>}</h2>
         <button 
           className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors flex items-center gap-2" 
           onClick={() => navigate('/users')}
@@ -223,8 +223,8 @@ const UserForm: React.FC = () => {
               onChange={handleChange}
               className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors appearance-none"
             >
-              <option value="Staff">👤 Staff</option>
-              <option value="Admin">👑 Admin</option>
+              <option value="Staff">Staff</option>
+              <option value="Admin">Admin</option>
             </select>
           </div>
 
@@ -286,7 +286,7 @@ const UserForm: React.FC = () => {
               className="px-6 py-2.5 rounded-lg font-medium text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               disabled={loading}
             >
-              {loading ? 'Đang lưu...' : isEditMode ? '💾 Cập nhật' : '✓ Tạo người dùng'}
+              {loading ? 'Đang lưu...' : isEditMode ? <><i className="fa-solid fa-floppy-disk mr-1"></i> Cập nhật</> : <><i className="fa-solid fa-check mr-1"></i> Tạo người dùng</>}
             </button>
           </div>
         </form>

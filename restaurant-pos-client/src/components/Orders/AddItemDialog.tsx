@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { productService } from '../../services/productService';
 import { categoryService } from '../../services/categoryService';
 import { Product, Category } from '../../types';
+import ProductOptionsModal from './ProductOptionsModal';
 
 interface AddItemDialogProps {
-  onAdd: (productId: number, quantity: number, notes: string) => void;
+  onAdd: (productId: number, quantity: number, notes: string, variantId?: number, modifierItemIds?: number[]) => void;
   onCancel: () => void;
 }
 
@@ -16,6 +17,7 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
   const [_loading, setLoading] = useState(true);
+  const [configuringProduct, setConfiguringProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -54,6 +56,12 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
       alert('Vui lòng chọn món');
       return;
     }
+    
+    if ((selectedProduct.variants && selectedProduct.variants.length > 0) || (selectedProduct.modifiers && selectedProduct.modifiers.length > 0)) {
+      setConfiguringProduct(selectedProduct);
+      return;
+    }
+
     if (quantity < 1) {
       alert('Số lượng phải >= 1');
       return;
@@ -65,8 +73,10 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-gray-700">
         <div className="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-800/50">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">➕ Thêm món</h3>
-          <button className="text-gray-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-700" onClick={onCancel}>✕</button>
+          <h3 className="text-xl font-bold text-white flex items-center gap-2"><i className="fa-solid fa-plus text-amber-500"></i> Thêm món</h3>
+          <button className="text-gray-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-700" onClick={onCancel}>
+             <i className="fa-solid fa-xmark"></i>
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
@@ -100,7 +110,7 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
                 <div className="text-gray-100 font-medium mb-1 truncate">{product.name}</div>
                 <div className="text-amber-400 text-sm font-bold">{product.price.toLocaleString('vi-VN')} đ</div>
                 {selectedProduct?.id === product.id && (
-                  <div className="absolute top-2 right-2 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs shadow-md">✓</div>
+                  <div className="absolute top-2 right-2 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs shadow-md"><i className="fa-solid fa-check"></i></div>
                 )}
               </div>
             ))}
@@ -132,7 +142,7 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
                       className="w-10 h-10 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors font-bold text-lg"
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     >
-                      −
+                      <i className="fa-solid fa-minus"></i>
                     </button>
                     <input
                       type="number"
@@ -145,7 +155,7 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
                       className="w-10 h-10 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors font-bold text-lg"
                       onClick={() => setQuantity(quantity + 1)}
                     >
-                      +
+                      <i className="fa-solid fa-plus"></i>
                     </button>
                   </div>
                 </div>
@@ -184,10 +194,28 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
             onClick={handleSubmit}
             disabled={!selectedProduct}
           >
-            ✓ Thêm món ({quantity})
+            <i className="fa-solid fa-check mr-2"></i> Thêm món ({quantity})
           </button>
         </div>
       </div>
+
+      {configuringProduct && (
+        <ProductOptionsModal
+          product={configuringProduct}
+          isOpen={!!configuringProduct}
+          onClose={() => setConfiguringProduct(null)}
+          onConfirm={(variant, modifiers, qty, customNotes) => {
+             setConfiguringProduct(null);
+             onAdd(
+                 configuringProduct.id, 
+                 qty || 1, 
+                 customNotes || '', 
+                 variant?.id, 
+                 modifiers?.map(m => m.id)
+             );
+          }}
+        />
+      )}
     </div>
   );
 };

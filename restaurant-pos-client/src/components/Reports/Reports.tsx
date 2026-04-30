@@ -410,7 +410,7 @@ const Reports: React.FC = () => {
             <div className="text-2xl font-bold text-slate-800 dark:text-white">{orderStats.totalOrders}</div>
           </div>
           <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700 text-center">
-            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl mx-auto mb-2">✅</div>
+            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl mx-auto mb-2"><i className="fa-solid fa-check-circle"></i></div>
             <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Hoàn Thành</h3>
             <div className="text-2xl font-bold text-blue-700 dark:text-blue-500">{orderStats.completedOrders}</div>
             <div className="text-xs font-medium text-blue-600 mt-1">{orderStats.completionRate.toFixed(1)}%</div>

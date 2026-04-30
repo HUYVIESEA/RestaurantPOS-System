@@ -4,16 +4,21 @@ import { orderService } from '../../services/orderService';
 import { productService } from '../../services/productService';
 import { tableService } from '../../services/tableService';
 import { categoryService } from '../../services/categoryService';
-import { Order, OrderItem, Product, Table, Category } from '../../types';
+import { Order, OrderItem, Product, Table, Category, ProductVariant, ModifierItem } from '../../types';
 import Toast from '../Common/Toast';
 import { useVoiceRecognition } from '../../hooks/useVoiceRecognition';
 import { parseVoiceOrder } from '../../utils/voiceOrderParser';
 import { useTextToSpeech } from '../../hooks/useTextToSpeech';
+import ProductOptionsModal from './ProductOptionsModal';
 
 interface CartItem {
+  cartId: string;
   product: Product;
   quantity: number;
   notes: string;
+  variant?: ProductVariant;
+  modifiers?: ModifierItem[];
+  unitPrice: number;
 }
 
 const OrderForm: React.FC = () => {
@@ -34,6 +39,7 @@ const OrderForm: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [configuringProduct, setConfiguringProduct] = useState<Product | null>(null);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,11 +89,15 @@ const OrderForm: React.FC = () => {
               let spokenItems: string[] = [];
 
               parsedItems.forEach(({ product, quantity }) => {
-                   const existingIndex = newCart.findIndex(i => i.product.id === product.id);
+                   const isUnlimited = product.stockQuantity !== undefined && product.stockQuantity < 0;
+                   const modIds = '';
+                   const cartId = `${product.id}-0-${modIds}`;
+                   const existingIndex = newCart.findIndex(i => i.cartId === cartId);
+                   
                    if (existingIndex > -1) {
                        newCart[existingIndex].quantity += quantity;
                    } else {
-                       newCart.push({ product, quantity: quantity, notes: '' });
+                       newCart.push({ cartId, product, quantity, notes: '', unitPrice: product.price });
                    }
                    addedCount++;
                    spokenItems.push(`${quantity} ${product.name}`);
@@ -137,33 +147,46 @@ const OrderForm: React.FC = () => {
     }
   };
 
-  const addToCart = (product: Product) => {
-    const existing = cart.find(item => item.product.id === product.id);
+  const handleProductClick = (product: Product) => {
+    if ((product.variants && product.variants.length > 0) || (product.modifiers && product.modifiers.length > 0)) {
+      setConfiguringProduct(product);
+    } else {
+      addToCart(product, undefined, [], 1, '');
+    }
+  };
+
+  const addToCart = (product: Product, variant?: ProductVariant, modifiers: ModifierItem[] = [], qty: number = 1, customNotes: string = '') => {
+    const modIds = modifiers.map(m => m.id).sort().join(',');
+    const cartId = `${product.id}-${variant?.id || 0}-${modIds}-${customNotes}`;
+    const unitPrice = product.price + (variant?.priceDelta || 0) + modifiers.reduce((sum, m) => sum + (m.priceDelta || 0), 0);
+
+    const existing = cart.find(item => item.cartId === cartId);
     const currentQty = existing ? existing.quantity : 0;
     const isUnlimited = product.stockQuantity !== undefined && product.stockQuantity < 0;
     
-    if (!isUnlimited && product.stockQuantity !== undefined && (currentQty + 1) > product.stockQuantity) {
+    if (!isUnlimited && product.stockQuantity !== undefined && (currentQty + qty) > product.stockQuantity) {
        setError(`Sản phẩm "${product.name}" chỉ còn ${product.stockQuantity} món`);
        return;
     }
 
     if (existing) {
       setCart(cart.map(item =>
-        item.product.id === product.id
-          ? { ...item, quantity: item.quantity + 1 }
+        item.cartId === cartId
+          ? { ...item, quantity: item.quantity + qty }
           : item
       ));
     } else {
-      setCart([...cart, { product, quantity: 1, notes: '' }]);
+      setCart([...cart, { cartId, product, quantity: qty, notes: customNotes, variant, modifiers, unitPrice }]);
     }
     setError(null);
+    setConfiguringProduct(null);
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (cartId: string, quantity: number) => {
     if (quantity <= 0) {
-      setCart(cart.filter(item => item.product.id !== productId));
+      setCart(cart.filter(item => item.cartId !== cartId));
     } else {
-      const item = cart.find(i => i.product.id === productId);
+      const item = cart.find(i => i.cartId === cartId);
       if (item) {
           const isUnlimited = item.product.stockQuantity !== undefined && item.product.stockQuantity < 0;
           if (!isUnlimited && item.product.stockQuantity !== undefined && quantity > item.product.stockQuantity) {
@@ -173,18 +196,18 @@ const OrderForm: React.FC = () => {
       }
 
       setCart(cart.map(item =>
-        item.product.id === productId ? { ...item, quantity } : item
+        item.cartId === cartId ? { ...item, quantity } : item
       ));
       setError(null);
     }
   };
 
-  const removeFromCart = (productId: number) => {
-    setCart(cart.filter(item => item.product.id !== productId));
+  const removeFromCart = (cartId: string) => {
+    setCart(cart.filter(item => item.cartId !== cartId));
   };
 
   const calculateTotal = () => {
-    return cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    return cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -215,8 +238,10 @@ const OrderForm: React.FC = () => {
             orderId: 0,
             productId: item.product.id,
             quantity: item.quantity,
-            unitPrice: item.product.price,
+            unitPrice: item.unitPrice,
             notes: item.notes || undefined,
+            variantId: item.variant?.id,
+            modifierItemIds: item.modifiers?.map(m => m.id),
         })) as OrderItem[],
       };
 
@@ -227,7 +252,7 @@ const OrderForm: React.FC = () => {
       }
       
       const selectedTableData = tables.find(t => t.id === selectedTable);
-      setToastMessage(`✅ Đã tạo đơn cho ${selectedTableData?.tableNumber || 'Mang về'}! Tổng: ${calculateTotal().toLocaleString('vi-VN')} đ`);
+      setToastMessage(`<i class="fa-solid fa-check-circle mr-1"></i> Đã tạo đơn cho ${selectedTableData?.tableNumber || 'Mang về'}! Tổng: ${calculateTotal().toLocaleString('vi-VN')} đ`);
       setShowToast(true);
       
       setTimeout(() => {
@@ -254,6 +279,15 @@ const OrderForm: React.FC = () => {
         />
       )}
 
+      {configuringProduct && (
+        <ProductOptionsModal
+          product={configuringProduct}
+          isOpen={!!configuringProduct}
+          onClose={() => setConfiguringProduct(null)}
+          onConfirm={(variant, modifiers, qty, notes) => addToCart(configuringProduct, variant, modifiers || [], qty || 1, notes || '')}
+        />
+      )}
+
       {supported && isListening && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all" onClick={stop}>
           <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full mx-4 border border-slate-100 dark:border-slate-700" onClick={e => e.stopPropagation()}>
@@ -274,8 +308,8 @@ const OrderForm: React.FC = () => {
       )}
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white">
-          {isTakeaway ? '🥡 Đơn Mang Về' : '🛒 Tạo đơn hàng mới'}
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+          {isTakeaway ? <><i className="fa-solid fa-box-open text-blue-600"></i> Đơn Mang Về</> : <><i className="fa-solid fa-cart-shopping text-blue-600"></i> Tạo đơn hàng mới</>}
         </h2>
         
         <div className="flex flex-wrap items-center gap-4">
@@ -314,7 +348,7 @@ const OrderForm: React.FC = () => {
         <div className="w-full lg:w-2/3 flex flex-col gap-6">
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-              📋 Thực đơn
+              <i className="fa-solid fa-clipboard-list text-blue-600"></i> Thực đơn
             </h3>
             
             {/* Category Filter */}
@@ -357,7 +391,7 @@ const OrderForm: React.FC = () => {
                       ? 'opacity-60 cursor-not-allowed grayscale-[0.5]' 
                       : 'cursor-pointer hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-600/30'
                     }`}
-                    onClick={() => !isOutOfStock && addToCart(product)}
+                    onClick={() => !isOutOfStock && handleProductClick(product)}
                   >
                     {product.imageUrl && (
                       <div className="w-full aspect-square rounded-xl overflow-hidden mb-3 bg-slate-100 dark:bg-slate-800">
@@ -457,25 +491,38 @@ const OrderForm: React.FC = () => {
               ) : (
                 <div className="flex flex-col gap-4">
                   {cart.map(item => (
-                    <div key={item.product.id} className="bg-white dark:bg-slate-700 p-3 rounded-xl border border-slate-200 dark:border-slate-600 shadow-sm flex flex-col gap-2 relative">
+                    <div key={item.cartId} className="bg-white dark:bg-slate-700 p-3 rounded-xl border border-slate-200 dark:border-slate-600 shadow-sm flex flex-col gap-2 relative">
                       <div className="flex justify-between items-start pr-6">
-                        <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm line-clamp-2">{item.product.name}</h4>
+                        <div>
+                          <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">{item.product.name}</h4>
+                          {(item.variant || (item.modifiers && item.modifiers.length > 0)) && (
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-col gap-0.5">
+                              {item.variant && <span>Size: {item.variant.name}</span>}
+                              {item.modifiers && item.modifiers.length > 0 && (
+                                <span>+ {item.modifiers.map(m => m.name).join(', ')}</span>
+                              )}
+                            </div>
+                          )}
+                          {item.notes && (
+                             <div className="text-xs text-amber-600 dark:text-amber-500 mt-1 italic">"{item.notes}"</div>
+                          )}
+                        </div>
                         <button
                           type="button"
                           className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:text-slate-500 dark:hover:text-red-400 dark:hover:bg-slate-600 transition-colors"
-                          onClick={() => removeFromCart(item.product.id)}
+                          onClick={() => removeFromCart(item.cartId)}
                           title="Xóa món"
                         >
                           <i className="fas fa-xmark"></i>
                         </button>
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-blue-700 dark:text-blue-500 font-bold text-sm">{(item.product.price * item.quantity).toLocaleString('vi-VN')} đ</p>
+                        <p className="text-blue-700 dark:text-blue-500 font-bold text-sm">{(item.unitPrice * item.quantity).toLocaleString('vi-VN')} đ</p>
                         <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600/50">
                           <button
                             type="button"
                             className="w-10 h-9 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 font-medium transition-colors"
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
                           >
                             <i className="fas fa-minus text-xs"></i>
                           </button>
@@ -483,7 +530,7 @@ const OrderForm: React.FC = () => {
                           <button
                             type="button"
                             className="w-10 h-9 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 font-medium transition-colors"
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
                           >
                             <i className="fas fa-plus text-xs"></i>
                           </button>
@@ -529,9 +576,9 @@ const OrderForm: React.FC = () => {
                     <i className="fas fa-circle-notch fa-spin"></i> Đang tạo...
                   </span>
                 ) : isTakeaway ? (
-                  <>🥡 Tạo đơn Mang Về</>
+                  <><i className="fa-solid fa-box-open"></i> Tạo đơn Mang Về</>
                 ) : (
-                  <>✓ Tạo đơn hàng</>
+                  <><i className="fa-solid fa-check"></i> Tạo đơn hàng</>
                 )}
               </button>
             </div>

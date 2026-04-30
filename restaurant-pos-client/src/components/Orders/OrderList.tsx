@@ -157,7 +157,7 @@ const OrderList: React.FC = () => {
       await orderService.updateStatus(payingOrder.id, 'Completed');
       
       setOrders(orders.map(o => o.id === payingOrder.id ? { ...o, status: 'Completed' } : o));
-      showToast(`✅ Thanh toán thành công đơn hàng #${payingOrder.id}`, 'success');
+      showToast(`<i class="fa-solid fa-check-circle mr-1"></i> Thanh toán thành công đơn hàng #${payingOrder.id}`, 'success');
       setPayingOrder(null);
       setShowQR(false);
     } catch (err) {

@@ -24,7 +24,7 @@ const ReturnTableDialog: React.FC<ReturnTableDialogProps> = ({
 
         <div className="p-6 space-y-6">
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300">
-            <p className="text-2xl m-0">⚠️</p>
+            <p className="text-2xl m-0"><i className="fa-solid fa-triangle-exclamation text-yellow-500"></i></p>
             <p className="m-0">Bàn này có <strong className="font-bold">{orderCount} đơn hàng</strong> chưa hoàn thành</p>
           </div>
 
@@ -40,9 +40,9 @@ const ReturnTableDialog: React.FC<ReturnTableDialogProps> = ({
           </div>
 
           <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
-            <p className="m-0">💡 <strong>Lưu ý:</strong></p>
+            <p className="m-0"><i className="fa-solid fa-lightbulb text-yellow-500 mr-1"></i> <strong>Lưu ý:</strong></p>
             <ul className="list-none p-0 space-y-1.5 m-0">
-              <li>✅ <strong>Hoàn thành đơn:</strong> Tính vào doanh thu, đơn chuyển sang "Hoàn thành"</li>
+              <li><i className="fa-solid fa-check text-green-500 mr-1"></i> <strong>Hoàn thành đơn:</strong> Tính vào doanh thu, đơn chuyển sang "Hoàn thành"</li>
               <li>❌ <strong>Chỉ trả bàn:</strong> Không tính doanh thu, đơn vẫn "Đang xử lý"</li>
             </ul>
           </div>
@@ -65,7 +65,7 @@ const ReturnTableDialog: React.FC<ReturnTableDialogProps> = ({
             className="py-3 px-4 rounded-xl font-semibold transition-colors flex-1 text-center touch-manipulation bg-blue-700 hover:bg-blue-800 text-white shadow-md shadow-blue-600/20"
             onClick={() => onConfirm(true)}
           >
-            ✅ Hoàn thành & Trả bàn
+            <i className="fa-solid fa-check mr-2"></i> Hoàn thành & Trả bàn
           </button>
         </div>
       </div>

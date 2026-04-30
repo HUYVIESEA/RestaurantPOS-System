@@ -27,7 +27,7 @@ export const ChangeRoleDialog: React.FC<ChangeRoleDialogProps> = ({
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
         <div className="bg-amber-50 dark:bg-amber-900/30 p-4 border-b border-amber-100 dark:border-amber-800/50">
           <h3 className="text-lg font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2">
-            <span className="text-xl">🔄</span> Thay đổi vai trò
+            <span className="text-xl"><i className="fa-solid fa-rotate"></i></span> Thay đổi vai trò
           </h3>
         </div>
 
@@ -40,7 +40,7 @@ export const ChangeRoleDialog: React.FC<ChangeRoleDialogProps> = ({
             <div className="flex flex-col items-center text-center gap-1">
               <span className="text-xs text-slate-500 dark:text-slate-400">Vai trò hiện tại:</span>
               <span className={`px-2.5 py-1 rounded text-xs font-semibold border ${currentRole === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-900 dark:text-blue-500'}`}>
-                {currentRole === 'Admin' ? '👑 Admin' : '👤 Staff'}
+                {currentRole === 'Admin' ? <><i className="fa-solid fa-crown mr-1"></i> Admin</> : <><i className="fa-solid fa-user mr-1"></i> Staff</>}
               </span>
             </div>
 
@@ -49,13 +49,13 @@ export const ChangeRoleDialog: React.FC<ChangeRoleDialogProps> = ({
             <div className="flex flex-col items-center text-center gap-1">
               <span className="text-xs text-slate-500 dark:text-slate-400">Vai trò mới:</span>
               <span className={`px-2.5 py-1 rounded text-xs font-semibold border ${newRole === 'Admin' ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-900 dark:text-blue-500'}`}>
-                {newRole === 'Admin' ? '👑 Admin' : '👤 Staff'}
+                {newRole === 'Admin' ? <><i className="fa-solid fa-crown mr-1"></i> Admin</> : <><i className="fa-solid fa-user mr-1"></i> Staff</>}
               </span>
             </div>
           </div>
 
           <div className="flex gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-sm rounded-lg border border-amber-100 dark:border-amber-800/50">
-            <span className="text-lg">⚠️</span>
+            <span className="text-lg"><i className="fa-solid fa-triangle-exclamation"></i></span>
             <p>
               {newRole === 'Admin' 
                 ? 'Admin có quyền truy cập toàn bộ hệ thống và quản lý người dùng.'
@@ -117,7 +117,7 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
           <>
             <div className="bg-blue-50 dark:bg-blue-900/30 p-4 border-b border-blue-100 dark:border-blue-900/50">
               <h3 className="text-lg font-bold text-blue-800 dark:text-blue-500 flex items-center gap-2">
-                <span className="text-xl">🔑</span> Reset mật khẩu
+                <span className="text-xl"><i className="fa-solid fa-key"></i></span> Reset mật khẩu
               </h3>
             </div>
 
@@ -127,7 +127,7 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
               </p>
 
               <div className="flex gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-300 text-sm rounded-lg border border-blue-100 dark:border-blue-900/50">
-                <span className="text-lg">ℹ️</span>
+                <span className="text-lg"><i className="fa-solid fa-info-circle"></i></span>
                 <p>
                   Mật khẩu mới sẽ được tạo tự động. Hãy lưu lại và gửi cho người dùng.
                 </p>
@@ -148,7 +148,7 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
           <>
             <div className="bg-blue-50 dark:bg-blue-900/30 p-4 border-b border-blue-100 dark:border-blue-900/50">
               <h3 className="text-lg font-bold text-blue-800 dark:text-blue-500 flex items-center gap-2">
-                <span className="text-xl">✅</span> Mật khẩu mới
+                <span className="text-xl"><i className="fa-solid fa-check text-green-500"></i></span> Mật khẩu mới
               </h3>
             </div>
 
@@ -168,13 +168,13 @@ export const ResetPasswordDialog: React.FC<ResetPasswordDialogProps> = ({
                     onClick={handleCopy}
                     title="Copy mật khẩu"
                   >
-                    {copied ? '✓ Đã copy' : '📋 Copy'}
+                    {copied ? <><i className="fa-solid fa-check mr-1"></i> Đã copy</> : <><i className="fa-solid fa-copy mr-1"></i> Copy</>}
                   </button>
                 </div>
               </div>
 
               <div className="flex gap-3 p-3 bg-rose-50 dark:bg-rose-900/20 text-rose-800 dark:text-rose-300 text-sm rounded-lg border border-rose-100 dark:border-rose-800/50 mt-4">
-                <span className="text-lg mt-0.5">⚠️</span>
+                <span className="text-lg mt-0.5"><i className="fa-solid fa-triangle-exclamation"></i></span>
                 <p>
                   <strong>Quan trọng:</strong> Hãy lưu lại mật khẩu này và gửi cho người dùng. 
                   Bạn sẽ không thể xem lại mật khẩu này sau khi đóng hộp thoại.
@@ -222,7 +222,7 @@ export const ToggleStatusDialog: React.FC<ToggleStatusDialogProps> = ({
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
         <div className={`p-4 border-b ${currentStatus ? 'bg-rose-50 border-rose-100 dark:bg-rose-900/30 dark:border-rose-800/50 text-rose-700 dark:text-rose-400' : 'bg-blue-50 border-blue-100 dark:bg-blue-900/30 dark:border-blue-900/50 text-blue-800 dark:text-blue-500'}`}>
           <h3 className="text-lg font-bold flex items-center gap-2">
-            <span className="text-xl">{currentStatus ? '🔒' : '🔓'}</span> {currentStatus ? 'Vô hiệu hóa' : 'Kích hoạt'} tài khoản
+            <span className="text-xl">{currentStatus ? <i className="fa-solid fa-lock"></i> : <i className="fa-solid fa-lock-open"></i>}</span> {currentStatus ? 'Vô hiệu hóa' : 'Kích hoạt'} tài khoản
           </h3>
         </div>
 
@@ -235,7 +235,7 @@ export const ToggleStatusDialog: React.FC<ToggleStatusDialogProps> = ({
             <div className="flex flex-col items-center text-center gap-1">
               <span className="text-xs text-slate-500 dark:text-slate-400">Trạng thái hiện tại:</span>
               <span className={`px-2.5 py-1 rounded text-xs font-semibold ${currentStatus ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-500' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
-                {currentStatus ? '✅ Hoạt động' : '⛔ Đã khóa'}
+                {currentStatus ? <><i className="fa-solid fa-check-circle text-green-500 mr-1"></i> Hoạt động</> : <><i className="fa-solid fa-ban text-red-500 mr-1"></i> Đã khóa</>}
               </span>
             </div>
 
@@ -244,13 +244,13 @@ export const ToggleStatusDialog: React.FC<ToggleStatusDialogProps> = ({
             <div className="flex flex-col items-center text-center gap-1">
               <span className="text-xs text-slate-500 dark:text-slate-400">Trạng thái mới:</span>
               <span className={`px-2.5 py-1 rounded text-xs font-semibold ${newStatus ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-500' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
-                {newStatus ? '✅ Hoạt động' : '⛔ Đã khóa'}
+                {newStatus ? <><i className="fa-solid fa-check-circle text-green-500 mr-1"></i> Hoạt động</> : <><i className="fa-solid fa-ban text-red-500 mr-1"></i> Đã khóa</>}
               </span>
             </div>
           </div>
 
           <div className="flex gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-300 text-sm rounded-lg border border-blue-100 dark:border-blue-900/50">
-            <span className="text-lg">ℹ️</span>
+            <span className="text-lg"><i className="fa-solid fa-info-circle"></i></span>
             <p>
               {currentStatus 
                 ? 'Người dùng sẽ không thể đăng nhập vào hệ thống sau khi bị vô hiệu hóa.'

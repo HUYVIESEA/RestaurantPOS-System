@@ -28,8 +28,8 @@ const CancelItemDialog: React.FC<CancelItemDialogProps> = ({ item, onConfirm, on
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-2xl shadow-xl w-full max-w-md flex flex-col overflow-hidden border border-gray-700">
         <div className="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-800/50">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">🗑️ Hủy món</h3>
-          <button className="text-gray-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-700" onClick={onCancel}>✕</button>
+          <h3 className="text-xl font-bold text-white flex items-center gap-2"><i className="fa-solid fa-trash-can text-red-500"></i> Hủy món</h3>
+          <button className="text-gray-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-700" onClick={onCancel}><i className="fa-solid fa-xmark"></i></button>
         </div>
 
         <div className="p-4 space-y-6">
@@ -150,7 +150,7 @@ const CancelItemDialog: React.FC<CancelItemDialogProps> = ({ item, onConfirm, on
 
             {cancelQuantity === maxQuantity && (
               <div className="mt-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center flex items-center justify-center gap-2">
-                <span>⚠️</span> Món này sẽ bị xóa hoàn toàn
+                <span><i className="fa-solid fa-triangle-exclamation text-amber-500"></i></span> Món này sẽ bị xóa hoàn toàn
               </div>
             )}
           </div>
@@ -167,7 +167,7 @@ const CancelItemDialog: React.FC<CancelItemDialogProps> = ({ item, onConfirm, on
             className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-xl font-bold transition-all shadow-lg shadow-red-500/20"
             onClick={handleConfirm}
           >
-            ✓ Xác nhận hủy ({cancelQuantity})
+            <i className="fa-solid fa-check mr-2"></i> Xác nhận hủy ({cancelQuantity})
           </button>
         </div>
       </div>

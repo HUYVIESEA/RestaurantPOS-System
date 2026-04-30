@@ -268,7 +268,7 @@ const Dashboard: React.FC = () => {
             className="flex items-center p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 rounded-2xl shadow-sm hover:shadow-md transition-all text-left"
             onClick={() => navigate('/orders')}
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-2xl mr-4">📋</div>
+            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-2xl mr-4"><i className="fa-solid fa-clipboard-list"></i></div>
             <div>
               <span className="block font-bold text-lg text-slate-800 dark:text-slate-100">Đơn hàng</span>
               <span className="block text-sm text-slate-500 dark:text-slate-400">Xem tất cả</span>

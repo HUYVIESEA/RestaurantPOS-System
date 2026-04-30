@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RestaurantPOS.API.Data;
@@ -11,9 +12,11 @@ using RestaurantPOS.API.Data;
 namespace RestaurantPOS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430062157_AddProductVariantsAndModifiers")]
+    partial class AddProductVariantsAndModifiers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -135,9 +138,6 @@ namespace RestaurantPOS.API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ModifierItemIdsJson")
-                        .HasColumnType("text");
-
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
@@ -153,9 +153,6 @@ namespace RestaurantPOS.API.Migrations
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
-
-                    b.Property<int?>("VariantId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -1050,13 +1047,13 @@ namespace RestaurantPOS.API.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 4, 30, 6, 30, 14, 443, DateTimeKind.Utc).AddTicks(1438),
+                            CreatedAt = new DateTime(2026, 4, 30, 6, 21, 56, 823, DateTimeKind.Utc).AddTicks(5651),
                             Email = "admin@restaurantpos.com",
                             FailedLoginAttempts = 0,
                             FullName = "Administrator",
                             IsActive = true,
                             MustChangePassword = false,
-                            PasswordHash = "$2a$11$K1gyX7GRY7z3.RvrBCABLuW057w5Ev9bvzG8YoOAXONES6vjC2KH.",
+                            PasswordHash = "$2a$11$mL3B6.xqPWcg8G.HzCYzI.SSmKuJ0zBQnDWS7.qHFbySK./WAyNWq",
                             Role = "Admin",
                             Username = "admin"
                         });
