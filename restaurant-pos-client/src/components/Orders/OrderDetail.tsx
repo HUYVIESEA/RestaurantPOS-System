@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import { Order, OrderItem } from '../../types';
 import { useToast } from '../../contexts/ToastContext';
-import AddItemDialog from './AddItemDialog';
+import AddItemDialog, { DialogCartItem } from './AddItemDialog';
 import CancelItemDialog from './CancelItemDialog';
 import VietQRView from '../Payment/VietQRView';
 
@@ -38,21 +38,23 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-  const handleAddItem = async (productId: number, quantity: number, notes: string, variantId?: number, modifierItemIds?: number[]) => {
+  const handleAddItem = async (items: DialogCartItem[]) => {
     try {
-      await orderService.addItem(parseInt(id!), {
-        productId,
-        quantity,
-        notes: notes || undefined,
-        variantId,
-        modifierItemIds
-      });
+      for (const item of items) {
+        await orderService.addItem(parseInt(id!), {
+          productId: item.product.id,
+          quantity: item.quantity,
+          notes: item.notes || undefined,
+          variantId: item.variant?.id,
+          modifierItemIds: item.modifiers?.map(m => m.id)
+        });
+      }
+      showSuccess(`Đã thêm ${items.length} món vào đơn hàng`);
       setShowAddDialog(false);
       await fetchOrderDetail();
-      showSuccess(`<i class="fa-solid fa-check-circle mr-1"></i> Đã thêm món thành công!\nSố lượng: ${quantity}`);
-    } catch (err) {
-      console.error('Error adding item:', err);
-      showError('Không thể thêm món');
+    } catch (err: any) {
+      showError(err.response?.data?.message || 'Lỗi khi thêm món');
+      throw err;
     }
   };
 

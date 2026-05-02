@@ -252,7 +252,7 @@ const OrderForm: React.FC = () => {
       }
       
       const selectedTableData = tables.find(t => t.id === selectedTable);
-      setToastMessage(`<i class="fa-solid fa-check-circle mr-1"></i> Đã tạo đơn cho ${selectedTableData?.tableNumber || 'Mang về'}! Tổng: ${calculateTotal().toLocaleString('vi-VN')} đ`);
+      setToastMessage(`Đã tạo đơn cho ${selectedTableData?.tableNumber || 'Mang về'}! Tổng: ${calculateTotal().toLocaleString('vi-VN')} đ`);
       setShowToast(true);
       
       setTimeout(() => {
