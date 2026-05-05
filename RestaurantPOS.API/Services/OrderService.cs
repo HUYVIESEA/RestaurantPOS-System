@@ -3,35 +3,26 @@ using RestaurantPOS.API.Data;
 using RestaurantPOS.API.Models;
 using Microsoft.AspNetCore.SignalR;
 using RestaurantPOS.API.Hubs;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RestaurantPOS.API.Services
 {
-    /// <summary>
-    /// Order Service with Hybrid Caching for enterprise performance
-    /// </summary>
     public class OrderService : IOrderService
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<RestaurantHub, IRestaurantClient> _hubContext;
         private readonly ILogger<OrderService> _logger;
-        private readonly ICacheService _cache;
-        
-        private const string CACHE_KEY_ORDER_PREFIX = "order:";
-        private const string CACHE_KEY_ORDERS_PREFIX = "orders:page:"; // For paginated lists
-        private const string CACHE_KEY_RECENT_ORDERS = "orders:recent:";
-        private const string CACHE_KEY_TABLE_ORDERS = "orders:table:";
-        private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(10);
 
         public OrderService(
             ApplicationDbContext context, 
             IHubContext<RestaurantHub, IRestaurantClient> hubContext, 
-            ILogger<OrderService> logger,
-            ICacheService cache)
+            ILogger<OrderService> logger)
         {
             _context = context;
             _hubContext = hubContext;
             _logger = logger;
-            _cache = cache;
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync()
@@ -47,15 +38,7 @@ namespace RestaurantPOS.API.Services
 
         public async Task<PagedResult<Order>> GetOrdersAsync(int pageNumber, int pageSize, string? status = null)
         {
-            var cacheKey = $"{CACHE_KEY_RECENT_ORDERS}{pageNumber}:{pageSize}:{status ?? "all"}";
-            
-            // Try cache first
-            var cached = await _cache.GetAsync<PagedResult<Order>>(cacheKey);
-            if (cached != null)
-            {
-                _logger.LogInformation("Orders page {Page} found in cache", pageNumber);
-                return cached;
-            }
+            _logger.LogInformation("Querying database for orders page {Page}", pageNumber);
 
             // Cache miss - query database
             var query = _context.Orders
@@ -73,6 +56,7 @@ namespace RestaurantPOS.API.Services
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
+                .AsSplitQuery()
                 .OrderByDescending(o => o.OrderDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -86,23 +70,14 @@ namespace RestaurantPOS.API.Services
                 PageSize = pageSize
             };
             
-            // Cache the result
-            await _cache.SetAsync(cacheKey, result, CacheExpiration);
+
 
             return result;
         }
 
         public async Task<Order?> GetOrderByIdAsync(int id)
         {
-            var cacheKey = $"{CACHE_KEY_ORDER_PREFIX}{id}";
-            
-            // Try cache first
-            var cached = await _cache.GetAsync<Order>(cacheKey);
-            if (cached != null)
-            {
-                _logger.LogInformation("Order {OrderId} found in cache", id);
-                return cached;
-            }
+            _logger.LogInformation("Querying database for order {OrderId}", id);
 
             // Cache miss - query database
             var order = await _context.Orders
@@ -110,27 +85,17 @@ namespace RestaurantPOS.API.Services
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(o => o.Id == id);
             
-            if (order != null)
-            {
-                await _cache.SetAsync(cacheKey, order, CacheExpiration);
-            }
+
             
             return order;
         }
 
         public async Task<IEnumerable<Order>> GetOrdersByTableAsync(int tableId)
         {
-            var cacheKey = $"{CACHE_KEY_TABLE_ORDERS}{tableId}";
-            
-            // Try cache first
-            var cached = await _cache.GetAsync<List<Order>>(cacheKey);
-            if (cached != null)
-            {
-                _logger.LogInformation("Orders for table {TableId} found in cache", tableId);
-                return cached;
-            }
+            _logger.LogInformation("Querying database for orders on table {TableId}", tableId);
 
             // Cache miss - query database
             var orders = await _context.Orders
@@ -138,50 +103,17 @@ namespace RestaurantPOS.API.Services
                 .Include(o => o.Table)
                 .Include(o => o.OrderItems!)
                 .ThenInclude(oi => oi.Product)
-                .Where(o => o.TableId == tableId)
+                .AsSplitQuery()
+                .Where(o => o.TableId == tableId && (o.Status == "Pending" || o.Status == "Processing"))
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
             
-            await _cache.SetAsync(cacheKey, orders, CacheExpiration);
+
             
             return orders;
         }
 
-        /// <summary>
-        /// Invalidates all cache entries related to an order
-        /// </summary>
-        private async Task InvalidateOrderCacheAsync(int? orderId = null, int? tableId = null, CancellationToken cancellationToken = default)
-        {
-            var keysToRemove = new List<string>();
-            
-            if (orderId.HasValue)
-            {
-                keysToRemove.Add($"{CACHE_KEY_ORDER_PREFIX}{orderId.Value}");
-            }
-            
-            if (tableId.HasValue)
-            {
-                keysToRemove.Add($"{CACHE_KEY_TABLE_ORDERS}{tableId.Value}");
-            }
-            
-            // Always invalidate recent orders list (paginated caches)
-            // We should use a wildcard or tag to invalidate all order lists, but since we use simple keys:
-            // This is a naive clear for common patterns. In production, use Redis Tags.
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10000:all");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10000:Pending,Processing");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:1000:all");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:1000:Pending,Processing");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:50:all");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:20:all");
-            keysToRemove.Add($"{CACHE_KEY_RECENT_ORDERS}1:10:all");
-            
-            foreach (var key in keysToRemove)
-            {
-                await _cache.RemoveAsync(key, cancellationToken);
-            }
-            
-            _logger.LogInformation("Invalidated {Count} cache keys for order {OrderId}", keysToRemove.Count, orderId);
-        }
+
 
         public async Task<Order> CreateOrderAsync(Order order)
         {
@@ -198,6 +130,7 @@ namespace RestaurantPOS.API.Services
                 // Optimization: Fetch all products in one query instead of N queries
                 var productIds = order.OrderItems.Select(i => i.ProductId).Distinct().ToList();
                 var products = await _context.Products
+                    .AsNoTracking()
                     .Where(p => productIds.Contains(p.Id))
                     .ToDictionaryAsync(p => p.Id);
 
@@ -242,8 +175,7 @@ namespace RestaurantPOS.API.Services
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
             
-            // Invalidate caches
-            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            _logger.LogInformation("Order {OrderId} created", order.Id);
             
             // Broadcast new order via SignalR
             await _hubContext.Clients.All.OrderCreated(order.Id);
@@ -257,6 +189,9 @@ namespace RestaurantPOS.API.Services
         {
             var order = await _context.Orders
                 .Include(o => o.Table)
+                .Include(o => o.OrderItems!)
+                .ThenInclude(oi => oi.Product)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(o => o.Id == id);
             
             if (order == null)
@@ -265,8 +200,7 @@ namespace RestaurantPOS.API.Services
             string oldStatus = order.Status;
             order.Status = status;
             
-            // Invalidate caches
-            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            _logger.LogInformation("Order {OrderId} status updated to {Status}", id, status);
 
             // ✅ Auto-free table when order is Completed or Cancelled
             if ((status == "Completed" || status == "Cancelled") && order.TableId.HasValue)
@@ -316,62 +250,73 @@ namespace RestaurantPOS.API.Services
         // ✅ Add item to existing order
         public async Task<Order?> AddItemToOrderAsync(int orderId, OrderItem item)
         {
+            return await AddItemsToOrderAsync(orderId, new List<OrderItem> { item });
+        }
+
+        // ✅ Add multiple items to existing order
+        public async Task<Order?> AddItemsToOrderAsync(int orderId, List<OrderItem> items)
+        {
             var order = await _context.Orders
-          .Include(o => o.OrderItems)
-       .FirstOrDefaultAsync(o => o.Id == orderId);
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            if (order == null)
+            if (order == null || items == null || !items.Any())
                 return null;
 
-            // Get product to set unit price
-            var product = await _context.Products
-                .FirstOrDefaultAsync(p => p.Id == item.ProductId);
-                
-            if (product == null)
-                return null;
+            var productIds = items.Select(i => i.ProductId).Distinct().ToList();
+            var products = await _context.Products
+                .Where(p => productIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id);
 
-            // ✅ NEW: Check if same product already exists in order
-            var existingItem = order.OrderItems?
-     .FirstOrDefault(oi => oi.ProductId == item.ProductId &&
-       (string.IsNullOrEmpty(oi.Notes) && string.IsNullOrEmpty(item.Notes) ||
-      oi.Notes == item.Notes));
-
-            if (existingItem != null)
+            foreach (var item in items)
             {
-                // Merge: Increase quantity of existing item
-                existingItem.Quantity += item.Quantity;
-                order.TotalAmount += product.Price * item.Quantity;
-            }
-            else
-            {
-                decimal unitPrice = product.Price;
-                if (item.VariantId.HasValue && product.Variants != null)
-                {
-                    var variant = product.Variants.FirstOrDefault(v => v.Id == item.VariantId.Value);
-                    if (variant != null) unitPrice += variant.PriceDelta;
-                }
-                if (item.ModifierItemIds != null && item.ModifierItemIds.Any() && product.Modifiers != null)
-                {
-                    var allMods = product.Modifiers.SelectMany(m => m.Items);
-                    foreach (var modId in item.ModifierItemIds)
-                    {
-                        var mod = allMods.FirstOrDefault(m => m.Id == modId);
-                        if (mod != null) unitPrice += mod.PriceDelta;
-                    }
-                }
+                if (!products.TryGetValue(item.ProductId, out var product))
+                    continue;
 
-                item.OrderId = orderId;
-                item.UnitPrice = unitPrice;
-                _context.OrderItems.Add(item);
-                order.TotalAmount += item.UnitPrice * item.Quantity;
+                var existingItem = order.OrderItems?
+                    .FirstOrDefault(oi => oi.ProductId == item.ProductId &&
+                                          (string.IsNullOrEmpty(oi.Notes) && string.IsNullOrEmpty(item.Notes) || oi.Notes == item.Notes) &&
+                                          oi.VariantId == item.VariantId &&
+                                          ((oi.ModifierItemIds == null && item.ModifierItemIds == null) || 
+                                           (oi.ModifierItemIds != null && item.ModifierItemIds != null && oi.ModifierItemIds.SequenceEqual(item.ModifierItemIds))));
+
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += item.Quantity;
+                    order.TotalAmount += CalculateUnitPrice(product, item) * item.Quantity;
+                }
+                else
+                {
+                    item.OrderId = orderId;
+                    item.UnitPrice = CalculateUnitPrice(product, item);
+                    _context.OrderItems.Add(item);
+                    order.TotalAmount += item.UnitPrice * item.Quantity;
+                }
             }
 
             await _context.SaveChangesAsync();
-            
-            // Invalidate caches
-            await InvalidateOrderCacheAsync(order.Id, order.TableId);
-            
+            _logger.LogInformation("Items added to order {OrderId}", orderId);
             return await GetOrderByIdAsync(orderId);
+        }
+
+        private decimal CalculateUnitPrice(Product product, OrderItem item)
+        {
+            decimal unitPrice = product.Price;
+            if (item.VariantId.HasValue && product.Variants != null)
+            {
+                var variant = product.Variants.FirstOrDefault(v => v.Id == item.VariantId.Value);
+                if (variant != null) unitPrice += variant.PriceDelta;
+            }
+            if (item.ModifierItemIds != null && item.ModifierItemIds.Any() && product.Modifiers != null)
+            {
+                var allMods = product.Modifiers.SelectMany(m => m.Items);
+                foreach (var modId in item.ModifierItemIds)
+                {
+                    var mod = allMods.FirstOrDefault(m => m.Id == modId);
+                    if (mod != null) unitPrice += mod.PriceDelta;
+                }
+            }
+            return unitPrice;
         }
 
         // ✅ NEW: Update item quantity
@@ -401,8 +346,7 @@ namespace RestaurantPOS.API.Services
 
             await _context.SaveChangesAsync();
             
-            // Invalidate caches
-            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            _logger.LogInformation("Item quantity updated in order {OrderId}", orderId);
             
             return await GetOrderByIdAsync(orderId);
         }
@@ -426,8 +370,7 @@ namespace RestaurantPOS.API.Services
 
             await _context.SaveChangesAsync();
             
-            // Invalidate caches
-            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            _logger.LogInformation("Item note updated in order {OrderId}", orderId);
             
             return await GetOrderByIdAsync(orderId);
         }
@@ -532,7 +475,7 @@ namespace RestaurantPOS.API.Services
 
             await _context.SaveChangesAsync();
             
-            await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            _logger.LogInformation("Order items updated in order {OrderId}", orderId);
             
             await _hubContext.Clients.All.OrderUpdated(orderId);
             await _hubContext.Clients.All.TableUpdated(order.TableId ?? 0);
@@ -603,8 +546,7 @@ namespace RestaurantPOS.API.Services
 
         await _context.SaveChangesAsync();
         
-        // Invalidate caches
-        await InvalidateOrderCacheAsync(order.Id, order.TableId);
+            _logger.LogInformation("Item removed from order {OrderId}", orderId);
         
         await _hubContext.Clients.All.OrderUpdated(orderId);
         await _hubContext.Clients.All.TableUpdated(order.TableId ?? 0);

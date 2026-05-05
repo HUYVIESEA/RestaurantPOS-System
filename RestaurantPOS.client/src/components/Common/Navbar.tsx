@@ -13,7 +13,8 @@ const Navbar: React.FC = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const isAdmin = useHasRole([ROLES.ADMIN]);
-  const isCashier = useHasRole([ROLES.CASHIER, 'Staff']);
+  const isManager = useHasRole([ROLES.MANAGER]);
+  const isStaff = useHasRole([ROLES.STAFF]);
   const isChef = useHasRole([ROLES.CHEF]);
 
   const isActive = (path: string) => {
@@ -31,7 +32,8 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  if (isChef) {
+  // Chef gets a dedicated minimal sidebar
+  if (isChef && !isAdmin) {
     return (
       <aside className="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 border-r border-gray-800 text-white shadow-xl flex flex-col transition-transform duration-300 transform md:translate-x-0 -translate-x-full">
         <div className="h-20 flex items-center px-6 border-b border-gray-800">
@@ -42,7 +44,22 @@ const Navbar: React.FC = () => {
             <span className="text-xl font-bold tracking-wider text-blue-600">MÀN BẾP</span>
           </Link>
         </div>
-        <div className="flex-1 overflow-y-auto"></div>
+        <div className="flex-1 overflow-y-auto py-4 px-3">
+          <ul className="space-y-1">
+            <li>
+              <Link to="/kitchen" className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive('/kitchen') ? 'bg-blue-600/20 text-blue-400' : 'text-gray-300 hover:bg-gray-800'}`}>
+                <i className="fas fa-fire-burner text-lg w-8 text-center"></i>
+                <span>Bếp</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/products" className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive('/products') ? 'bg-blue-600/20 text-blue-400' : 'text-gray-300 hover:bg-gray-800'}`}>
+                <i className="fas fa-hamburger text-lg w-8 text-center"></i>
+                <span>Thực đơn</span>
+              </Link>
+            </li>
+          </ul>
+        </div>
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center justify-between mb-4">
              <ThemeToggle />
@@ -51,12 +68,18 @@ const Navbar: React.FC = () => {
              <div className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center border-2 border-gray-800 shadow-sm"><i className="fas fa-user text-gray-300"></i></div>
              <div className="flex flex-col items-start text-left flex-1">
                 <span className="text-sm font-semibold text-gray-200 leading-tight truncate">{user?.fullName}</span>
-                <span className="text-xs text-blue-500 flex items-center gap-1"><i className="fas fa-hat-chef mr-1"></i>Đầu bếp</span>
+                <span className="text-xs text-orange-400 flex items-center gap-1"><i className="fas fa-hat-chef mr-1"></i>Đầu bếp</span>
              </div>
              <i className={`fas fa-chevron-up text-xs text-gray-500 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}></i>
           </button>
           {showUserMenu && (
              <div className="mt-2 w-full bg-gray-800 rounded-xl shadow-xl border border-gray-700 py-2 overflow-hidden">
+                <Link to="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700/50 w-full text-left transition-colors" onClick={() => setShowUserMenu(false)}>
+                   <i className="fas fa-circle-user w-5 text-center"></i> Hồ sơ cá nhân
+                </Link>
+                <Link to="/change-password" className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700/50 w-full text-left transition-colors" onClick={() => setShowUserMenu(false)}>
+                   <i className="fas fa-key w-5 text-center"></i> Đổi mật khẩu
+                </Link>
                 <button className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 w-full text-left transition-colors" onClick={() => { setShowUserMenu(false); logout(); }}>
                    <i className="fas fa-arrow-right-from-bracket w-5 text-center"></i> Đăng xuất
                 </button>
@@ -69,12 +92,12 @@ const Navbar: React.FC = () => {
 
   const allMenuItems = [
     { path: '/', label: 'Dashboard', icon: 'fa-chart-pie', permission: isAdmin },
-    { path: '/tables', label: 'Bàn & Khu vực', icon: 'fa-concierge-bell', permission: isAdmin || isCashier },
-    { path: '/orders', label: 'Đơn hàng', icon: 'fa-file-invoice-dollar', permission: isAdmin || isCashier },
-    { path: '/products', label: 'Thực đơn', icon: 'fa-hamburger', permission: isAdmin },
-    { path: '/categories', label: 'Danh mục', icon: 'fa-layer-group', permission: isAdmin },
-    { path: '/inventory', label: 'Kho hàng', icon: 'fa-boxes', permission: isAdmin },
-    { path: '/suppliers', label: 'Nhà cung cấp', icon: 'fa-truck-loading', permission: isAdmin },
+    { path: '/tables', label: 'Bàn & Khu vực', icon: 'fa-concierge-bell', permission: isAdmin || isManager || isStaff },
+    { path: '/orders', label: 'Đơn hàng', icon: 'fa-file-invoice-dollar', permission: isAdmin || isManager || isStaff },
+    { path: '/products', label: 'Thực đơn', icon: 'fa-hamburger', permission: isAdmin || isManager },
+    { path: '/categories', label: 'Danh mục', icon: 'fa-layer-group', permission: isAdmin || isManager },
+    { path: '/inventory', label: 'Kho hàng', icon: 'fa-boxes', permission: isAdmin || isManager },
+    { path: '/suppliers', label: 'Nhà cung cấp', icon: 'fa-truck-loading', permission: isAdmin || isManager },
     { path: '/kitchen', label: 'Bếp', icon: 'fa-fire-burner', permission: isAdmin },
     { path: '/statistics', label: 'Thống kê', icon: 'fa-chart-area', permission: isAdmin },
     { path: '/users', label: 'Người dùng', icon: 'fa-user-friends', permission: isAdmin },
@@ -160,7 +183,7 @@ const Navbar: React.FC = () => {
 
         {/* Footer Actions */}
         <div className="p-4 border-t border-gray-100 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-slate-900/50">
-<div className="flex items-center justify-between mb-4 px-2 hidden md:flex">
+          <div className="flex items-center justify-between mb-4 px-2 hidden md:flex">
               <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tiện ích</span>
               <div className="flex items-center gap-3">
                 <NotificationBell placement="top-left" />
@@ -182,7 +205,8 @@ const Navbar: React.FC = () => {
                 <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                   <i className={`fas ${
                     user?.role === ROLES.ADMIN ? 'fa-crown text-yellow-500' : 
-                    user?.role === 'Manager' ? 'fa-user-tie text-blue-600' : 
+                    user?.role === ROLES.MANAGER ? 'fa-user-tie text-blue-600' : 
+                    user?.role === ROLES.CHEF ? 'fa-hat-chef text-orange-400' :
                     'fa-user text-gray-400'
                   } text-[10px]`}></i>
                   {user?.role || 'Guest'}
@@ -215,6 +239,16 @@ const Navbar: React.FC = () => {
                   <i className="fas fa-key w-5 text-center text-gray-400"></i>
                   <span>Đổi mật khẩu</span>
                 </Link>
+                {(isAdmin || isManager) && (
+                  <Link
+                    to="/payment-settings"
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-blue-600 transition-colors"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    <i className="fas fa-credit-card w-5 text-center text-gray-400"></i>
+                    <span>Cấu hình thanh toán</span>
+                  </Link>
+                )}
                 <div className="h-px bg-gray-100 dark:bg-gray-700 my-1"></div>
                 <button
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 w-full text-left transition-colors font-medium"

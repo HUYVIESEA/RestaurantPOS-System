@@ -247,10 +247,6 @@ const OrderForm: React.FC = () => {
 
       await orderService.create(orderData as Omit<Order, 'id' | 'orderDate' | 'totalAmount'>);
       
-      if (selectedTable) {
-        await tableService.updateAvailability(selectedTable, false);
-      }
-      
       const selectedTableData = tables.find(t => t.id === selectedTable);
       setToastMessage(`Đã tạo đơn cho ${selectedTableData?.tableNumber || 'Mang về'}! Tổng: ${calculateTotal().toLocaleString('vi-VN')} đ`);
       setShowToast(true);

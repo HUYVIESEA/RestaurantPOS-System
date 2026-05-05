@@ -23,7 +23,7 @@ namespace RestaurantPOS.API.Controllers
 
         // GET: api/Orders
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,Staff")] // All staff can view orders
+        [Authorize(Roles = "Admin,Manager,Staff,Chef")] // All roles can view orders
         public async Task<ActionResult<PagedResult<Order>>> GetOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? status = null)
         {
             var result = await _orderService.GetOrdersAsync(page, pageSize, status);
@@ -88,6 +88,23 @@ namespace RestaurantPOS.API.Controllers
         public async Task<ActionResult<Order>> AddItemToOrder(int id, [FromBody] OrderItem item)
         {
             var updatedOrder = await _orderService.AddItemToOrderAsync(id, item);
+
+            if (updatedOrder == null)
+            {
+                return NotFound();
+            }
+
+            // ✅ Broadcast to all clients
+            await _hubContext.Clients.All.OrderUpdated(updatedOrder.Id);
+
+            return Ok(updatedOrder);
+        }
+
+        // POST: api/Orders/5/Items/Bulk - Add multiple items to existing order
+        [HttpPost("{id}/Items/Bulk")]
+        public async Task<ActionResult<Order>> AddItemsToOrder(int id, [FromBody] List<OrderItem> items)
+        {
+            var updatedOrder = await _orderService.AddItemsToOrderAsync(id, items);
 
             if (updatedOrder == null)
             {

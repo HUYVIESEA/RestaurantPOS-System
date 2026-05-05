@@ -27,15 +27,17 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
 
   if (allowedRoles && user?.role && !allowedRoles.includes(user.role)) {
     // Smart redirect based on role
+    if (user.role === ROLES.MANAGER) return <Navigate to="/tables" replace />;
+    if (user.role === ROLES.STAFF) return <Navigate to="/orders" replace />;
     if (user.role === ROLES.CHEF) return <Navigate to="/kitchen" replace />;
-    if (user.role === ROLES.CASHIER) return <Navigate to="/orders" replace />;
     return <Navigate to="/" replace />;
   }
 
   // Handle default redirect if user accesses "/"
   if (location.pathname === '/') {
+    if (user?.role === ROLES.MANAGER) return <Navigate to="/tables" replace />;
+    if (user?.role === ROLES.STAFF) return <Navigate to="/orders" replace />;
     if (user?.role === ROLES.CHEF) return <Navigate to="/kitchen" replace />;
-    if (user?.role === ROLES.CASHIER) return <Navigate to="/orders" replace />;
   }
 
   return children;

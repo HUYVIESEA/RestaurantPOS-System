@@ -52,6 +52,11 @@ export const orderService = {
     return response.data;
   },
 
+  addItems: async (orderId: number, items: Omit<OrderItem, 'id' | 'orderId' | 'unitPrice' | 'order' | 'product'>[]): Promise<Order> => {
+    const response = await apiClient.post<Order>(`/Orders/${orderId}/Items/bulk`, items);
+    return response.data;
+  },
+
   // ✅ NEW: Update item quantity
   updateItemQuantity: async (orderId: number, itemId: number, quantity: number): Promise<Order> => {
     const response = await apiClient.patch<Order>(`/Orders/${orderId}/Items/${itemId}`, quantity);

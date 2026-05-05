@@ -29,8 +29,9 @@ import UserForm from './components/Users/UserForm';
 import UserProfile from './components/Users/UserProfile';
 import ChangePassword from './components/Users/ChangePassword';
 import PaymentResult from './components/Payment/PaymentResult';
+import PaymentSettingsPage from './components/Payment/PaymentSettingsPage';
 import SupplierList from './components/Suppliers/SupplierList';
-import { ROUTE_PERMISSIONS } from './constants/roles';
+import { ROLES, ROUTE_PERMISSIONS } from './constants/roles';
 
 
 
@@ -92,6 +93,7 @@ function AppContent() {
               
               {/* Payment */}
               <Route path="/payment-result" element={<PrivateRoute allowedRoles={ROUTE_PERMISSIONS['/orders']}><PaymentResult /></PrivateRoute>} />
+              <Route path="/payment-settings" element={<PrivateRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER]}><PaymentSettingsPage /></PrivateRoute>} />
 
               {/* Suppliers */}
               <Route path="/suppliers" element={<PrivateRoute allowedRoles={ROUTE_PERMISSIONS['/suppliers']}><SupplierList /></PrivateRoute>} />

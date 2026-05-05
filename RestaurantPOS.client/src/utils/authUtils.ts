@@ -3,9 +3,10 @@ import { ROLES } from '../constants/roles';
 /**
  * Authorization Utilities
  * Provides helper functions for role-based access control in the frontend
+ * Roles: Admin, Manager, Staff (thu ngân/phục vụ), Chef (nhân viên bếp)
  */
 
-export type UserRole = typeof ROLES.ADMIN | typeof ROLES.CASHIER | typeof ROLES.CHEF | 'Manager' | 'Staff';
+export type UserRole = typeof ROLES.ADMIN | typeof ROLES.MANAGER | typeof ROLES.STAFF | typeof ROLES.CHEF;
 
 export interface Permission {
   canView: boolean;
@@ -31,24 +32,31 @@ export const isAdmin = (userRole: string | undefined): boolean => {
 };
 
 /**
- * Check if user is Manager (Legacy support)
+ * Check if user is Manager
  */
 export const isManager = (userRole: string | undefined): boolean => {
-  return userRole === 'Manager';
+  return userRole === ROLES.MANAGER;
 };
 
 /**
- * Check if user is Staff (Legacy support)
+ * Check if user is Staff (thu ngân/phục vụ)
  */
 export const isStaff = (userRole: string | undefined): boolean => {
-  return userRole === 'Staff' || userRole === ROLES.CASHIER || userRole === ROLES.CHEF;
+  return userRole === ROLES.STAFF;
+};
+
+/**
+ * Check if user is Chef (nhân viên bếp)
+ */
+export const isChef = (userRole: string | undefined): boolean => {
+  return userRole === ROLES.CHEF;
 };
 
 /**
  * Check if user is Admin or Manager
  */
 export const isAdminOrManager = (userRole: string | undefined): boolean => {
-  return userRole === ROLES.ADMIN || userRole === 'Manager';
+  return userRole === ROLES.ADMIN || userRole === ROLES.MANAGER;
 };
 
 /**
@@ -57,6 +65,10 @@ export const isAdminOrManager = (userRole: string | undefined): boolean => {
 export const getProductPermissions = (userRole: string | undefined): Permission => {
   if (isAdminOrManager(userRole)) {
     return { canView: true, canCreate: true, canEdit: true, canDelete: true };
+  }
+  // Chef can view products (to check ingredients, notes)
+  if (isChef(userRole)) {
+    return { canView: true, canCreate: false, canEdit: false, canDelete: false };
   }
   // Staff can only view
   return { canView: true, canCreate: false, canEdit: false, canDelete: false };
@@ -69,7 +81,6 @@ export const getCategoryPermissions = (userRole: string | undefined): Permission
   if (isAdminOrManager(userRole)) {
     return { canView: true, canCreate: true, canEdit: true, canDelete: true };
   }
-  // Staff can only view
   return { canView: true, canCreate: false, canEdit: false, canDelete: false };
 };
 
@@ -80,11 +91,11 @@ export const getOrderPermissions = (userRole: string | undefined): Permission =>
   if (isAdminOrManager(userRole)) {
     return { canView: true, canCreate: true, canEdit: true, canDelete: true };
   }
-  // Cashier can create and edit but not delete
-  if (userRole === ROLES.CASHIER || userRole === 'Staff') {
+  // Staff (thu ngân) can create and edit orders but not delete
+  if (isStaff(userRole)) {
     return { canView: true, canCreate: true, canEdit: true, canDelete: false };
   }
-  // Chef cannot do anything with orders directly, only kitchen view
+  // Chef cannot manage orders directly (only via kitchen view)
   return { canView: false, canCreate: false, canEdit: false, canDelete: false };
 };
 
@@ -95,9 +106,10 @@ export const getTablePermissions = (userRole: string | undefined): Permission =>
   if (isAdminOrManager(userRole)) {
     return { canView: true, canCreate: true, canEdit: true, canDelete: true };
   }
-  if (userRole === ROLES.CASHIER || userRole === 'Staff') {
+  if (isStaff(userRole)) {
     return { canView: true, canCreate: false, canEdit: false, canDelete: false };
   }
+  // Chef doesn't need table access
   return { canView: false, canCreate: false, canEdit: false, canDelete: false };
 };
 
@@ -108,7 +120,6 @@ export const getReportPermissions = (userRole: string | undefined): Permission =
   if (isAdminOrManager(userRole)) {
     return { canView: true, canCreate: false, canEdit: false, canDelete: false };
   }
-  // Staff cannot access reports
   return { canView: false, canCreate: false, canEdit: false, canDelete: false };
 };
 
@@ -119,15 +130,14 @@ export const getUserPermissions = (userRole: string | undefined): Permission => 
   if (isAdmin(userRole)) {
     return { canView: true, canCreate: true, canEdit: true, canDelete: true };
   }
-  // Manager and Staff cannot manage users
   return { canView: false, canCreate: false, canEdit: false, canDelete: false };
 };
 
 /**
- * Check if user can view all orders (Admin and Manager only)
+ * Check if user can view all orders
  */
 export const canViewAllOrders = (userRole: string | undefined): boolean => {
-  return isAdminOrManager(userRole) || userRole === ROLES.CASHIER;
+  return isAdminOrManager(userRole) || isStaff(userRole);
 };
 
 /**
@@ -144,13 +154,12 @@ export const getRoleDisplayName = (role: string | undefined): string => {
   switch (role) {
     case ROLES.ADMIN:
       return 'Quản trị viên';
-    case 'Manager':
+    case ROLES.MANAGER:
       return 'Quản lý';
-    case ROLES.CASHIER:
-    case 'Staff':
-      return 'Thu ngân';
+    case ROLES.STAFF:
+      return 'Nhân viên';
     case ROLES.CHEF:
-      return 'Bếp';
+      return 'Đầu bếp';
     default:
       return 'Không xác định';
   }
@@ -163,10 +172,9 @@ export const getRoleBadgeColor = (role: string | undefined): string => {
   switch (role) {
     case ROLES.ADMIN:
       return 'badge-danger'; // Red
-    case 'Manager':
+    case ROLES.MANAGER:
       return 'badge-primary'; // Blue
-    case ROLES.CASHIER:
-    case 'Staff':
+    case ROLES.STAFF:
       return 'badge-success'; // Green
     case ROLES.CHEF:
       return 'badge-warning'; // Orange
@@ -182,10 +190,9 @@ export const getRoleDescription = (role: string | undefined): string => {
   switch (role) {
     case ROLES.ADMIN:
       return 'Toàn quyền quản lý hệ thống';
-    case 'Manager':
+    case ROLES.MANAGER:
       return 'Quản lý vận hành nhà hàng';
-    case ROLES.CASHIER:
-    case 'Staff':
+    case ROLES.STAFF:
       return 'Nhân viên thu ngân/phục vụ';
     case ROLES.CHEF:
       return 'Nhân viên bếp';

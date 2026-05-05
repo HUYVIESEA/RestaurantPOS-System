@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using RestaurantPOS.API.Hubs;
@@ -8,6 +9,7 @@ namespace RestaurantPOS.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class DevicesController : ControllerBase
 {
     private readonly IDeviceService _deviceService;
@@ -33,6 +35,7 @@ public class DevicesController : ControllerBase
     }
 
     [HttpPost("refresh-code")]
+    [Authorize(Roles = "Admin")]
     public ActionResult<object> RefreshStoreCode()
     {
         return Ok(_deviceService.RefreshStoreCode());
@@ -65,6 +68,7 @@ public class DevicesController : ControllerBase
     }
 
     [HttpPost("approve/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ApproveDevice(Guid id)
     {
         try
@@ -80,6 +84,7 @@ public class DevicesController : ControllerBase
     }
 
     [HttpPost("reject/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RejectDevice(Guid id)
     {
         var result = await _deviceService.RejectDeviceAsync(id);
@@ -90,6 +95,7 @@ public class DevicesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RevokeDevice(Guid id)
     {
         var result = await _deviceService.RevokeDeviceAsync(id);

@@ -42,22 +42,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add MongoDB - Not configured
-// Add Memory Cache (L1) for hybrid caching
-builder.Services.AddMemoryCache(options =>
-{
-    options.SizeLimit = 1024; // Limit to 1024 entries
-    options.CompactionPercentage = 0.25; // Compact 25% when full
-});
-
-// Add Redis Cache (L2) for distributed caching
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
-    options.InstanceName = "RestaurantPOS_";
-});
-
-// Add Hybrid Cache Service (Memory + Redis)
-builder.Services.AddSingleton<ICacheService, HybridCacheService>();
+// builder.Services.AddMemoryCache(); // Disabled
+// builder.Services.AddStackExchangeRedisCache(...); // Disabled
 
 // Register application services
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -78,8 +64,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IShiftService, ShiftService>();
 
 // BigData Services - Not configured
-// Cache Warming Service (pre-load frequently accessed data)
-builder.Services.AddHostedService<CacheWarmingService>();
+// builder.Services.AddHostedService<CacheWarmingService>(); // Disabled
 
 // CQRS with MediatR (for enterprise scalability) - DISABLED temporarily
 // Requires model updates to match CQRS pattern

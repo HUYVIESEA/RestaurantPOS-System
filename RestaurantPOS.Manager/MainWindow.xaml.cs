@@ -242,7 +242,7 @@ namespace RestaurantPOS.Manager
         {
             Log("Starting Web Client...");
             // Use cmd /c to run npm, which is more robust on Windows when UseShellExecute is false
-            StartProcess("cmd.exe", "/c npm run dev", Path.Combine(_rootDirectory, "restaurant-pos-client"), true);
+            StartProcess("cmd.exe", "/c npm run dev", Path.Combine(_rootDirectory, "RestaurantPOS.Client"), true);
         }
 
         private void BtnStopWeb_Click(object sender, RoutedEventArgs e)
@@ -331,7 +331,7 @@ namespace RestaurantPOS.Manager
                     {
                         FileName = "npm",
                         Arguments = "install",
-                        WorkingDirectory = Path.Combine(_rootDirectory, "restaurant-pos-client"),
+                        WorkingDirectory = Path.Combine(_rootDirectory, "RestaurantPOS.Client"),
                         UseShellExecute = true,
                         CreateNoWindow = false
                     };
@@ -364,7 +364,7 @@ namespace RestaurantPOS.Manager
 
                     // 1. Build Frontend
                     Application.Current.Dispatcher.Invoke(() => Log("Building Frontend (React)..."));
-                    string frontendDir = Path.Combine(_rootDirectory, "restaurant-pos-client");
+                    string frontendDir = Path.Combine(_rootDirectory, "RestaurantPOS.Client");
                     // Use cmd to run npm to ensure it works in all environments
                     var psiNpm = new ProcessStartInfo
                     {
@@ -468,7 +468,7 @@ namespace RestaurantPOS.Manager
                 try
                 {
                     // Frontend
-                    string frontendDir = Path.Combine(_rootDirectory, "restaurant-pos-client");
+                    string frontendDir = Path.Combine(_rootDirectory, "RestaurantPOS.Client");
                     DeleteDirectory(Path.Combine(frontendDir, "node_modules"));
                     DeleteDirectory(Path.Combine(frontendDir, ".vite"));
                     DeleteDirectory(Path.Combine(frontendDir, "dist"));

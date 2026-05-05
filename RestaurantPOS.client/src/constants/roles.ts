@@ -1,6 +1,7 @@
 export const ROLES = {
   ADMIN: 'Admin',
-  CASHIER: 'Cashier',
+  MANAGER: 'Manager',
+  STAFF: 'Staff',
   CHEF: 'Chef'
 };
 
@@ -8,17 +9,19 @@ export const ROUTE_PERMISSIONS = {
   // Admin only
   '/statistics': [ROLES.ADMIN],
   '/users': [ROLES.ADMIN],
-  '/inventory': [ROLES.ADMIN],
-  '/products': [ROLES.ADMIN],
-  '/categories': [ROLES.ADMIN],
-  '/suppliers': [ROLES.ADMIN],
 
-  // Shared
-  '/orders': [ROLES.ADMIN, ROLES.CASHIER],
-  '/tables': [ROLES.ADMIN, ROLES.CASHIER],
+  // Admin + Manager
+  '/inventory': [ROLES.ADMIN, ROLES.MANAGER],
+  '/products': [ROLES.ADMIN, ROLES.MANAGER, ROLES.CHEF],
+  '/categories': [ROLES.ADMIN, ROLES.MANAGER],
+  '/suppliers': [ROLES.ADMIN, ROLES.MANAGER],
+
+  // Operations
+  '/orders': [ROLES.ADMIN, ROLES.MANAGER, ROLES.STAFF],
+  '/tables': [ROLES.ADMIN, ROLES.MANAGER, ROLES.STAFF],
   '/kitchen': [ROLES.ADMIN, ROLES.CHEF],
 
   // Everyone
-  '/profile': [ROLES.ADMIN, ROLES.CASHIER, ROLES.CHEF],
-  '/change-password': [ROLES.ADMIN, ROLES.CASHIER, ROLES.CHEF],
+  '/profile': [ROLES.ADMIN, ROLES.MANAGER, ROLES.STAFF, ROLES.CHEF],
+  '/change-password': [ROLES.ADMIN, ROLES.MANAGER, ROLES.STAFF, ROLES.CHEF],
 };

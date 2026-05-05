@@ -40,15 +40,16 @@ const OrderDetail: React.FC = () => {
 
   const handleAddItem = async (items: DialogCartItem[]) => {
     try {
-      for (const item of items) {
-        await orderService.addItem(parseInt(id!), {
-          productId: item.product.id,
-          quantity: item.quantity,
-          notes: item.notes || undefined,
-          variantId: item.variant?.id,
-          modifierItemIds: item.modifiers?.map(m => m.id)
-        });
-      }
+      const formattedItems = items.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        notes: item.notes || undefined,
+        variantId: item.variant?.id,
+        modifierItemIds: item.modifiers?.map(m => m.id)
+      }));
+
+      await orderService.addItems(parseInt(id!), formattedItems);
+      
       showSuccess(`Đã thêm ${items.length} món vào đơn hàng`);
       setShowAddDialog(false);
       await fetchOrderDetail();

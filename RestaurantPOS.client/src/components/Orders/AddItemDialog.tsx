@@ -20,11 +20,13 @@ interface AddItemDialogProps {
 }
 
 const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<DialogCartItem[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [configuringProduct, setConfiguringProduct] = useState<Product | null>(null);
 
@@ -39,7 +41,9 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
         productService.getAll(),
         categoryService.getAll(),
       ]);
-      setProducts(productsData.filter(p => p.isAvailable));
+      const availableProducts = productsData.filter(p => p.isAvailable);
+      setAllProducts(availableProducts);
+      setFilteredProducts(availableProducts);
       setCategories(categoriesData);
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -48,16 +52,26 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
     }
   };
 
-  const handleCategoryFilter = async (categoryId: number | null) => {
-    setSelectedCategory(categoryId);
-    try {
-      const data = categoryId
-        ? await productService.getByCategory(categoryId)
-        : await productService.getAll();
-      setProducts(data.filter(p => p.isAvailable));
-    } catch (err) {
-      console.error('Error filtering products:', err);
+  useEffect(() => {
+    let filtered = allProducts;
+    
+    if (selectedCategory !== null) {
+      filtered = filtered.filter(p => p.categoryId === selectedCategory);
     }
+    
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        p.category?.name.toLowerCase().includes(query)
+      );
+    }
+    
+    setFilteredProducts(filtered);
+  }, [selectedCategory, searchQuery, allProducts]);
+
+  const handleCategoryFilter = (categoryId: number | null) => {
+    setSelectedCategory(categoryId);
   };
 
   const addToCart = (product: Product, variant?: ProductVariant, modifiers: ModifierItem[] = [], qty: number = 1, customNotes: string = '') => {
@@ -133,28 +147,41 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-          {/* Category Filter */}
-          <div className="flex overflow-x-auto pb-2 gap-2 custom-scrollbar">
-            <button
-              className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-colors ${selectedCategory === null ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
-              onClick={() => handleCategoryFilter(null)}
-            >
-              Tất cả
-            </button>
-            {categories.map(category => (
+          {/* Search and Category Filter */}
+          <div className="space-y-3">
+            <div className="relative">
+              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input
+                type="text"
+                placeholder="Tìm món ăn..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-slate-100 dark:bg-slate-700 border-none rounded-xl text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+              />
+            </div>
+            
+            <div className="flex overflow-x-auto pb-2 gap-2 custom-scrollbar">
               <button
-                key={category.id}
-                className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-colors ${selectedCategory === category.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
-                onClick={() => handleCategoryFilter(category.id)}
+                className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-colors ${selectedCategory === null ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
+                onClick={() => handleCategoryFilter(null)}
               >
-                {category.name}
+                Tất cả
               </button>
-            ))}
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium transition-colors ${selectedCategory === category.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
+                  onClick={() => handleCategoryFilter(category.id)}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Product Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {products.map(product => {
+            {filteredProducts.map(product => {
               const inCartCount = cart.filter(c => c.product.id === product.id).reduce((sum, c) => sum + c.quantity, 0);
               return (
                 <div
@@ -172,8 +199,8 @@ const AddItemDialog: React.FC<AddItemDialogProps> = ({ onAdd, onCancel }) => {
             })}
           </div>
 
-          {products.length === 0 && (
-            <div className="text-center py-8 text-slate-500 dark:text-slate-400">Không có món nào</div>
+          {filteredProducts.length === 0 && !loading && (
+            <div className="text-center py-8 text-slate-500 dark:text-slate-400">Không tìm thấy món nào</div>
           )}
 
           {/* Cart Details */}
